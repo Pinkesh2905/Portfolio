@@ -372,10 +372,48 @@ function revealElement(element, delay = 0) {
     }, delay);
 }
 
-// Parallax Effect for Hero Section
-// function initializeParallax() {
-//     const heroSection = document.getElementById('hero');
-//     if (!heroSection) return;
-    
-//     window.addEventListener('scroll', () => {
-//         const scrolled = window.pageYOffset;
+
+// Parallax Hero
+function initializeParallax() {
+    const hero = document.getElementById('hero');
+    if (!hero) return;
+    window.addEventListener('scroll', () => {
+        hero.style.backgroundPositionY = `${window.scrollY * 0.4}px`;
+    });
+}
+
+// Contact Form
+function initializeContactForm() {
+    const form = document.getElementById('contactForm');
+    if (!form) return;
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = form.querySelector('[name="name"]').value.trim();
+        const email = form.querySelector('[name="email"]').value.trim();
+        const message = form.querySelector('[name="message"]').value.trim();
+
+        if (!name || !email || !message) {
+            alert('Please fill all fields.');
+            return;
+        }
+        alert('Message sent successfully!');
+        form.reset();
+    });
+}
+
+// Lazy Loading
+function initializeLazyLoading() {
+    const images = document.querySelectorAll('img[data-src]');
+    if (!images.length) return;
+    const imgObserver = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src;
+                img.removeAttribute('data-src');
+                obs.unobserve(img);
+            }
+        });
+    });
+    images.forEach(img => imgObserver.observe(img));
+}
