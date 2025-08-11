@@ -1,215 +1,381 @@
+// Portfolio JavaScript - Modern Interactive Features
+
 document.addEventListener('DOMContentLoaded', () => {
-    const navbar = document.getElementById('navbar');
-    const navMenu = document.querySelector('#navbar .nav-menu');
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelectorAll('#navbar .nav-link');
-    const sections = document.querySelectorAll('section[id]'); // Get all sections with an ID
-    const scrollToTopBtn = document.querySelector('.scroll-to-top');
-    const contactForm = document.getElementById('contact-form');
-    const formMessage = document.getElementById('form-message');
-    const currentYearSpan = document.getElementById('currentYear');
-
-    // Set current year in footer
-    if (currentYearSpan) {
-        currentYearSpan.textContent = new Date().getFullYear();
-    }
-
-    // --- Navbar Logic ---
-
-    // Hamburger menu toggle
-    if (hamburger && navMenu) {
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            navMenu.classList.toggle('active');
-        });
-
-        // Close menu when a link is clicked
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                if (navMenu.classList.contains('active')) {
-                    hamburger.classList.remove('active');
-                    navMenu.classList.remove('active');
-                }
-            });
-        });
-    }
-
-    // Sticky navbar and active link highlighting on scroll
-    function handleScroll() {
-        // Sticky navbar
-        if (window.scrollY > navbar.offsetHeight) {
-            navbar.classList.add('sticky');
-        } else {
-            navbar.classList.remove('sticky'); // This class isn't explicitly styled yet but can be used
-        }
-
-        // Scroll to top button visibility
-        if (scrollToTopBtn) {
-            if (window.scrollY > 300) {
-                scrollToTopBtn.classList.add('visible');
-            } else {
-                scrollToTopBtn.classList.remove('visible');
+    // Initialize all components
+    initializeLoader();
+    initializeNavigation();
+    initializeScrollEffects();
+    initializeTypewriter();
+    initializeAnimations();
+    initializeMobileMenu();
+    setCurrentYear();
+    
+    // Remove loader after everything is loaded
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const loader = document.getElementById('loading-screen');
+            if (loader) {
+                loader.style.opacity = '0';
+                loader.style.visibility = 'hidden';
+                setTimeout(() => loader.remove(), 500);
             }
+        }, 1000);
+    });
+});
+
+// Loader Animation
+function initializeLoader() {
+    const loader = document.getElementById('loading-screen');
+    if (!loader) return;
+    
+    // Add some loading text animations
+    const loadingTexts = [
+        'Loading Portfolio...',
+        'Preparing Experience...',
+        'Almost Ready...',
+        'Welcome!'
+    ];
+    
+    let currentIndex = 0;
+    const textElement = loader.querySelector('p');
+    
+    if (textElement) {
+        const interval = setInterval(() => {
+            textElement.style.opacity = '0';
+            setTimeout(() => {
+                textElement.textContent = loadingTexts[currentIndex];
+                textElement.style.opacity = '1';
+                currentIndex = (currentIndex + 1) % loadingTexts.length;
+            }, 200);
+        }, 800);
+        
+        // Clear interval when page loads
+        window.addEventListener('load', () => {
+            clearInterval(interval);
+        });
+    }
+}
+
+// Navigation and Header Effects
+function initializeNavigation() {
+    const header = document.getElementById('header');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('section[id]');
+    
+    // Navbar scroll effect
+    let lastScrollY = window.scrollY;
+    
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+        
+        // Add/remove scrolled class
+        if (scrollY > 100) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
         }
-
-        // Active link highlighting
-        let currentSectionId = '';
+        
+        // Hide/show navbar on scroll
+        if (scrollY > lastScrollY && scrollY > 500) {
+            header.style.transform = 'translateY(-100%)';
+        } else {
+            header.style.transform = 'translateY(0)';
+        }
+        lastScrollY = scrollY;
+        
+        // Update active navigation link
+        updateActiveNavLink();
+    });
+    
+    // Smooth scrolling for navigation links
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href');
+            const targetSection = document.querySelector(targetId);
+            
+            if (targetSection) {
+                const headerHeight = header.offsetHeight;
+                const targetPosition = targetSection.offsetTop - headerHeight - 20;
+                
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+                
+                // Close mobile menu if open
+                closeMobileMenu();
+            }
+        });
+    });
+    
+    function updateActiveNavLink() {
+        const headerHeight = header.offsetHeight;
+        let currentSection = '';
+        
         sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-            // Adjust offset for navbar height if it's fixed and opaque
-            const activationOffset = navbar.offsetHeight + 50;
-
-            if (pageYOffset >= sectionTop - activationOffset && pageYOffset < sectionTop + sectionHeight - activationOffset) {
-                currentSectionId = section.getAttribute('id');
+            const sectionTop = section.offsetTop - headerHeight - 100;
+            const sectionHeight = section.offsetHeight;
+            
+            if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+                currentSection = section.getAttribute('id');
             }
         });
         
-        // Special case for hero when at the very top
-        if (window.scrollY < sections[0].offsetTop + sections[0].clientHeight - (navbar.offsetHeight + 50)) {
-             if (sections[0].id === 'hero') currentSectionId = 'hero';
-        }
-
-
         navLinks.forEach(link => {
             link.classList.remove('active');
-            if (link.getAttribute('href').substring(1) === currentSectionId) {
+            if (link.getAttribute('href') === `#${currentSection}`) {
                 link.classList.add('active');
             }
         });
     }
+}
 
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initial call to set active link on page load
-
-    // --- Smooth Scrolling for all anchor links ---
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-
-            if (targetElement) {
-                let offset = navbar.offsetHeight;
-                // If target is hero, scroll to very top (0)
-                if (targetId === '#hero') {
-                    offset = 0;
-                     window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                } else {
-                     window.scrollTo({
-                        top: targetElement.offsetTop - offset + 1, // +1 for pixel perfection with some browsers
-                        behavior: 'smooth'
-                    });
-                }
-            }
+// Mobile Menu Functionality
+function initializeMobileMenu() {
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+    
+    if (hamburger && mobileMenu) {
+        hamburger.addEventListener('click', () => {
+            toggleMobileMenu();
         });
-    });
-
-
-    // --- Contact Form Submission (Basic Example) ---
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent default form submission
-
-            // Basic validation example (can be more robust)
-            const name = this.elements['name'].value.trim();
-            const email = this.elements['email'].value.trim();
-            const message = this.elements['message'].value.trim();
-
-            if (!name || !email || !message) {
-                displayFormMessage('Please fill in all required fields.', 'error');
-                return;
-            }
-            if (!isValidEmail(email)) {
-                displayFormMessage('Please enter a valid email address.', 'error');
-                return;
-            }
-
-            // Simulate form submission (replace with actual AJAX call)
-            displayFormMessage('Sending your message...', 'info'); // Optional: show sending status
-
-            // Example: Using Fetch API (you'd need a backend endpoint)
-            /*
-            const formData = new FormData(this);
-            fetch('YOUR_BACKEND_ENDPOINT', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json()) // Or .text() depending on backend response
-            .then(data => {
-                if (data.success) { // Assuming backend returns { success: true }
-                    displayFormMessage('Message sent successfully! Thank you.', 'success');
-                    contactForm.reset();
-                } else {
-                    displayFormMessage(data.message || 'An error occurred. Please try again.', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                displayFormMessage('An error occurred. Please try again later.', 'error');
+        
+        // Close menu when clicking on a link
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                closeMobileMenu();
             });
-            */
-
-            // For this demo, we'll just show a success message after a delay
-            setTimeout(() => {
-                displayFormMessage('Message sent successfully! (This is a demo)', 'success');
-                contactForm.reset();
-                setTimeout(() => displayFormMessage('', ''), 3000); // Clear message after a few seconds
-            }, 1500);
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+                closeMobileMenu();
+            }
         });
     }
-
-    function displayFormMessage(message, type) {
-        if (formMessage) {
-            formMessage.textContent = message;
-            formMessage.className = `form-message ${type}`; // type can be 'success', 'error', or 'info'
+    
+    function toggleMobileMenu() {
+        hamburger.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+        
+        // Prevent body scroll when menu is open
+        if (mobileMenu.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
         }
     }
-
-    function isValidEmail(email) {
-        // Basic email validation regex
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
+    
+    function closeMobileMenu() {
+        hamburger.classList.remove('active');
+        mobileMenu.classList.remove('active');
+        document.body.style.overflow = '';
     }
+    
+    // Make closeMobileMenu available globally
+    window.closeMobileMenu = closeMobileMenu;
+}
 
-    // --- Scroll Reveal / Animations (Simple Example) ---
-    // You can use a library like ScrollReveal.js for more advanced effects
-    // This is a very basic version:
-    const revealElements = document.querySelectorAll('.section-title, .skill-item, .project-card, .timeline-item, .hero-text > *, .hero-image-container');
+// Scroll to Top Button and General Scroll Effects
+function initializeScrollEffects() {
+    const scrollToTopBtn = document.getElementById('scrollToTop');
+    
+    window.addEventListener('scroll', () => {
+        // Show/hide scroll to top button
+        if (window.scrollY > 300) {
+            scrollToTopBtn.classList.add('visible');
+        } else {
+            scrollToTopBtn.classList.remove('visible');
+        }
+    });
+    
+    // Scroll to top functionality
+    if (scrollToTopBtn) {
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+}
 
-    const revealObserver = new IntersectionObserver((entries, observer) => {
+// Typewriter Effect
+function initializeTypewriter() {
+    const typewriterElement = document.getElementById('typewriter');
+    if (!typewriterElement) return;
+    
+    const texts = [
+        'MCA Student',
+        'Aspiring Software Developer',
+        'Full Stack Developer',
+        'Problem Solver',
+        'Tech Enthusiast'
+    ];
+    
+    let textIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let typeDelay = 100;
+    
+    function typeWriter() {
+        const currentText = texts[textIndex];
+        
+        if (isDeleting) {
+            typewriterElement.textContent = currentText.substring(0, charIndex - 1);
+            charIndex--;
+            typeDelay = 50;
+        } else {
+            typewriterElement.textContent = currentText.substring(0, charIndex + 1);
+            charIndex++;
+            typeDelay = 100;
+        }
+        
+        if (!isDeleting && charIndex === currentText.length) {
+            typeDelay = 2000; // Pause at end
+            isDeleting = true;
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            textIndex = (textIndex + 1) % texts.length;
+            typeDelay = 500; // Pause before next text
+        }
+        
+        setTimeout(typeWriter, typeDelay);
+    }
+    
+    // Start typewriter effect
+    setTimeout(typeWriter, 1000);
+}
+
+// Scroll-triggered Animations
+function initializeAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('revealed'); // Add a class to trigger CSS animation
-                // observer.unobserve(entry.target); // Optional: stop observing once revealed
-            } else {
-                // entry.target.classList.remove('revealed'); // Optional: remove class to re-animate on scroll up
+                entry.target.classList.add('animate');
+                
+                // Special handling for skills grid - stagger animation
+                if (entry.target.classList.contains('skills-grid')) {
+                    animateSkillCards();
+                }
+                
+                // Special handling for project cards
+                if (entry.target.classList.contains('projects-grid')) {
+                    animateProjectCards();
+                }
+                
+                // Counter animation for stats
+                if (entry.target.classList.contains('stat-card')) {
+                    animateCounter(entry.target);
+                }
             }
         });
-    }, { threshold: 0.1 }); // Trigger when 10% of the element is visible
+    }, observerOptions);
+    
+    // Observe elements for animation
+    const animatedElements = document.querySelectorAll([
+        '.fade-in-up',
+        '.fade-in-left', 
+        '.fade-in-right',
+        '.skills-grid',
+        '.projects-grid',
+        '.stat-card',
+        '.timeline-item',
+        '.contact-card'
+    ].join(', '));
+    
+    animatedElements.forEach(el => observer.observe(el));
+}
 
-    revealElements.forEach(el => {
-        revealObserver.observe(el);
+// Skill Cards Animation
+function animateSkillCards() {
+    const skillCards = document.querySelectorAll('.skill-card');
+    skillCards.forEach((card, index) => {
+        setTimeout(() => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'all 0.6s ease';
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 50);
+        }, index * 100);
     });
-    // Add CSS for .revealed class (e.g., opacity, transform) in style.css if you want animations
-    // Example CSS for reveal (add to style.css):
-    /*
-    .section-title, .skill-item, .project-card, .timeline-item, .hero-text > *, .hero-image-container {
-        opacity: 0;
-        transform: translateY(30px);
-        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-    }
-    .revealed {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    */
-    // Note: The above CSS is commented out. You'd add it to your style.css and uncomment it,
-    // then uncomment the .revealed class addition in the JS observer.
-    // For simplicity in this example, I'm not including the CSS animation part directly,
-    // but the JS setup is here if you want to implement it.
+}
 
-});
+// Project Cards Animation
+function animateProjectCards() {
+    const projectCards = document.querySelectorAll('.project-card');
+    projectCards.forEach((card, index) => {
+        setTimeout(() => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(50px)';
+            card.style.transition = 'all 0.8s ease';
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 50);
+        }, index * 200);
+    });
+}
+
+// Counter Animation for Stats
+function animateCounter(element) {
+    const numberElement = element.querySelector('div:first-child');
+    if (!numberElement) return;
+    
+    const finalNumber = parseInt(numberElement.textContent);
+    const suffix = numberElement.textContent.replace(/[0-9]/g, '');
+    let currentNumber = 0;
+    const increment = finalNumber / 30;
+    
+    const counter = setInterval(() => {
+        currentNumber += increment;
+        if (currentNumber >= finalNumber) {
+            numberElement.textContent = finalNumber + suffix;
+            clearInterval(counter);
+        } else {
+            numberElement.textContent = Math.floor(currentNumber) + suffix;
+        }
+    }, 50);
+}
+
+// Utility Functions
+function setCurrentYear() {
+    const yearElement = document.getElementById('currentYear');
+    if (yearElement) {
+        yearElement.textContent = new Date().getFullYear();
+    }
+}
+
+// Smooth Reveal Animation for Elements
+function revealElement(element, delay = 0) {
+    setTimeout(() => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(30px)';
+        element.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+        
+        requestAnimationFrame(() => {
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
+        });
+    }, delay);
+}
+
+// Parallax Effect for Hero Section
+// function initializeParallax() {
+//     const heroSection = document.getElementById('hero');
+//     if (!heroSection) return;
+    
+//     window.addEventListener('scroll', () => {
+//         const scrolled = window.pageYOffset;
