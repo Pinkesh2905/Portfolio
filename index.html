@@ -4,16 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pinkesh - Portfolio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        'primary': '#3b82f6',
+                        'primary-dark': '#1d4ed8',
+                        'secondary': '#64748b',
+                        'accent': '#f59e0b'
+                    }
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <header id="header">
-        <nav id="navbar">
-            <div class="container">
-                <a href="#hero" class="logo">Pinkesh</a>
-                <ul class="nav-menu">
+<body class="font-inter bg-white text-gray-800">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="flex flex-col items-center">
+            <div class="loading-spinner"></div>
+            <p class="mt-4 text-lg text-gray-600">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header id="header" class="fixed top-0 left-0 w-full z-40 transition-all duration-300">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <a href="#hero" class="text-2xl font-bold text-gray-800 hover:text-primary transition-colors">
+                    <span class="text-primary">&lt;</span>Pinkesh<span class="text-primary">/&gt;</span>
+                </a>
+                
+                <!-- Desktop Menu -->
+                <ul class="hidden md:flex space-x-8">
                     <li><a href="#hero" class="nav-link active">Home</a></li>
                     <li><a href="#about" class="nav-link">About</a></li>
                     <li><a href="#skills" class="nav-link">Skills</a></li>
@@ -21,175 +53,293 @@
                     <li><a href="#experience" class="nav-link">Experience</a></li>
                     <li><a href="#contact" class="nav-link">Contact</a></li>
                 </ul>
-                <div class="hamburger">
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden hamburger" id="hamburger">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="md:hidden mobile-menu">
+                <ul class="pt-8 pb-4">
+                    <li><a href="#hero" class="mobile-nav-link">Home</a></li>
+                    <li><a href="#about" class="mobile-nav-link">About</a></li>
+                    <li><a href="#skills" class="mobile-nav-link">Skills</a></li>
+                    <li><a href="#projects" class="mobile-nav-link">Projects</a></li>
+                    <li><a href="#experience" class="mobile-nav-link">Experience</a></li>
+                    <li><a href="#contact" class="mobile-nav-link">Contact</a></li>
+                </ul>
             </div>
         </nav>
     </header>
 
-    <section id="hero" class="section">
-        <div class="container hero-content">
-            <div class="hero-text">
-                <h1>Hi, I'm <span class="highlight">Pinkesh</span></h1>
-                <p class="subtitle">MCA Student | Aspiring Software Developer</p>
-                <p class="description">
-                    I build modern, responsive, and user-friendly web applications.
-                    Passionate about clean code and innovative solutions.
-                </p>
-                <div class="hero-buttons">
-                    <a href="#projects" class="btn btn-primary">View My Work</a>
-                    <a href="https://drive.google.com/file/d/1RXhTWSuBNYsR9CkMpFoBrgzu4dkO-Q34/view?usp=sharing" target="_blank" class="btn btn-secondary">Download CV <i class="fas fa-download"></i></a>
+    <!-- Hero Section -->
+    <section id="hero" class="min-h-screen flex items-center bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
+        <div class="floating-shapes"></div>
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col lg:flex-row items-center justify-between">
+                <div class="lg:w-1/2 text-center lg:text-left">
+                    <div class="fade-in-up">
+                        <h1 class="text-4xl md:text-6xl font-bold mb-4">
+                            Hi, I'm <span class="text-primary gradient-text">Pinkesh</span>
+                        </h1>
+                        <div class="typewriter-container mb-6">
+                            <p class="text-xl md:text-2xl text-secondary">
+                                <span id="typewriter"></span>
+                            </p>
+                        </div>
+                        <p class="text-lg text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0">
+                            I build modern, responsive, and user-friendly web applications. 
+                            Passionate about clean code and innovative solutions.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                            <a href="#projects" class="btn-primary group">
+                                View My Work
+                                <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                            </a>
+                            <a href="https://drive.google.com/file/d/1AZbmTQfv4o9uaFf_UnuGv8Q2ebWnvS4x/view?usp=sharing" target="_blank" class="btn-secondary group">
+                                Download CV
+                                <i class="fas fa-download ml-2 group-hover:animate-bounce"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="hero-image-container">
-                <div class="hero-image-placeholder">
-                    <!-- <i class="fas fa-user-tie fa-5x"></i> -->
-                    <img src="profile.jpg" alt="" style="border-radius: 150px; border: dotted rgb(0, 85, 255);">
+                <div class="lg:w-1/2 mt-12 lg:mt-0 flex justify-center">
+                    <div class="hero-image-container fade-in-right">
+                        <div class="relative">
+                            <img src="https://drive.google.com/file/d/1LNvY1EhsNdYdzFNCuEADhro6fEjkymTY/view?usp=sharing" 
+                                 alt="Pinkesh Profile" 
+                                 class="w-80 h-80 rounded-full object-cover border-4 border-white shadow-2xl">
+                            <div class="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 opacity-20"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="about" class="section bg-light">
-        <div class="container">
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
             <h2 class="section-title">About Me</h2>
-            <div class="about-content">
-                <div class="about-image-container">
-                     <div class="about-image-placeholder">
-                        <i class="fas fa-user-circle fa-4x"></i>
-                     </div>
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="order-2 lg:order-1">
+                    <div class="space-y-6">
+                        <p class="text-lg leading-relaxed fade-in-left">
+                            Hello! I'm Pinkesh, a dedicated and results-oriented software developer with a strong foundation in full-stack web development and modern technologies like MERN, Django, and Flutter. I thrive on transforming real-world problems into elegant and functional applications.
+                        </p>
+                        <p class="text-lg leading-relaxed fade-in-left" style="animation-delay: 0.2s">
+                            My journey in tech started during my B.Sc. IT and grew during my MCA, where I built case-study projects like Bloom (a mental wellness platform), MockMate (placement preparation platform), and EatZy food delivery system. I love exploring new frameworks and turning ideas into reality.
+                        </p>
+                        <p class="text-lg leading-relaxed fade-in-left" style="animation-delay: 0.4s">
+                            Outside of development, I enjoy listening to music and learning new technologies through real project-building.
+                        </p>
+                        <div class="flex flex-wrap gap-4 mt-8">
+                            <div class="stat-card">
+                                <div class="text-2xl font-bold text-primary">3+</div>
+                                <div class="text-sm text-gray-600">Projects Completed</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="text-2xl font-bold text-primary">4+</div>
+                                <div class="text-sm text-gray-600">Years Learning</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="text-2xl font-bold text-primary">10+</div>
+                                <div class="text-sm text-gray-600">Technologies</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="about-text">
-                    <p>
-                        Hello! I'm Pinkesh, a dedicated and results-oriented software developer with a strong foundation in full-stack web development and modern technologies like MEAN, Django, and Flutter. I thrive on transforming real-world problems into elegant and functional apps.
-                    </p>
-                    <p>
-                        My journey in tech started during my B.Sc. IT and grew during my MCA, where I built case-study projects like Bloom (a mental wellness platform) and food delivery systems. I love exploring new frameworks and turning ideas into reality.
-                    </p>
-                    <p>
-                        Outside of development, I enjoy listening to music and learning new tech through real project-building.
-                    </p>
+                <div class="order-1 lg:order-2 flex justify-center">
+                    <div class="about-image-container fade-in-right">
+                        <div class="relative p-8">
+                            <div class="w-64 h-64 bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-code text-6xl text-primary opacity-80"></i>
+                            </div>
+                            <div class="absolute -top-4 -right-4 w-24 h-24 bg-accent rounded-full flex items-center justify-center">
+                                <i class="fas fa-laptop-code text-2xl text-white"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="skills" class="section">
-        <div class="container">
+    <!-- Skills Section -->
+    <section id="skills" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
             <h2 class="section-title">My Skills</h2>
             <div class="skills-grid">
-                <div class="skill-item">
-                    <i class="fab fa-html5 skill-icon" style="color: #e34f26;"></i>
+                <div class="skill-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="skill-icon" style="background: linear-gradient(135deg, #e34f26, #f06529)">
+                        <i class="fab fa-html5"></i>
+                    </div>
                     <h3>HTML5</h3>
                 </div>
-                <div class="skill-item">
-                    <i class="fab fa-css3-alt skill-icon" style="color: #1572b6;"></i>
+                <div class="skill-card" data-aos="fade-up" data-aos-delay="150">
+                    <div class="skill-icon" style="background: linear-gradient(135deg, #1572b6, #33a9dc)">
+                        <i class="fab fa-css3-alt"></i>
+                    </div>
                     <h3>CSS3</h3>
                 </div>
-                <div class="skill-item">
-                    <i class="fab fa-js-square skill-icon" style="color: #f7df1e;"></i>
+                <div class="skill-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="skill-icon" style="background: linear-gradient(135deg, #f7df1e, #f0db4f)">
+                        <i class="fab fa-js-square"></i>
+                    </div>
                     <h3>JavaScript</h3>
                 </div>
-                <div class="skill-item">
-                    <i class="fab fa-react skill-icon" style="color: #61dafb;"></i>
+                <div class="skill-card" data-aos="fade-up" data-aos-delay="250">
+                    <div class="skill-icon" style="background: linear-gradient(135deg, #61dafb, #21d4fd)">
+                        <i class="fab fa-react"></i>
+                    </div>
                     <h3>React</h3>
                 </div>
-                <div class="skill-item">
-                    <i class="fab fa-node-js skill-icon" style="color: #339933;"></i>
+                <div class="skill-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="skill-icon" style="background: linear-gradient(135deg, #339933, #66bb6a)">
+                        <i class="fab fa-node-js"></i>
+                    </div>
                     <h3>Node.js</h3>
                 </div>
-                <div class="skill-item">
-                    <i class="fas fa-database skill-icon" style="color: #4db33d;"></i>
+                <div class="skill-card" data-aos="fade-up" data-aos-delay="350">
+                    <div class="skill-icon" style="background: linear-gradient(135deg, #4db33d, #66bb6a)">
+                        <i class="fas fa-database"></i>
+                    </div>
                     <h3>MongoDB</h3>
                 </div>
-                <div class="skill-item">
-                    <i class="fab fa-python skill-icon" style="color: #3776ab;"></i>
+                <div class="skill-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="skill-icon" style="background: linear-gradient(135deg, #3776ab, #4b8bbe)">
+                        <i class="fab fa-python"></i>
+                    </div>
                     <h3>Python</h3>
                 </div>
-                <div class="skill-item">
-                    <i class="fab fa-git-alt skill-icon" style="color: #f05032;"></i>
+                <div class="skill-card" data-aos="fade-up" data-aos-delay="450">
+                    <div class="skill-icon" style="background: linear-gradient(135deg, #f05032, #fd7e14)">
+                        <i class="fab fa-git-alt"></i>
+                    </div>
                     <h3>Git & GitHub</h3>
                 </div>
-                <div class="skill-item">
-                    <i class="fas fa-brain skill-icon" style="color: #9c27b0;"></i>
+                <div class="skill-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="skill-icon" style="background: linear-gradient(135deg, #092e20, #0f4c3a)">
+                        <i class="fab fa-python"></i>
+                    </div>
                     <h3>Django</h3>
                 </div>
-                <div class="skill-item">
-                    <i class="fas fa-mobile-alt skill-icon" style="color: #03a9f4;"></i>
+                <div class="skill-card" data-aos="fade-up" data-aos-delay="550">
+                    <div class="skill-icon" style="background: linear-gradient(135deg, #03a9f4, #0288d1)">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
                     <h3>Flutter</h3>
                 </div>
-                <div class="skill-item">
-                    <i class="fab fa-angular skill-icon" style="color: #dd0031;"></i>
-                    <h3>AngularJS</h3>
+                <div class="skill-card" data-aos="fade-up" data-aos-delay="600">
+                    <div class="skill-icon" style="background: linear-gradient(135deg, #dd0031, #c3002f)">
+                        <i class="fab fa-angular"></i>
+                    </div>
+                    <h3>Angular</h3>
                 </div>
-
+                <div class="skill-card" data-aos="fade-up" data-aos-delay="650">
+                    <div class="skill-icon" style="background: linear-gradient(135deg, #38b2ac, #4fd1c7)">
+                        <i class="fas fa-wind"></i>
+                    </div>
+                    <h3>Tailwind CSS</h3>
                 </div>
+            </div>
         </div>
     </section>
 
-    <section id="projects" class="section bg-light">
-        <div class="container">
-            <h2 class="section-title">My Projects</h2>
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title">Featured Projects</h2>
             <div class="projects-grid">
-                <div class="project-card">
-                    <div class="project-image-placeholder">
-                        <!-- Project Thumbnail 1 -->
-                         <img src="bloom.png" alt="" >
+                <!-- Project 1: Bloom -->
+                <div class="project-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="project-image">
+                        <img src="assets/Screenshot 2025-06-02 121817.png" alt="Bloom Mental Wellness Platform">
+                        <div class="project-overlay">
+                            <div class="project-links">
+                                <a href="https://bloom-pwns.onrender.com/" target="_blank" class="project-btn">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="https://github.com/Pinkesh2905/bloom" target="_blank" class="project-btn">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="project-info">
+                    <div class="project-content">
+                        <div class="project-category">Web Application</div>
                         <h3 class="project-title">Bloom – Mental Wellness Platform</h3>
                         <p class="project-description">
-                            A Django-based mental health platform with mood tracking, therapy tips, and a static chatbot (Bloom Bot). Integrated voice input and chat history features.
+                            A comprehensive Django-based mental health platform featuring mood tracking, therapy tips, and an intelligent chatbot (Bloom Bot) with voice input capabilities and chat history.
                         </p>
-                        <p class="project-tech-stack">
-                            <strong>Technologies:</strong> Django, SQLite, JavaScript, CSS
-                        </p>
-
-                        <div class="project-links">
-                            <a href="https://bloom-qug6.onrender.com/" target="_blank" class="btn-project"><i class="fas fa-eye"></i> Live Demo</a>
-                            <a href="https://github.com/Pinkesh2905/bloom" target="_blank" class="btn-project"><i class="fab fa-github"></i> View Code</a>
+                        <div class="project-tech">
+                            <span class="tech-tag">Django</span>
+                            <span class="tech-tag">SQLite</span>
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">CSS</span>
                         </div>
                     </div>
                 </div>
-                <div class="project-card">
-                    <div class="project-image-placeholder">
-                        <!-- Project Thumbnail 2 -->
-                         <img src="eatzy.png" alt="">
-                    </div>
-                    <div class="project-info">
-                        <h3 class="project-title">MEAN Stack Food Delivery App</h3>
-                        <p class="project-description">
-                            Built a dynamic AngularJS app with user login, cart, search/filter, admin panel, and MongoDB backend. Handles real-time updates and UI logic.
-                        </p>
-                        <p class="project-tech-stack">
-                            <strong>Technologies:</strong> AngularJS, ExpressJS, MongoDB, NodeJS
-                        </p>
 
-                        <div class="project-links">
-                            <!-- <a href="#" target="_blank" class="btn-project"><i class="fas fa-eye"></i> Live Demo</a> -->
-                            <a href="https://github.com/Pinkesh2905/EatZy" target="_blank" class="btn-project"><i class="fab fa-github"></i> View Code</a>
+                <!-- Project 2: EatZy -->
+                <div class="project-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="project-image">
+                        <img src="assets/Screenshot 2025-06-02 124235.png" alt="EatZy Food Delivery App">
+                        <div class="project-overlay">
+                            <div class="project-links">
+                                <a href="https://github.com/Pinkesh2905/EatZy" target="_blank" class="project-btn">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <div class="project-category">Full Stack App</div>
+                        <h3 class="project-title">EatZy - Food Delivery App</h3>
+                        <p class="project-description">
+                            A dynamic food delivery application built with MEAN stack featuring user authentication, shopping cart, search/filter functionality, admin panel, and real-time updates.
+                        </p>
+                        <div class="project-tech">
+                            <span class="tech-tag">MongoDB</span>
+                            <span class="tech-tag">Express.js</span>
+                            <span class="tech-tag">Angular</span>
+                            <span class="tech-tag">Node.js</span>
                         </div>
                     </div>
                 </div>
-                <div class="project-card">
-                    <div class="project-image-placeholder">
-                        <!-- Project Thumbnail 3 -->
-                         <img src="coffee.png" alt="">
+
+                <!-- Project 3: MockMate -->
+                <div class="project-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="project-image">
+                        <div class="project-placeholder">
+                            <i class="fas fa-graduation-cap text-6xl text-primary opacity-60"></i>
+                        </div>
+                        <div class="project-overlay">
+                            <div class="project-links">
+                                <a href="#" class="project-btn disabled">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="https://github.com/Pinkesh2905/mockmate" class="project-btn disabled">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="project-info">
-                        <h3 class="project-title">Coffee Shop</h3>
+                    <div class="project-content">
+                        <div class="project-category">EdTech Social Platform</div>
+                        <h3 class="project-title">MockMate - Placement and Interview Buddy </h3>
                         <p class="project-description">
-                            A beautifully designed static website for a coffee shop with a menu, gallery, and contact form. Built with HTML, CSS, and a hint of JavaScript for interactivity.
+                            A comprehensive placement preparation platform for freshers featuring aptitude tests, Social connections, LeetCode-style problem solving interface, and AI-powered mock interviews.
                         </p>
-                        <p class="project-tech-stack">
-                            <strong>Technologies:</strong> HTML, CSS, JS
-                        </p>
-                        <div class="project-links">
-                            <a href="https://pinkesh2905.github.io/coffeeshop/" target="_blank" class="btn-project"><i class="fas fa-eye"></i> Live Demo</a>
-                            <a href="https://github.com/Pinkesh2905/coffeeshop" target="_blank" class="btn-project"><i class="fab fa-github"></i> View Code</a>
+                        <div class="project-tech">
+                            <span class="tech-tag">Django</span>
+                            <span class="tech-tag">Python</span>
+                            <span class="tech-tag">AI Integration</span>
+                            <span class="tech-tag">PostgreSQL</span>
                         </div>
                     </div>
                 </div>
@@ -197,83 +347,121 @@
         </div>
     </section>
 
-    <section id="experience" class="section">
-        <div class="container">
-            <h2 class="section-title">Work Experience</h2>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-icon"><i class="fas fa-briefcase"></i></div>
+    <!-- Experience Section -->
+    <section id="experience" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title">Experience & Learning Journey</h2>
+            <div class="timeline-container">
+                <div class="timeline-line"></div>
+                
+                <div class="timeline-item fade-in-up">
+                    <div class="timeline-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
                     <div class="timeline-content">
-                        <h3 class="timeline-title">Project-Based Learning</h3>
-                        <span class="timeline-date">2023 - Present</span>
+                        <div class="timeline-date">2023 - Present</div>
+                        <h3 class="timeline-title">Project-Based Learning & Development</h3>
                         <p class="timeline-description">
-                            Gained hands-on experience by building multiple personal and academic projects, including case studies assigned by college. Worked with technologies like Django, AngularJS, Node.js, MongoDB, and Flutter to create real-world web and mobile applications.
+                            Gained hands-on experience by building multiple personal and academic projects, including case studies assigned by college. Worked with cutting-edge technologies like Django, Angular, React, Node.js, MongoDB, and Flutter to create real-world web and mobile applications.
                         </p>
-
+                        <div class="timeline-achievements">
+                            <div class="achievement-item">
+                                <i class="fas fa-check-circle text-green-500"></i>
+                                <span>Built 5+ web applications</span>
+                            </div>
+                            <div class="achievement-item">
+                                <i class="fas fa-check-circle text-green-500"></i>
+                                <span>Mastered full-stack development</span>
+                            </div>
+                            <div class="achievement-item">
+                                <i class="fas fa-check-circle text-green-500"></i>
+                                <span>Deployed production-ready apps</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <!-- <div class="timeline-item">
-                    <div class="timeline-icon"><i class="fas fa-briefcase"></i></div>
-                    <div class="timeline-content">
-                        <span class="timeline-date">June 2020 - Dec 2021</span>
-                        <h3 class="timeline-title">Software Engineer - Innovatech Ltd.</h3>
-                        <p class="timeline-description">
-                            Developed and maintained features for a SaaS platform using JavaScript and Python.
-                            Collaborated with cross-functional teams to deliver high-quality software.
-                        </p>
-                    </div>
-                </div> -->
             </div>
         </div>
     </section>
 
-    <section id="contact" class="section bg-light">
-        <div class="container">
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
             <h2 class="section-title">Get In Touch</h2>
-            <div class="contact-content">
-                <div class="contact-info">
-                    <p>
-                        I'm currently open to new opportunities and collaborations.
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-12">
+                    <p class="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
+                        I'm currently open to new opportunities and collaborations. 
                         If you have a project in mind, a question, or just want to say hi, feel free to reach out!
                     </p>
-                    <ul>
-                        <li><i class="fas fa-envelope"></i> <a href="pinkeshd29@gmail.com">pinkeshd29@gmail.com</a></li>
-                        <li><i class="fas fa-phone"></i> <a href="+91 9875034836">+91 9875034836</a></li>
-                        <li><i class="fas fa-map-marker-alt"></i> Borsad, Gujarat, India </li>
-                    </ul>
-                    <div class="social-links-contact">
-                        <a href="https://github.com/Pinkesh2905" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                        <a href="https://www.linkedin.com/in/pinkesh-darji-3731b9266?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                        <a href="https://x.com/techexplorer29" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        </div>
                 </div>
-                <form id="contact-form" class="contact-form">
-                    <div class="form-group">
-                        <input type="text" name="name" placeholder="Your Name" required>
+                
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Email -->
+                    <div class="contact-card fade-in-up">
+                        <div class="contact-icon bg-blue-100 text-blue-600">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3 class="contact-title">Email</h3>
+                        <a href="mailto:pinkeshd29@gmail.com" class="contact-info">pinkeshd29@gmail.com</a>
                     </div>
-                    <div class="form-group">
-                        <input type="email" name="email" placeholder="Your Email" required>
+                    
+                    <!-- Phone -->
+                    <div class="contact-card fade-in-up" style="animation-delay: 0.2s">
+                        <div class="contact-icon bg-green-100 text-green-600">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h3 class="contact-title">Phone</h3>
+                        <a href="tel:+919875034836" class="contact-info">+91 9875034836</a>
                     </div>
-                    <div class="form-group">
-                        <input type="text" name="subject" placeholder="Subject" required>
+                    
+                    <!-- Location -->
+                    <div class="contact-card fade-in-up" style="animation-delay: 0.4s">
+                        <div class="contact-icon bg-purple-100 text-purple-600">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h3 class="contact-title">Location</h3>
+                        <span class="contact-info">Borsad, Gujarat, India</span>
                     </div>
-                    <div class="form-group">
-                        <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Send Message <i class="fas fa-paper-plane"></i></button>
-                    <div id="form-message" class="form-message"></div>
-                </form>
+                </div>
+                
+                <!-- Social Links -->
+                <div class="flex justify-center space-x-6 mt-12">
+                    <a href="https://github.com/Pinkesh2905" target="_blank" class="social-link bg-gray-800 hover:bg-gray-900">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/pinkesh-darji-3731b9266/" target="_blank" class="social-link bg-blue-600 hover:bg-blue-700">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="https://x.com/techexplorer29" target="_blank" class="social-link bg-blue-400 hover:bg-blue-500">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="mailto:pinkeshd29@gmail.com" class="social-link bg-red-500 hover:bg-red-600">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </section>
 
-    <footer id="footer">
-        <div class="container">
-            <p>&copy; <span id="currentYear"></span> Pinkesh. All Rights Reserved.</p>
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-6">
+            <div class="text-center">
+                <p class="mb-4">
+                    &copy; <span id="currentYear">2025</span> Pinkesh. All Rights Reserved.
+                </p>
+                <p class="text-gray-400">
+                    Built with <i class="fas fa-heart text-red-500"></i> and <i class="fas fa-code text-blue-400"></i>
+                </p>
+            </div>
         </div>
     </footer>
 
-    <a href="#" class="scroll-to-top"><i class="fas fa-arrow-up"></i></a>
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTop" class="scroll-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
     <script src="script.js"></script>
 </body>
