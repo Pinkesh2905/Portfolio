@@ -296,6 +296,22 @@ body {
     animation: pulse-ring 2s infinite;
 }
 
+#hero {
+    padding-top: calc(var(--header-height, 90px) + 4rem);
+}
+
+:root {
+    --header-height: 80px;
+}
+
+@media (max-width: 768px) {
+    :root {
+        --header-height: 60px;
+    }
+}
+
+
+
 @keyframes pulse-ring {
     0% {
         transform: scale(0.95);
