@@ -1,765 +1,1629 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pinkesh | Full Stack Developer & Data Analyst</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['Fira Code', 'monospace'],
-                    },
-                    animation: {
-                        'gradient': 'gradient 8s linear infinite',
-                        'float': 'float 3s ease-in-out infinite',
-                        'slide-up': 'slideUp 0.6s ease-out',
-                    },
-                    keyframes: {
-                        gradient: {
-                            '0%, 100%': { backgroundPosition: '0% 50%' },
-                            '50%': { backgroundPosition: '100% 50%' },
-                        },
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        },
-                        slideUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PinkeshOS v2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* ── TOKENS ─────────────────────────────────────────────── */
+:root {
+  --bg: #030308;
+  --surface: rgba(15, 15, 26, 0.6);
+  --surface-opaque: #0f0f1a;
+  --surface2: rgba(30, 30, 46, 0.4);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.15);
+  --p: #7c3aed;      /* vivid purple */
+  --p2: #a78bfa;
+  --c: #06b6d4;      /* sharp cyan */
+  --c2: #67e8f9;
+  --g: #10b981;
+  --a: #f59e0b;
+  --r: #f43f5e;
+  --text: #ffffff;
+  --text2: #a1a1aa;
+  --text3: #52525b;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --display: 'Syne', sans-serif;
+  --win-radius: 14px;
+  --titlebar-h: 42px;
+  --glass: backdrop-filter: blur(24px) saturate(160%);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,0.6);
+}
 
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            background: #0a0a0f;
-            color: #e5e7eb;
-            overflow-x: hidden;
-        }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
 
-        .bg-animated {
-            background: linear-gradient(-45deg, #0a0a0f, #1a1a2e, #16213e, #0f0f1e);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
-        }
+/* ── BOOT ───────────────────────────────────────────────── */
+#boot{
+  position:fixed;inset:0;z-index:9999;
+  background:#000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;
+  transition:opacity .9s cubic-bezier(.4,0,.2,1);
+}
+#boot.out{opacity:0;pointer-events:none;}
+.boot-logo{
+  font-family:var(--display);font-weight:800;
+  font-size:clamp(2.2rem,6vw,4.5rem);
+  letter-spacing:-3px;color:#fff;
+  animation:bootPulse 2s ease-in-out infinite;
+}
+.boot-logo em{color:var(--p);font-style:normal;}
+@keyframes bootPulse{0%,100%{text-shadow:0 0 0 transparent}50%{text-shadow:0 0 40px rgba(139,92,246,.5)}}
+.boot-ring{
+  width:48px;height:48px;
+  border:2px solid var(--surface2);
+  border-top-color:var(--p);
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.boot-msg{font-family:var(--mono);font-size:.65rem;letter-spacing:3px;color:var(--text3);text-transform:uppercase;}
 
-        .glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+/* ── DESKTOP ────────────────────────────────────────────── */
+#desktop{
+  width:100%;height:100%;
+  background:var(--bg);
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(124, 58, 237, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.06) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(15, 15, 26, 0.2) 0%, transparent 100%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 30-30 30L0 30z' fill='%23ffffff' fill-opacity='0.008'/%3E%3C/svg%3E");
+  display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+}
+#desktop-area{flex:1;position:relative;overflow:hidden;order:1;}
 
-        .glass-hover:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(34, 211, 238, 0.3);
-        }
+/* ambient glow that follows mouse */
+#mouse-glow{
+  position:fixed;width:800px;height:800px;
+  background:radial-gradient(circle,rgba(124,58,237,.06) 0%,transparent 70%);
+  pointer-events:none;z-index:0;
+  left:0;top:0;
+  will-change:transform;
+  transform:translate3d(-50%,-50%,0);
+  transition:transform .1s ease-out;
+}
 
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0a0a0f; }
-        ::-webkit-scrollbar-thumb { background: #22d3ee; border-radius: 4px; }
+/* watermark */
+.wm{
+  position:absolute;right:2rem;bottom:56px;
+  font-family:var(--display);font-weight:800;
+  font-size:clamp(4rem,10vw,9rem);
+  color:transparent;
+  -webkit-text-stroke:1px rgba(255,255,255,0.025);
+  line-height:.9;text-align:right;
+  user-select:none;pointer-events:none;
+  letter-spacing:-4px;
+}
 
-        .gradient-text {
-            background: linear-gradient(135deg, #22d3ee 0%, #a78bfa 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+/* ── TASKBAR ────────────────────────────────────────────── */
+#taskbar{
+  order:2;height:52px;flex-shrink:0;
+  background: rgba(10, 10, 18, 0.7);
+  backdrop-filter: blur(28px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display:flex;align-items:center;padding:0 16px;gap:12px;
+  z-index:800;
+  position:relative;
+  box-shadow: 0 -4px 30px rgba(0,0,0,0.3);
+}
+.tb-start{
+  display:flex;align-items:center;gap:8px;
+  background: linear-gradient(135deg, var(--p), #6d28d9);
+  border:1px solid rgba(255,255,255,0.1);
+  color:#fff;
+  padding:6px 16px 6px 10px;
+  border-radius:10px;
+  font-family:var(--display);font-size:.7rem;font-weight:800;letter-spacing:.5px;
+  cursor:pointer;transition:all .3s cubic-bezier(0.16, 1, 0.3, 1);flex-shrink:0;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+.tb-start:hover{background:var(--p2);transform:translateY(-2px);box-shadow: 0 6px 16px rgba(124, 58, 237, 0.5);}
+.tb-start img{width:22px;height:22px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,0.2);}
+.tb-sep{width:1px;height:24px;background:rgba(255,255,255,0.1);flex-shrink:0;}
+#tb-apps{display:flex;align-items:center;gap:6px;flex:1;overflow:hidden;}
+.tb-app{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 12px;border-radius:8px;
+  font-family:var(--mono);font-size:.65rem;color:var(--text2);
+  cursor:pointer;transition:all .2s ease;white-space:nowrap;
+  border:1px solid transparent;max-width:150px;
+  position:relative;
+}
+.tb-app .tb-app-icon{font-size:.85rem;flex-shrink:0;}
+.tb-app span{overflow:hidden;text-overflow:ellipsis;}
+.tb-app:hover{background:rgba(255,255,255,.05);color:var(--text);transform:translateY(-1px);}
+.tb-app.active{background:rgba(124,58,237,.15);border-color:rgba(124,58,237,.25);color:var(--p2);}
+.tb-app.active::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:14px;height:2px;background:var(--p);border-radius:1px;box-shadow: 0 0 8px var(--p);}
+.tb-right{display:flex;align-items:center;gap:14px;flex-shrink:0;}
+.tb-badge{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:.6rem;
+  color:var(--g);
+  background:rgba(16,185,129,.1);
+  border:1px solid rgba(16,185,129,.2);
+  padding:4px 10px;border-radius:20px;
+}
+.tb-badge::before{content:'';width:6px;height:6px;background:var(--g);border-radius:50%;animation:dot 2s infinite;}
+.tb-clock{font-family:var(--mono);font-size:.6rem;color:var(--text2);text-align:right;line-height:1.4;letter-spacing:0.5px;}
 
-        .glow {
-            box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
-        }
+/* ── WINDOWS ────────────────────────────────────────────── */
+.win{
+  position:absolute;
+  display:flex;flex-direction:column;
+  background: var(--surface);
+  backdrop-filter: blur(24px) saturate(160%);
+  border:1px solid rgba(255, 255, 255, 0.1);
+  border-radius:var(--win-radius);
+  box-shadow: var(--shadow-lg);
+  min-width:360px;min-height:240px;
+  overflow:hidden;
+  /* open animation */
+  transform-origin: center center;
+  transition: box-shadow 0.3s, opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.win.win-opening{opacity:0;transform:scale(.92) translateY(20px);}
+.win.focused{
+  box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.05),0 0 0 1px rgba(139,92,246,.1),0 0 60px rgba(139,92,246,.06);
+  z-index:200!important;
+}
+.win.minimizing{
+  animation:winMinimize .22s cubic-bezier(.4,0,1,1) forwards;
+}
+@keyframes winMinimize{
+  to{opacity:0;transform:scale(.75) translateY(30px);}
+}
 
-        .mobile-menu {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-        
-        .mobile-menu.active {
-            max-height: 500px;
-        }
+/* titlebar */
+.wtb{
+  height:var(--titlebar-h);
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), transparent);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  display:flex;align-items:center;
+  padding:0 14px;gap:12px;
+  cursor:grab;flex-shrink:0;
+  user-select:none;
+}
+.wtb:active{cursor:grabbing;}
+.wc{display:flex;gap:7px;margin-right:6px;}
+.wc button{
+  width:12px;height:12px;border-radius:50%;
+  border:none;cursor:pointer;
+  transition:all .2s;
+  flex-shrink:0;position:relative;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.2);
+}
+.wc button:hover{transform:scale(1.15);}
+.wc-x{background:#ff5f57;}.wc-m{background:#febc2e;}.wc-f{background:#28c840;}
+.wc button i{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:.45rem;color:rgba(0,0,0,0.6);opacity:0;transition:opacity .2s;
+}
+.wc button:hover i{opacity:1;}
+.wt-icon{font-size:.85rem;color:var(--text2);margin-left: 2px;}
+.wt-title{font-family:var(--mono);font-size:.65rem;color:var(--text);flex:1;letter-spacing:.3px;font-weight: 500;}
+.wt-subtitle{font-family:var(--mono);font-size:.58rem;color:var(--text3);font-weight: 400;}
 
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.6s ease;
-        }
+/* resize */
+.wrsz{position:absolute;bottom:0;right:0;width:16px;height:16px;cursor:se-resize;z-index:5;}
+.wrsz::after{content:'';position:absolute;bottom:4px;right:4px;width:7px;height:7px;border-right:2px solid var(--border-hover);border-bottom:2px solid var(--border-hover);}
 
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
+/* win body scroll */
+.wb{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.wb-scroll{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--surface2) transparent;}
+.wb-scroll{flex:1;overflow-y:auto;scrollbar-width:none;}
+.wb-scroll::-webkit-scrollbar{width:0px;}
+.wb-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+/* custom thin scrollbar for specific areas if needed */
+.thin-scroll::-webkit-scrollbar{width:3px;}
+.thin-scroll::-webkit-scrollbar-thumb{background:var(--border-hover);border-radius:10px;}
 
-        .typing::after {
-            content: '|';
-            animation: blink 1s infinite;
-            color: #22d3ee;
-        }
+/* ── ABOUT WINDOW ──────────────────────────────────────── */
+.about-hero{
+  padding:28px 28px 0;
+  display:flex;gap:20px;align-items:flex-start;
+}
+.about-photo-wrap{position:relative;flex-shrink:0;}
+.about-photo{
+  width:100px;height:100px;border-radius:24px;
+  object-fit:cover;object-position:center top;
+  border:3px solid var(--p);
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4);
+}
+.about-photo-status{
+  position:absolute;bottom:-2px;right:-2px;
+  width:18px;height:18px;background:var(--g);
+  border:3px solid var(--surface-opaque);border-radius:50%;
+  box-shadow: 0 0 10px var(--g);
+}
+.about-name{font-family:var(--display);font-weight:800;font-size:1.8rem;color:var(--text);letter-spacing:-1.2px;line-height:1.1;}
+.about-tagline{font-family:var(--mono);font-size:.65rem;color:var(--c);letter-spacing:2px;text-transform:uppercase;margin:.3rem 0 .6rem;}
+.about-badges{display:flex;flex-wrap:wrap;gap:5px;}
+.badge{
+  padding:3px 9px;border-radius:4px;
+  font-family:var(--mono);font-size:.58rem;letter-spacing:.5px;
+  border:1px solid;
+}
+.badge-purple{color:var(--p2);border-color:rgba(139,92,246,.25);background:rgba(139,92,246,.07);}
+.badge-cyan{color:var(--c);border-color:rgba(34,211,238,.2);background:rgba(34,211,238,.05);}
+.badge-green{color:var(--g);border-color:rgba(16,185,129,.2);background:rgba(16,185,129,.05);}
+.badge-amber{color:var(--a);border-color:rgba(245,158,11,.2);background:rgba(245,158,11,.05);}
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
+.about-tabs{
+  display:flex;gap:1px;
+  padding:16px 28px 0;
+  border-bottom:1px solid var(--border);
+}
+.atab{
+  padding:7px 14px;
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.5px;
+  color:var(--text3);cursor:pointer;transition:all .2s;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+}
+.atab:hover{color:var(--text2);}
+.atab.on{color:var(--p2);border-bottom-color:var(--p);}
 
-        .skill-card {
-            transition: all 0.3s ease;
-        }
+.about-panel{display:none;padding:20px 28px 24px;flex-direction:column;gap:12px;}
+.about-panel.on{display:flex;}
 
-        .skill-card:hover {
-            transform: translateY(-5px) scale(1.05);
-        }
+.info-row{display:flex;gap:10px;align-items:flex-start;}
+.info-key{font-family:var(--mono);font-size:.6rem;color:var(--c);text-transform:uppercase;letter-spacing:1.5px;width:90px;flex-shrink:0;padding-top:1px;}
+.info-val{font-size:.8rem;color:var(--text2);line-height:1.65;}
+.info-val strong{color:var(--text);}
 
-        .project-card {
-            position: relative;
-            overflow: hidden;
-        }
+.edu-card{
+  border:1px solid rgba(255,255,255,0.06);border-radius:12px;
+  padding:16px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  position:relative;overflow:hidden;
+  transition: all 0.3s ease;
+}
+.edu-card:hover{background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); transform: translateY(-2px);}
+.edu-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--p),var(--c));box-shadow: 2px 0 12px rgba(124,58,237,0.3);}
+.edu-degree{font-family:var(--display);font-size:1rem;font-weight:700;color:var(--text);}
+.edu-school{font-size:.8rem;color:var(--p2);margin:.3rem 0;font-weight:500;}
+.edu-year{font-family:var(--mono);font-size:.65rem;color:var(--text3);letter-spacing: 0.5px;}
 
-        .project-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
+.fun-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.fun-chip{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 12px;
+  border:1px solid var(--border);border-radius:7px;
+  font-size:.75rem;color:var(--text2);
+  background:rgba(255,255,255,.015);
+}
+.fun-chip i{font-size:.9rem;}
 
-        .project-card:hover .project-overlay {
-            opacity: 1;
-        }
+/* ── TERMINAL ───────────────────────────────────────────── */
+.term-wrap{
+  flex:1;display:flex;flex-direction:column;
+  background:#050509;overflow:hidden;
+}
+.term-topbar{
+  display:flex;gap:6px;padding:8px 14px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  background:rgba(0,0,0,.3);
+}
+.term-tab{
+  padding:3px 10px;border-radius:4px;
+  font-family:var(--mono);font-size:.6rem;color:var(--text3);
+  cursor:pointer;transition:all .15s;
+}
+.term-tab.on{background:rgba(139,92,246,.2);color:var(--p2);}
+.term-out{
+  flex:1;overflow-y:auto;padding:12px 16px;
+  font-family:var(--mono);font-size:.7rem;line-height:1.9;
+  scrollbar-width:thin;scrollbar-color:var(--surface2) transparent;
+}
+.term-out::-webkit-scrollbar{width:3px;}
+.term-out::-webkit-scrollbar-thumb{background:var(--p);}
+.tl{display:flex;flex-wrap:wrap;gap:4px;}
+.tp{color:var(--p);flex-shrink:0;}
+.tc{color:var(--c);}
+.to{padding-left:16px;color:var(--text3);}
+.to.hi{color:var(--text);}
+.to.gr{color:var(--g);}
+.to.am{color:var(--a);}
+.to.re{color:var(--r);}
+.to.cy{color:var(--c);}
+.to.pu{color:var(--p2);}
+.term-in-row{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 16px;
+  border-top:1px solid rgba(255,255,255,.05);
+  background:rgba(0,0,0,.3);flex-shrink:0;
+}
+.term-in{
+  flex:1;background:none;border:none;outline:none;
+  font-family:var(--mono);font-size:.7rem;
+  color:var(--c);caret-color:var(--c);
+}
 
-        /* Fixed circular image container */
-        .profile-circle {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            overflow: hidden;
-            position: relative;
-        }
+/* ── PROJECTS ───────────────────────────────────────────── */
+.proj-sidebar{
+  width:180px;flex-shrink:0;
+  border-right:1px solid var(--border);
+  padding:8px;
+  display:flex;flex-direction:column;gap:2px;
+  overflow-y:auto;
+}
+.proj-item{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 10px;border-radius:7px;
+  cursor:pointer;transition:all .18s;
+  font-size:.72rem;color:var(--text2);
+}
+.proj-item:hover{background:rgba(255,255,255,.05);color:var(--text);}
+.proj-item.on{background:rgba(139,92,246,.12);color:var(--p2);}
+.proj-item-icon{
+  width:28px;height:28px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;flex-shrink:0;
+}
+.proj-item-name{font-size:.68rem;font-weight:600;line-height:1.3;}
+.proj-item-type{font-family:var(--mono);font-size:.55rem;color:var(--text3);}
 
-        .profile-circle img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-        }
-    </style>
+.proj-detail{flex:1;overflow-y:auto;padding:20px 22px;scrollbar-width:thin;scrollbar-color:var(--surface2) transparent;}
+.proj-detail::-webkit-scrollbar{width:3px;}
+.proj-detail::-webkit-scrollbar-thumb{background:var(--surface2);}
+.pd-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;}
+.pd-icon{
+  width:52px;height:52px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;
+}
+.pd-name{font-family:var(--display);font-weight:800;font-size:1.3rem;color:var(--text);line-height:1.1;}
+.pd-type{font-family:var(--mono);font-size:.6rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-top:.25rem;}
+.pd-links{display:flex;gap:7px;margin-top:.6rem;}
+.pd-link{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 11px;border-radius:5px;
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.5px;text-transform:uppercase;
+  text-decoration:none;transition:all .18s;border:1px solid;
+}
+.pd-link-live{background:var(--p);border-color:var(--p);color:#fff;}
+.pd-link-live:hover{background:var(--p2);}
+.pd-link-gh{background:transparent;border-color:var(--border-hover);color:var(--text2);}
+.pd-link-gh:hover{border-color:var(--c);color:var(--c);}
+
+.pd-section{margin-bottom:16px;}
+.pd-section-title{
+  font-family:var(--mono);font-size:.58rem;letter-spacing:3px;
+  color:var(--text3);text-transform:uppercase;
+  margin-bottom:8px;
+  display:flex;align-items:center;gap:8px;
+}
+.pd-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.pd-desc{font-size:.78rem;color:var(--text2);line-height:1.75;}
+.pd-chips{display:flex;flex-wrap:wrap;gap:5px;}
+.pd-chip{
+  padding:4px 10px;border-radius:6px;
+  font-family:var(--mono);font-size:.65rem;
+  background:rgba(124,58,237,0.1);
+  border:1px solid rgba(124,58,237,0.2);color:var(--p2);
+  transition: all 0.2s ease;
+}
+.pd-chip:hover{background:rgba(124,58,237,0.2); border-color:var(--p2);}
+.pd-features{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.pd-features li{
+  font-size:.75rem;color:var(--text2);
+  display:flex;gap:8px;align-items:flex-start;line-height:1.6;
+}
+.pd-features li::before{content:'→';color:var(--c);flex-shrink:0;margin-top:1px;font-weight:bold;}
+.pd-challenge{
+  background:rgba(244,63,94,0.06);
+  border:1px solid rgba(244,63,94,0.15);
+  border-radius:10px;padding:16px;
+  font-size:.78rem;color:var(--text2);line-height:1.75;
+}
+.pd-challenge strong{color:var(--r); font-weight: 600;}
+
+/* ── SKILLS ─────────────────────────────────────────────── */
+.skills-body{padding:18px 20px;display:flex;flex-direction:column;gap:18px;}
+.sg-title{
+  font-family:var(--mono);font-size:.58rem;letter-spacing:3px;
+  color:var(--text3);text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;margin-bottom:10px;
+}
+.sg-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;}
+.sk{
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:12px;padding:16px 10px;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  transition:all .3s cubic-bezier(0.16, 1, 0.3, 1);cursor:default;
+  background:rgba(255,255,255,.02);position:relative;overflow:hidden;
+}
+.sk:hover{transform:translateY(-5px);border-color:var(--p);background: rgba(124,58,237,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.5);}
+.sk i{font-size:1.8rem;transition:transform .4s cubic-bezier(0.16, 1, 0.3, 1);}
+.sk:hover i{transform:scale(1.2) rotate(5deg);}
+.sk span{font-family:var(--mono);font-size:.65rem;color:var(--text2);text-align:center;transition:color .2s;font-weight: 500;}
+.sk-bar{width:80%;height:3px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;}
+.sk-bar-fill{height:100%;border-radius:4px;width:0;transition:width 1.5s cubic-bezier(.16,1,.3,1);}
+
+/* ── EXPERIENCE ─────────────────────────────────────────── */
+.exp-body{padding:18px 20px;display:flex;flex-direction:column;gap:14px;}
+.exp-card{
+  border:1px solid rgba(255,255,255,0.06);border-radius:12px;
+  padding:20px;position:relative;overflow:hidden;
+  background:rgba(255,255,255,.02);
+  transition:all .3s ease;
+}
+.exp-card:hover{border-color:rgba(255,255,255,0.12);transform:translateX(4px);background: rgba(255,255,255,0.04);}
+.exp-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.exp-card.current::before{background:linear-gradient(180deg,var(--p),var(--c));}
+.exp-card.past::before{background:linear-gradient(180deg,var(--a),var(--r));}
+.exp-now{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--mono);font-size:.58rem;color:var(--g);
+  background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.18);
+  padding:2px 8px;border-radius:20px;margin-bottom:8px;
+}
+.exp-now::before{content:'';width:5px;height:5px;background:var(--g);border-radius:50%;animation:dot 1.8s infinite;}
+.exp-role{font-family:var(--display);font-weight:700;font-size:1rem;color:var(--text);margin-bottom:2px;}
+.exp-company{font-size:.75rem;color:var(--p2);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.exp-period{font-family:var(--mono);font-size:.6rem;color:var(--text3);margin-bottom:12px;}
+.exp-list{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.exp-list li{font-size:.75rem;color:var(--text2);display:flex;gap:8px;line-height:1.65;}
+.exp-list li::before{content:'▸';color:var(--c);flex-shrink:0;margin-top:1px;}
+.exp-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
+.exp-tag{
+  padding:2px 8px;
+  border:1px solid var(--border);border-radius:3px;
+  font-family:var(--mono);font-size:.58rem;color:var(--text3);
+}
+
+/* ── STATS / DASHBOARD ──────────────────────────────────── */
+.dash-body{padding:14px;display:flex;flex-direction:column;gap:12px;}
+.dash-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.kpi{
+  border:1px solid rgba(255,255,255,0.06);border-radius:12px;
+  padding:16px;
+  background:rgba(255,255,255,.02);
+  transition:all .3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.kpi:hover{border-color:var(--p);transform:translateY(-4px);box-shadow: 0 8px 24px rgba(124,58,237,0.2);}
+.kpi-label{font-family:var(--mono);font-size:.6rem;color:var(--text3);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:8px;font-weight: 600;}
+.kpi-val{font-family:var(--display);font-weight:800;font-size:2rem;line-height:1;letter-spacing: -0.5px;}
+.kpi-sub{font-size:.68rem;color:var(--text2);margin-top:6px;opacity: 0.8;}
+
+.dash-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.dash-card{border:1px solid var(--border);border-radius:8px;padding:14px;background:rgba(255,255,255,.015);}
+.dash-card-title{font-family:var(--mono);font-size:.58rem;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:10px;}
+.mbar{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.mbar:last-child{margin-bottom:0;}
+.mbar-label{font-size:.68rem;color:var(--text2);width:85px;flex-shrink:0;}
+.mbar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.mbar-fill{height:100%;border-radius:3px;width:0;transition:width 1.6s cubic-bezier(.16,1,.3,1);}
+.mbar-pct{font-family:var(--mono);font-size:.58rem;color:var(--text3);width:26px;text-align:right;}
+
+.activity-item{display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--border);}
+.activity-item:last-child{border-bottom:none;}
+.act-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.act-text{font-size:.7rem;color:var(--text2);flex:1;line-height:1.5;}
+.act-time{font-family:var(--mono);font-size:.58rem;color:var(--text3);flex-shrink:0;}
+
+/* ── CONTACT ────────────────────────────────────────────── */
+.contact-body{padding:18px 20px;display:flex;flex-direction:column;gap:8px;}
+.contact-header{
+  background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(6,182,212,0.05));
+  border:1px solid rgba(124,58,237,0.15);
+  border-radius:14px;padding:20px;margin-bottom:8px;
+}
+.contact-header h3{font-family:var(--display);font-weight:800;font-size:1.4rem;color:var(--text);margin-bottom:6px;letter-spacing:-0.5px;}
+.contact-header p{font-size:.8rem;color:var(--text2);line-height:1.7;}
+.ci{
+  display:flex;align-items:center;gap:16px;
+  padding:14px 18px;
+  border:1px solid rgba(255,255,255,0.06);border-radius:12px;
+  background:rgba(255,255,255,.02);
+  text-decoration:none;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);cursor:pointer;
+}
+.ci:hover{background:rgba(124,58,237,0.1);border-color:rgba(124,58,237,0.25);transform:translateX(6px);box-shadow: 0 4px 15px rgba(0,0,0,0.2);}
+.ci-ico{
+  width:42px;height:42px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;flex-shrink:0;
+}
+.ci-label{font-family:var(--mono);font-size:.62rem;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;font-weight: 600;}
+.ci-val{font-size:.78rem;color:var(--text);font-weight: 500;}
+.cert-row{
+  display:flex;align-items:center;gap:16px;
+  padding:14px 18px;
+  border:1px solid rgba(245,158,11,.2);border-radius:12px;
+  background:rgba(245,158,11,.05);
+  text-decoration:none;transition:all 0.3s ease;
+}
+.cert-row:hover{background:rgba(245,158,11,.1);transform:translateX(6px);}
+
+/* ── START MENU ─────────────────────────────────────────── */
+#smenu{
+  position:absolute;bottom:64px;left:16px;
+  width:300px;
+  background: rgba(12, 12, 20, 0.85);
+  backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  overflow:hidden;
+  z-index:2000;
+  transform-origin:bottom left;
+  transform:scale(.92) translateY(12px);
+  opacity:0;pointer-events:none;
+  transition:all .4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 12px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05);
+}
+#smenu.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all;}
+.sm-head{
+  padding:20px 24px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  display:flex;align-items:center;gap:16px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+}
+.sm-ava{width:46px;height:46px;border-radius:14px;object-fit:cover;border:2px solid var(--p);box-shadow: 0 4px 12px rgba(124,58,237,0.3);}
+.sm-name{font-family:var(--display);font-weight:700;font-size:.9rem;color:var(--text);letter-spacing:-0.3px;}
+.sm-status{font-family:var(--mono);font-size:.62rem;color:var(--g);display:flex;align-items:center;gap:6px;opacity:0.9;}
+.sm-status::before{content:'';width:6px;height:6px;background:var(--g);border-radius:50%;box-shadow: 0 0 8px var(--g);}
+.sm-list{padding:12px;}
+.sm-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 14px;border-radius:10px;
+  font-size:.75rem;color:var(--text2);
+  cursor:pointer;transition:all .2s ease;
+  text-decoration:none;
+  border: 1px solid transparent;
+}
+.sm-item:hover{background:rgba(124, 58, 237, 0.15);color:var(--text);border-color:rgba(124, 58, 237, 0.2);transform: translateX(4px);}
+.sm-item i{width:20px;text-align:center;color:var(--p2);font-size:.9rem;}
+.sm-div{height:1px;background:rgba(255,255,255,0.06);margin:8px 12px;}
+
+/* ── NOTIFICATIONS ──────────────────────────────────────── */
+#notif-area{
+  position:absolute;top:12px;right:12px;
+  display:flex;flex-direction:column;gap:8px;
+  z-index:3000;pointer-events:none;
+  width:300px;
+}
+.notif{
+  background:rgba(15,15,26,.95);
+  backdrop-filter:blur(20px);
+  border:1px solid var(--border);
+  border-radius:10px;padding:12px 14px;
+  display:flex;gap:10px;align-items:flex-start;
+  pointer-events:all;
+  animation:notifIn .3s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 8px 30px rgba(0,0,0,.5);
+}
+@keyframes notifIn{from{opacity:0;transform:translateX(30px) scale(.92)}to{opacity:1;transform:translateX(0) scale(1)}}
+.notif.out{animation:notifOut .25s ease forwards;}
+@keyframes notifOut{to{opacity:0;transform:translateX(30px) scale(.9)}}
+.notif-icon{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;}
+.notif-title{font-size:.68rem;font-weight:600;color:var(--text);margin-bottom:2px;}
+.notif-msg{font-size:.62rem;color:var(--text2);line-height:1.5;}
+
+/* ── DESKTOP ICONS ──────────────────────────────────────── */
+.dicons{
+  position:absolute;top:20px;left:20px;
+  display:flex;flex-direction:column;
+  flex-wrap:wrap;
+  align-content:flex-start;
+  gap:4px;
+  max-height: calc(100% - 40px);
+  z-index: 20;
+}
+.dic{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  width:82px;padding:10px 4px;border-radius:16px;
+  cursor:pointer;transition:all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select:none;
+  border: 1px solid transparent;
+}
+.dic:hover{background:rgba(255, 255, 255,.05); border-color: rgba(255, 255, 255, 0.08); transform: scale(1.05); box-shadow: 0 4px 20px rgba(0,0,0,0.2);}
+.dic:active{background:rgba(255,255,255,.1); transform: scale(0.95);}
+.dic-img{
+  width:46px;height:46px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:1.3rem;
+  transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.dic:hover .dic-img{transform:translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.5);}
+.dic span{font-size:.6rem;color:var(--text);text-align:center;line-height:1.35;text-shadow:0 1px 4px rgba(0,0,0,0.8);font-weight: 500;}
+.dicons .dic:nth-child(odd){animation: float 4s ease-in-out infinite;}
+.dicons .dic:nth-child(even){animation: float 4s ease-in-out infinite 2s;}
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-5px)}
+}
+
+/* ── CLOCK WIDGET ───────────────────────────────────── */
+#clock-widget{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-120%);
+  text-align:center;pointer-events:none;user-select:none;
+  opacity: 0.95; z-index: 5;
+}
+#widget-time{
+  font-family:var(--display);font-weight:800;font-size:7rem;
+  color: #fff; line-height: 1; letter-spacing: -5px;
+  text-shadow: 0 0 30px rgba(0,0,0,0.3);
+}
+#widget-date{
+  font-family:var(--mono);font-size:.9rem;color:var(--text2);
+  letter-spacing:4px;text-transform:uppercase;margin-top: 10px;
+}
+#widget-status{
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 20px;
+  background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);
+  color: var(--g); font-family: var(--mono); font-size: .65rem; font-weight: 600;
+  margin-top: 24px; letter-spacing: 1px;
+}
+
+/* ── UTIL ───────────────────────────────────────────────── */
+.sep{height:1px;background:var(--border);}
+.tag{padding:2px 7px;border-radius:3px;font-family:var(--mono);font-size:.58rem;border:1px solid var(--border);color:var(--text3);}
+
+/* window open/close states */
+.win{display:none;}
+.win.visible{display:flex;}
+
+@media(max-width:800px){
+  .wm{display:none;}
+  #clock-widget{transform: translate(-50%, -100%) scale(0.6);}
+  .dicons{flex-direction: row; flex-wrap: wrap; justify-content: center; width: 100%; top: auto; bottom: 80px; left: 0;}
+  .dic{width: 70px;}
+  .dic span{font-size:.5rem;}
+  .tb-badge span{display:none;}
+  
+  .win{
+    width: 95% !important;
+    left: 2.5% !important;
+    top: 20px !important;
+    height: auto !important;
+    max-height: 80vh !important;
+  }
+  .wt-subtitle{display:none;}
+}
+</style>
 </head>
-<body class="bg-animated">
+<body>
 
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-50 glass transition-all duration-300" id="navbar">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <a href="#home" class="text-xl font-bold font-mono gradient-text">
-                    &lt;Pinkesh/&gt;
-                </a>
-                
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#about" class="text-gray-300 hover:text-cyan-400 transition text-sm font-mono">About</a>
-                    <a href="#skills" class="text-gray-300 hover:text-cyan-400 transition text-sm font-mono">Skills</a>
-                    <a href="#projects" class="text-gray-300 hover:text-cyan-400 transition text-sm font-mono">Projects</a>
-                    <a href="#experience" class="text-gray-300 hover:text-cyan-400 transition text-sm font-mono">Experience</a>
-                    <a href="#contact" class="px-4 py-2 bg-cyan-500 text-black rounded-lg hover:bg-cyan-400 transition font-medium text-sm">
-                        Contact
-                    </a>
-                </div>
+<div id="mouse-glow"></div>
 
-                <button id="mobile-btn" class="md:hidden text-gray-300 focus:outline-none">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-            </div>
+<!-- ── BOOT ─────────────────────────────────────────────── -->
+<div id="boot">
+  <div class="boot-logo">Pinkesh<em>OS</em></div>
+  <div class="boot-ring"></div>
+  <div class="boot-msg" id="boot-msg">Initializing system...</div>
+</div>
 
-            <div class="mobile-menu md:hidden" id="mobile-menu">
-                <div class="px-2 pt-2 pb-3 space-y-1">
-                    <a href="#about" class="block px-3 py-2 text-gray-300 hover:text-cyan-400 hover:bg-white/5 rounded">About</a>
-                    <a href="#skills" class="block px-3 py-2 text-gray-300 hover:text-cyan-400 hover:bg-white/5 rounded">Skills</a>
-                    <a href="#projects" class="block px-3 py-2 text-gray-300 hover:text-cyan-400 hover:bg-white/5 rounded">Projects</a>
-                    <a href="#experience" class="block px-3 py-2 text-gray-300 hover:text-cyan-400 hover:bg-white/5 rounded">Experience</a>
-                    <a href="#contact" class="block px-3 py-2 text-cyan-400 border border-cyan-500/30 rounded text-center">Contact</a>
-                </div>
-            </div>
+<!-- ── DESKTOP ───────────────────────────────────────────── -->
+<div id="desktop">
+<div id="desktop-area">
+
+  <div id="clock-widget">
+    <div id="widget-time">00:00</div>
+    <div id="widget-date">MONDAY, JAN 01</div>
+    <div id="widget-status"><i class="fas fa-circle" style="font-size: 6px; animation: dot 2s infinite"></i> SYSTEM OPERATIONAL</div>
+  </div>
+
+  <div class="wm">PINKESH<br>DARJI</div>
+  <div id="notif-area"></div>
+
+  <!-- DESKTOP ICONS -->
+  <div class="dicons">
+    <div class="dic" onclick="openWin('w-about')">
+      <div class="dic-img" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)"><i class="fas fa-user" style="color:#fff"></i></div>
+      <span>about.me</span>
+    </div>
+    <div class="dic" onclick="openWin('w-term')">
+      <div class="dic-img" style="background:rgba(10,10,20,0.8);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(10px)"><i class="fas fa-terminal" style="color:var(--g)"></i></div>
+      <span>terminal</span>
+    </div>
+    <div class="dic" onclick="openWin('w-proj')">
+      <div class="dic-img" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)"><i class="fas fa-rocket" style="color:#fff"></i></div>
+      <span>projects</span>
+    </div>
+    <div class="dic" onclick="openWin('w-skills')">
+      <div class="dic-img" style="background:linear-gradient(135deg,#f59e0b,#d97706)"><i class="fas fa-code" style="color:#fff"></i></div>
+      <span>skills</span>
+    </div>
+    <div class="dic" onclick="openWin('w-exp')">
+      <div class="dic-img" style="background:linear-gradient(135deg,#ef4444,#dc2626)"><i class="fas fa-briefcase" style="color:#fff"></i></div>
+      <span>work</span>
+    </div>
+    <div class="dic" onclick="openWin('w-dash')">
+      <div class="dic-img" style="background:linear-gradient(135deg,#10b981,#059669)"><i class="fas fa-chart-bar" style="color:#fff"></i></div>
+      <span>stats</span>
+    </div>
+    <div class="dic" onclick="openWin('w-contact')">
+      <div class="dic-img" style="background:linear-gradient(135deg,#ec4899,#db2777)"><i class="fas fa-paper-plane" style="color:#fff"></i></div>
+      <span>contact</span>
+    </div>
+  </div>
+
+  <!-- ════════════ WINDOWS ════════════ -->
+
+  <!-- ABOUT -->
+  <div class="win" id="w-about" style="width:500px;top:55px;left:110px;">
+    <div class="wtb" data-win="w-about">
+      <div class="wc">
+        <button class="wc-x" onclick="closeWin('w-about')"><i class="fas fa-times"></i></button>
+        <button class="wc-m" onclick="minWin('w-about')"><i class="fas fa-minus"></i></button>
+        <button class="wc-f" onclick="maxWin('w-about')"><i class="fas fa-expand"></i></button>
+      </div>
+      <i class="fas fa-user wt-icon"></i>
+      <span class="wt-title">about.me — Pinkesh Darji</span>
+    </div>
+    <div class="wb">
+      <div class="about-hero">
+        <div class="about-photo-wrap">
+          <img src="https://i.postimg.cc/X78SxyTb/dp02.jpg" class="about-photo" alt="Pinkesh">
+          <div class="about-photo-status"></div>
         </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section id="home" class="min-h-screen flex items-center pt-16 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto w-full">
-            <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-                
-                <!-- Left Content -->
-                <div class="space-y-6 text-center lg:text-left order-2 lg:order-1">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 glass rounded-full text-cyan-400 text-xs font-mono">
-                        <span class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
-                        Open to opportunities
-                    </div>
-                    
-                    <h1 class="text-4xl sm:text-5xl lg:text-7xl font-bold leading-tight">
-                        Hi, I'm <span class="gradient-text">Pinkesh</span>
-                    </h1>
-                    
-                    <p class="text-xl sm:text-2xl font-mono text-gray-400">
-                        <span class="text-cyan-400">const</span> role = <span class="text-yellow-400">"</span><span id="typewriter" class="typing text-yellow-400"></span><span class="text-yellow-400">"</span>
-                    </p>
-                    
-                    <p class="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto lg:mx-0">
-                        I like building things that people actually use, whether that’s a web app, a dashboard, or a system that makes work easier. Right now I’m learning by doing, shipping real features and working with real data in a production environment.
-                    </p>
-                    
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                        <a href="#projects" class="px-6 py-3 bg-cyan-500 text-black rounded-lg hover:bg-cyan-400 transition font-medium inline-flex items-center justify-center gap-2 glow">
-                            <i class="fas fa-code"></i> View Projects
-                        </a>
-                        <a href="https://drive.google.com/file/d/1EGecxcaeJKmkAaoCeTVoxAnAbeM1a2Np/view?usp=sharing" target="_blank" class="px-6 py-3 glass glass-hover rounded-lg transition font-medium inline-flex items-center justify-center gap-2">
-                            <i class="fas fa-download"></i> Resume
-                        </a>
-                    </div>
-
-                    <div class="flex gap-4 justify-center lg:justify-start pt-4">
-                        <a href="https://github.com/Pinkesh2905" target="_blank" class="w-10 h-10 glass glass-hover rounded-lg flex items-center justify-center hover:text-cyan-400 transition">
-                            <i class="fab fa-github"></i>
-                        </a>
-                        <a href="https://www.linkedin.com/in/pinkesh-darji-3731b9266/" target="_blank" class="w-10 h-10 glass glass-hover rounded-lg flex items-center justify-center hover:text-cyan-400 transition">
-                            <i class="fab fa-linkedin"></i>
-                        </a>
-                        <a href="https://x.com/techexplorer29" target="_blank" class="w-10 h-10 glass glass-hover rounded-lg flex items-center justify-center hover:text-cyan-400 transition">
-                            <i class="fab fa-x-twitter"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Right Visual -->
-                <div class="order-1 lg:order-2 flex justify-center">
-                    <div class="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96">
-                        <div class="absolute inset-0 border-2 border-dashed border-cyan-500/30 rounded-full animate-spin" style="animation-duration: 20s;"></div>
-                        <div class="absolute inset-4 border border-purple-500/20 rounded-full animate-spin" style="animation-duration: 15s; animation-direction: reverse;"></div>
-                        
-                        <div class="absolute inset-8 profile-circle border-4 border-cyan-500/30 shadow-2xl">
-                            <img src="https://i.postimg.cc/X78SxyTb/dp02.jpg" alt="Pinkesh">
-                        </div>
-                        
-                        <div class="absolute right-[-10px] top-10 glass px-3 py-1.5 rounded-lg animate-float flex items-center gap-2 text-xs sm:text-sm">
-                            <i class="fas fa-code text-cyan-400"></i>
-                            <span class="font-mono">Developer</span>
-                        </div>
-
-                        <div class="absolute left-2 bottom-6 glass px-3 py-1.5 rounded-lg animate-float flex items-center gap-2 text-xs sm:text-sm" style="animation-delay: 1s;">
-                            <i class="fas fa-chart-line text-purple-400"></i>
-                            <span class="font-mono">Analyst</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+        <div>
+          <div class="about-name">Pinkesh Darji</div>
+          <div class="about-tagline">Builder · Analyst · AI Enthusiast</div>
+          <div class="about-badges">
+            <span class="badge badge-purple">Full Stack Dev</span>
+            <span class="badge badge-cyan">Data Analyst</span>
+            <span class="badge badge-green">Open to Work</span>
+            <span class="badge badge-amber">Vibe Coder</span>
+          </div>
         </div>
-    </section>
-
-
-
-    <!-- About Section -->
-    <section id="about" class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 reveal">
-        <div class="max-w-7xl mx-auto">
-            <div class="glass rounded-2xl p-6 sm:p-8 lg:p-12 border-l-4 border-cyan-500">
-                <h2 class="text-2xl sm:text-3xl font-bold font-mono mb-8"><span class="text-cyan-500">01.</span> About Me</h2>
-                
-                <div class="grid lg:grid-cols-2 gap-8 lg:gap-12">
-                    <div class="space-y-4 text-gray-300">
-                        <p>
-                            I'm <strong class="text-white">Pinkesh</strong>, a developer who loves turning ideas into products that actually get used, not just built.
-                        </p>
-                        <p>
-                            I’ve created projects like <strong class="text-cyan-400">Bloom</strong>, a mental wellness platform, and <strong class="text-yellow-400">MockMate</strong>, an AI-powered interview prep system, both focused on solving real problems with clean, thoughtful engineering.
-                        </p>
-                        <p>
-                            Right now I’m interning at <strong class="text-purple-400">Vezapp Solutions</strong>, where I work with data pipelines, SQL, dashboards, and full-stack features that go straight into production.
-                        </p>
-                        <p>
-                            I enjoy working where logic meets creativity, whether it’s designing a UI, optimizing a query, or building a system that just feels right to use.
-                        </p>
-                        
-                        <div class="glass px-4 py-3 rounded-lg inline-block mt-4">
-                            <span class="text-cyan-400 font-mono text-sm">Status:</span>
-                            <span class="text-white text-sm ml-2">Building things that matter 🚀</span>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="glass glass-hover p-6 rounded-xl text-center">
-                            <i class="fas fa-project-diagram text-cyan-400 text-3xl mb-2"></i>
-                            <h3 class="text-3xl font-bold text-white">8+</h3>
-                            <p class="text-xs font-mono text-cyan-400">PROJECTS</p>
-                        </div>
-                        <div class="glass glass-hover p-6 rounded-xl text-center">
-                            <i class="fas fa-code text-purple-400 text-3xl mb-2"></i>
-                            <h3 class="text-3xl font-bold text-white">4+</h3>
-                            <p class="text-xs font-mono text-purple-400">YEARS</p>
-                        </div>
-                        <div class="glass glass-hover p-6 rounded-xl text-center col-span-2">
-                            <i class="fas fa-layer-group text-yellow-400 text-3xl mb-2"></i>
-                            <h3 class="text-3xl font-bold text-white">15+</h3>
-                            <p class="text-xs font-mono text-yellow-400">TECHNOLOGIES</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      </div>
+      <div class="about-tabs">
+        <div class="atab on" onclick="switchTab('about','bio')">Bio</div>
+        <div class="atab" onclick="switchTab('about','edu')">Education</div>
+        <div class="atab" onclick="switchTab('about','interests')">Interests</div>
+      </div>
+      <div class="about-panel on" id="about-bio">
+        <div class="info-row">
+          <span class="info-key">Who</span>
+          <span class="info-val">Final year MCA student at CHARUSAT University who builds software people actually use. I enjoy working at the intersection of <strong>engineering, data, and AI</strong>.</span>
         </div>
-    </section>
+        <div class="info-row">
+          <span class="info-key">Currently</span>
+          <span class="info-val">Interning at <strong>Vezapp Solutions LLP</strong> — building data pipelines, SQL architectures, and production dashboards for digitalized foundry logbooks.</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Interests</span>
+          <span class="info-val"><strong>Software Engineering</strong> · <strong>Data Science</strong> · <strong>Artificial Intelligence</strong> · Vibe Coding with music on 🎵</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Looking for</span>
+          <span class="info-val"><strong>Full-time roles</strong> in Data Science & Software Engineering</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Location</span>
+          <span class="info-val">Borsad, Gujarat, India 🇮🇳</span>
+        </div>
+      </div>
+      <div class="about-panel" id="about-edu">
+        <div class="edu-card">
+          <div class="edu-degree">Master of Computer Applications (MCA)</div>
+          <div class="edu-school">CHARUSAT University</div>
+          <div class="edu-year">2024 – 2026 &nbsp;·&nbsp; Pursuing</div>
+        </div>
+        <div class="edu-card">
+          <div class="edu-degree">BSc in Computer Applications & IT</div>
+          <div class="edu-school">Sardar Patel University (SP University)</div>
+          <div class="edu-year">2021 – 2024 &nbsp;·&nbsp; Completed</div>
+        </div>
+        <div class="info-row" style="margin-top:4px;">
+          <span class="info-key">Cert</span>
+          <span class="info-val"><strong>Google Data Analytics Professional Certificate</strong> — Data Cleaning, Visualization, Analysis</span>
+        </div>
+      </div>
+      <div class="about-panel" id="about-interests">
+        <div class="fun-grid">
+          <div class="fun-chip"><i class="fas fa-cricket-bat-ball" style="color:var(--g)"></i> Cricket</div>
+          <div class="fun-chip"><i class="fas fa-music" style="color:var(--p2)"></i> Music</div>
+          <div class="fun-chip"><i class="fab fa-youtube" style="color:#ef4444"></i> Tech YouTube</div>
+          <div class="fun-chip"><i class="fas fa-brain" style="color:var(--c)"></i> AI / ML Research</div>
+          <div class="fun-chip"><i class="fas fa-fire" style="color:var(--a)"></i> Vibe Coding</div>
+          <div class="fun-chip"><i class="fas fa-chart-line" style="color:var(--g)"></i> Data Stories</div>
+        </div>
+        <div class="info-row" style="margin-top:6px;">
+          <span class="info-key">Vibe</span>
+          <span class="info-val">I build best with lo-fi beats or a cricket match in the background. The kind of dev who goes down rabbit holes at 2am because something was <strong>interesting</strong>, not just required.</span>
+        </div>
+      </div>
+    </div>
+    <div class="wrsz" data-win="w-about"></div>
+  </div>
 
+  <!-- TERMINAL -->
+  <div class="win" id="w-term" style="width:560px;top:80px;left:630px;">
+    <div class="wtb" data-win="w-term">
+      <div class="wc">
+        <button class="wc-x" onclick="closeWin('w-term')"><i class="fas fa-times"></i></button>
+        <button class="wc-m" onclick="minWin('w-term')"><i class="fas fa-minus"></i></button>
+        <button class="wc-f" onclick="maxWin('w-term')"><i class="fas fa-expand"></i></button>
+      </div>
+      <i class="fas fa-terminal wt-icon"></i>
+      <span class="wt-title">bash — pinkesh@portfolio ~</span>
+      <span class="wt-subtitle">zsh 5.9</span>
+    </div>
+    <div class="wb">
+      <div class="term-wrap">
+        <div class="term-topbar">
+          <div class="term-tab on">1: bash</div>
+          <div class="term-tab" style="opacity:.5">2: python</div>
+          <div class="term-tab" style="opacity:.5">3: sql</div>
+        </div>
+        <div class="term-out" id="term-out"></div>
+        <div class="term-in-row">
+          <span class="tp">pinkesh@portfolio:~$</span>
+          <input class="term-in" id="term-in" placeholder="type 'help' for commands" autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+    </div>
+    <div class="wrsz" data-win="w-term"></div>
+  </div>
 
-    <!-- Skills Section -->
-    <section id="skills" class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 reveal">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-12">
-                <h2 class="text-2xl sm:text-3xl font-bold font-mono mb-2"><span class="text-cyan-500">02.</span> Tech Stack</h2>
-                <div class="h-1 w-16 bg-cyan-500 rounded-full mx-auto"></div>
-            </div>
+  <!-- PROJECTS -->
+  <div class="win" id="w-proj" style="width:680px;top:290px;left:90px;">
+    <div class="wtb" data-win="w-proj">
+      <div class="wc">
+        <button class="wc-x" onclick="closeWin('w-proj')"><i class="fas fa-times"></i></button>
+        <button class="wc-m" onclick="minWin('w-proj')"><i class="fas fa-minus"></i></button>
+        <button class="wc-f" onclick="maxWin('w-proj')"><i class="fas fa-expand"></i></button>
+      </div>
+      <i class="fas fa-rocket wt-icon"></i>
+      <span class="wt-title">Projects — 4 apps shipped</span>
+    </div>
+    <div class="wb" style="flex-direction:row;height:420px;">
+      <div class="proj-sidebar">
+        <div style="font-family:var(--mono);font-size:.55rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;padding:4px 6px 6px;">WORKSPACE</div>
+        <div class="proj-item on" id="pi-elevo" onclick="switchProj('elevo')">
+          <div class="proj-item-icon" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)">🚀</div>
+          <div><div class="proj-item-name">Elevo</div><div class="proj-item-type">AI Platform</div></div>
+        </div>
+        <div class="proj-item" id="pi-bloom" onclick="switchProj('bloom')">
+          <div class="proj-item-icon" style="background:linear-gradient(135deg,#10b981,#059669)">🌸</div>
+          <div><div class="proj-item-name">Bloom</div><div class="proj-item-type">Wellness App</div></div>
+        </div>
+        <div class="proj-item" id="pi-eatzy" onclick="switchProj('eatzy')">
+          <div class="proj-item-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706)">🍔</div>
+          <div><div class="proj-item-name">EatZy</div><div class="proj-item-type">MEAN Stack</div></div>
+        </div>
+        <div class="proj-item" id="pi-mockmate" onclick="switchProj('mockmate')">
+          <div class="proj-item-icon" style="background:linear-gradient(135deg,#06b6d4,#0891b2)">🤖</div>
+          <div><div class="proj-item-name">MockMate</div><div class="proj-item-type">AI App · v1</div></div>
+        </div>
+      </div>
 
-            <!-- Frontend -->
-            <div class="mb-8">
-                <h3 class="text-lg font-mono text-cyan-400 mb-4 flex items-center gap-2">
-                    <i class="fas fa-palette"></i> Frontend
-                </h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                    <div class="glass glass-hover skill-card p-6 rounded-xl flex flex-col items-center gap-3">
-                        <i class="fab fa-react text-4xl text-cyan-400"></i>
-                        <span class="font-mono text-sm">React</span>
-                    </div>
-                    <div class="glass glass-hover skill-card p-6 rounded-xl flex flex-col items-center gap-3">
-                        <i class="fab fa-angular text-4xl text-red-500"></i>
-                        <span class="font-mono text-sm">Angular</span>
-                    </div>
-                    <div class="glass glass-hover skill-card p-6 rounded-xl flex flex-col items-center gap-3">
-                        <i class="fab fa-js text-4xl text-yellow-400"></i>
-                        <span class="font-mono text-sm">JavaScript</span>
-                    </div>
-                    <div class="glass glass-hover skill-card p-6 rounded-xl flex flex-col items-center gap-3">
-                        <i class="fas fa-wind text-4xl text-cyan-300"></i>
-                        <span class="font-mono text-sm">Tailwind</span>
-                    </div>
-                    <div class="glass glass-hover skill-card p-6 rounded-xl flex flex-col items-center gap-3">
-                        <i class="fab fa-html5 text-4xl text-orange-500"></i>
-                        <span class="font-mono text-sm">HTML/CSS</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Backend -->
-            <div class="mb-8">
-                <h3 class="text-lg font-mono text-green-400 mb-4 flex items-center gap-2">
-                    <i class="fas fa-server"></i> Backend
-                </h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                    <div class="glass glass-hover skill-card p-6 rounded-xl flex flex-col items-center gap-3">
-                        <i class="fab fa-python text-4xl text-yellow-300"></i>
-                        <span class="font-mono text-sm">Python</span>
-                    </div>
-                    <div class="glass glass-hover skill-card p-6 rounded-xl flex flex-col items-center gap-3">
-                        <i class="fas fa-server text-4xl text-green-400"></i>
-                        <span class="font-mono text-sm">Django</span>
-                    </div>
-                    <div class="glass glass-hover skill-card p-6 rounded-xl flex flex-col items-center gap-3">
-                        <i class="fab fa-node text-4xl text-green-500"></i>
-                        <span class="font-mono text-sm">Node.js</span>
-                    </div>
-                    <div class="glass glass-hover skill-card p-6 rounded-xl flex flex-col items-center gap-3">
-                        <i class="fas fa-database text-4xl text-green-600"></i>
-                        <span class="font-mono text-sm">MongoDB</span>
-                    </div>
-                    <div class="glass glass-hover skill-card p-6 rounded-xl flex flex-col items-center gap-3">
-                        <i class="fas fa-database text-4xl text-blue-500"></i>
-                        <span class="font-mono text-sm">PostgreSQL</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Data & Analytics -->
+      <!-- PROJECT DETAILS -->
+      <div class="proj-detail wb-scroll" id="proj-content">
+        <!-- ELEVO (default) -->
+        <div id="pd-elevo">
+          <div class="pd-header">
+            <div class="pd-icon" style="background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(79,70,229,.2));border:1px solid rgba(124,58,237,.3);font-size:1.6rem;">🚀</div>
             <div>
-                <h3 class="text-lg font-mono text-purple-400 mb-4 flex items-center gap-2">
-                    <i class="fas fa-chart-line"></i> Data & Analytics
-                </h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                    <div class="glass glass-hover skill-card p-6 rounded-xl flex flex-col items-center gap-3">
-                        <i class="fas fa-chart-bar text-4xl text-yellow-500"></i>
-                        <span class="font-mono text-sm">Power BI</span>
-                    </div>
-                    <div class="glass glass-hover skill-card p-6 rounded-xl flex flex-col items-center gap-3">
-                        <i class="fas fa-chart-pie text-4xl text-blue-400"></i>
-                        <span class="font-mono text-sm">Looker</span>
-                    </div>
-                    <div class="glass glass-hover skill-card p-6 rounded-xl flex flex-col items-center gap-3">
-                        <i class="fas fa-table text-4xl text-green-400"></i>
-                        <span class="font-mono text-sm">SQL</span>
-                    </div>
-                    <div class="glass glass-hover skill-card p-6 rounded-xl flex flex-col items-center gap-3">
-                        <i class="fas fa-brain text-4xl text-purple-400"></i>
-                        <span class="font-mono text-sm">Machine Learning</span>
-                    </div>
-                    <div class="glass glass-hover skill-card p-6 rounded-xl flex flex-col items-center gap-3">
-                        <i class="fas fa-chart-line text-4xl text-cyan-400"></i>
-                        <span class="font-mono text-sm">Data Analysis</span>
-                    </div>
-                </div>
+              <div class="pd-name">Elevo</div>
+              <div class="pd-type">AI Career Prep Platform · MCA 4th Sem</div>
+              <div class="pd-links">
+                <a href="https://github.com/Pinkesh2905/Elevo" target="_blank" class="pd-link pd-link-gh"><i class="fab fa-github"></i> GitHub</a>
+              </div>
             </div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Overview</div>
+            <div class="pd-desc">Elevo is an <strong style="color:var(--p2)">end-to-end AI-powered placement preparation platform</strong> for students. It evolved from MockMate (3rd sem) into a complete career readiness system — covering everything from coding practice to resume analysis to mock interviews.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Core Features</div>
+            <ul class="pd-features">
+              <li><strong>Resume-Based AI Mock Interviews</strong> — Parses your resume, identifies skills & roles, then generates a dynamic interview (Technical / HR) with questions tailored to your exact background.</li>
+              <li><strong>ATS Resume Analyzer</strong> — Scores your resume against job descriptions, gives actionable improvement insights.</li>
+              <li><strong>Coding Practice Module</strong> — Structured DSA and problem-solving exercises.</li>
+              <li><strong>Aptitude Tests</strong> — Auto-graded quizzes for placement exam prep.</li>
+              <li><strong>Personalized Feedback Engine</strong> — Response-aware AI that adapts follow-up questions based on what you answered.</li>
+              <li><strong>Progress Tracking</strong> — Dashboard showing readiness score, weak areas, and improvement over time.</li>
+            </ul>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Hardest Challenge</div>
+            <div class="pd-challenge"><strong>🔥 The AI Interview Logic</strong> — Building an interview engine that <em>understands your resume</em>, extracts role-specific skills, and then generates context-aware follow-up questions based on how you actually respond — not just a static question bank — required careful prompt engineering and multi-turn conversation design with Gemini/OpenAI APIs.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Tech Stack</div>
+            <div class="pd-chips">
+              <span class="pd-chip">Django</span><span class="pd-chip">Python</span><span class="pd-chip">OpenAI API</span><span class="pd-chip">Gemini API</span><span class="pd-chip">gTTS</span><span class="pd-chip">PostgreSQL</span><span class="pd-chip">HTML/CSS/JS</span>
+            </div>
+          </div>
         </div>
-    </section>
 
-    <!-- Certification Section -->
-    <section class="py-12 px-4 sm:px-6 lg:px-8 reveal">
-        <div class="max-w-7xl mx-auto">
-            <div class="glass rounded-2xl p-6 sm:p-8 border border-yellow-500/20">
-                <div class="flex flex-col md:flex-row items-center gap-6">
-                    <div class="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center border-2 border-yellow-500 glow flex-shrink-0">
-                        <i class="fab fa-google text-3xl"></i>
-                    </div>
-                    
-                    <div class="flex-grow text-center md:text-left">
-                        <h3 class="text-xl sm:text-2xl font-bold mb-2">Google Data Analytics Certified</h3>
-                        <p class="text-gray-400 text-sm mb-4">
-                            Professional certification covering data processing, analysis, and visualization.
-                        </p>
-                        <div class="flex flex-wrap gap-2 justify-center md:justify-start">
-                            <span class="text-xs bg-gray-800 text-yellow-400 px-2 py-1 rounded-full">Data Cleaning</span>
-                            <span class="text-xs bg-gray-800 text-yellow-400 px-2 py-1 rounded-full">Visualization</span>
-                            <span class="text-xs bg-gray-800 text-yellow-400 px-2 py-1 rounded-full">Analysis</span>
-                        </div>
-                    </div>
-                    
-                    <a href="https://drive.google.com/file/d/1iCb_WYSOHj95oBcwHdvLXbSy4W3SVazw/view?usp=sharing" target="_blank" class="px-6 py-3 bg-yellow-500 text-black rounded-lg hover:bg-yellow-400 transition font-medium inline-flex items-center gap-2 flex-shrink-0">
-                        <i class="fas fa-certificate"></i> Verify
-                    </a>
-                </div>
+        <!-- BLOOM -->
+        <div id="pd-bloom" style="display:none">
+          <div class="pd-header">
+            <div class="pd-icon" style="background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(5,150,105,.2));border:1px solid rgba(16,185,129,.3);font-size:1.6rem;">🌸</div>
+            <div>
+              <div class="pd-name">Bloom Wellness</div>
+              <div class="pd-type">Mental Wellness Platform · BSc Case Study</div>
+              <div class="pd-links">
+                <a href="https://bloom-pwns.onrender.com/" target="_blank" class="pd-link pd-link-live"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+                <a href="https://github.com/Pinkesh2905/bloom" target="_blank" class="pd-link pd-link-gh"><i class="fab fa-github"></i> GitHub</a>
+              </div>
             </div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Overview</div>
+            <div class="pd-desc">A mental wellness web application built as a college case study. Designed around real user needs — helping people track their emotional state, access positivity tools, and feel less alone with their mental health.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Core Features</div>
+            <ul class="pd-features">
+              <li>Daily <strong>mood tracking</strong> with history visualization.</li>
+              <li><strong>Bloom Chatbot</strong> — a rule-based conversational bot focused on spreading positivity and lightening the user's mood.</li>
+              <li>Curated <strong>therapist content</strong> and mental wellness resources.</li>
+              <li>Secure <strong>authentication system</strong> with user profiles.</li>
+            </ul>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Hardest Challenge</div>
+            <div class="pd-challenge"><strong>🔥 Module Scoping</strong> — Deciding <em>which features actually solve the problem of mental wellness</em> without bloating the app. The chatbot design was especially tricky — building conversational logic that felt warm and helpful, not robotic, using only rule-based responses without an LLM.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Tech Stack</div>
+            <div class="pd-chips"><span class="pd-chip">Django</span><span class="pd-chip">Python</span><span class="pd-chip">HTML/CSS</span><span class="pd-chip">JavaScript</span><span class="pd-chip">SQLite</span></div>
+          </div>
         </div>
-    </section>
 
-    <!-- Projects Section -->
-    <section id="projects" class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 reveal">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-12">
-                <h2 class="text-2xl sm:text-3xl font-bold font-mono mb-2"><span class="text-cyan-500">03.</span> Featured Projects</h2>
-                <div class="h-1 w-16 bg-cyan-500 rounded-full mx-auto"></div>
+        <!-- EATZY -->
+        <div id="pd-eatzy" style="display:none">
+          <div class="pd-header">
+            <div class="pd-icon" style="background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(217,119,6,.2));border:1px solid rgba(245,158,11,.3);font-size:1.6rem;">🍔</div>
+            <div>
+              <div class="pd-name">EatZy</div>
+              <div class="pd-type">Food Delivery App · MEAN Stack</div>
+              <div class="pd-links">
+                <a href="https://github.com/Pinkesh2905/EatZy" target="_blank" class="pd-link pd-link-gh"><i class="fab fa-github"></i> GitHub</a>
+              </div>
             </div>
-
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                
-                <!-- Project 1: Bloom -->
-                <div class="glass glass-hover rounded-2xl overflow-hidden project-card">
-                    <div class="h-48 overflow-hidden relative">
-                        <img src="https://images.unsplash.com/photo-1604480132736-44c188fe4d20?q=80&w=1980" alt="Bloom" class="w-full h-full object-cover" loading="lazy">
-                        <div class="project-overlay flex items-end p-6">
-                            <div class="flex gap-3">
-                                <a href="https://bloom-pwns.onrender.com/" target="_blank" class="w-10 h-10 bg-cyan-500 rounded-lg flex items-center justify-center hover:bg-cyan-400 transition">
-                                    <i class="fas fa-external-link-alt text-black"></i>
-                                </a>
-                                <a href="https://github.com/Pinkesh2905/bloom" target="_blank" class="w-10 h-10 bg-white rounded-lg flex items-center justify-center hover:bg-gray-200 transition">
-                                    <i class="fab fa-github text-black"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-3">Bloom Wellness</h3>
-                        <div class="mb-4">
-                            <p class="text-sm text-gray-400 mb-2"><strong class="text-cyan-400">What it is:</strong> A mental wellness web app built as a college case study.</p>
-                            <p class="text-sm text-gray-400 mb-2"><strong class="text-cyan-400">What it does:</strong> Users can track moods, chat with a rule-based bot, and explore therapist content.</p>
-                            <p class="text-sm text-gray-400"><strong class="text-cyan-400">My role:</strong> Designed the UI, built the Django backend, handled auth, mood tracking, and the chatbot.</p>
-                        </div>
-                        <div class="flex flex-wrap gap-2">
-                            <span class="text-xs font-mono text-cyan-400">Django</span>
-                            <span class="text-xs font-mono text-cyan-400">HTML/CSS</span>
-                            <span class="text-xs font-mono text-cyan-400">JavaScript</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project 2: EatZy -->
-                <div class="glass glass-hover rounded-2xl overflow-hidden project-card">
-                    <div class="h-48 overflow-hidden relative">
-                        <img src="https://images.unsplash.com/photo-1752095809262-eb816c4dcc3e?q=80&w=1241" alt="EatZy" class="w-full h-full object-cover" loading="lazy">
-                        <div class="project-overlay flex items-end p-6">
-                            <div class="flex gap-3">
-                                <a href="https://github.com/Pinkesh2905/EatZy" target="_blank" class="w-10 h-10 bg-white rounded-lg flex items-center justify-center hover:bg-gray-200 transition">
-                                    <i class="fab fa-github text-black"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-3">EatZy</h3>
-                        <div class="mb-4">
-                            <p class="text-sm text-gray-400 mb-2"><strong class="text-cyan-400">What it is:</strong> A food delivery app built using the MEAN stack.</p>
-                            <p class="text-sm text-gray-400 mb-2"><strong class="text-cyan-400">What it does:</strong> Displays food items, supports user login, and includes a cart and ordering flow.</p>
-                            <p class="text-sm text-gray-400"><strong class="text-cyan-400">What I learned:</strong> How frontend AngularJS talks to a Node and MongoDB backend using REST APIs.</p>
-                        </div>
-                        <div class="flex flex-wrap gap-2">
-                            <span class="text-xs font-mono text-cyan-400">MongoDB</span>
-                            <span class="text-xs font-mono text-cyan-400">Express</span>
-                            <span class="text-xs font-mono text-cyan-400">AngularJS</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project 3: MockMate -->
-                <div class="glass glass-hover rounded-2xl overflow-hidden project-card">
-                    <div class="h-48 overflow-hidden relative">
-                        <img src="https://plus.unsplash.com/premium_photo-1721080251127-76315300cc5c?q=80&w=1170" alt="MockMate" class="w-full h-full object-cover" loading="lazy">
-                        <div class="project-overlay flex items-end p-6">
-                            <div class="flex gap-3">
-                                <a href="https://github.com/Pinkesh2905/mockmate" target="_blank" class="w-10 h-10 bg-white rounded-lg flex items-center justify-center hover:bg-gray-200 transition">
-                                    <i class="fab fa-github text-black"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-3">MockMate</h3>
-                        <div class="mb-4">
-                            <p class="text-sm text-gray-400 mb-2"><strong class="text-cyan-400">What it is:</strong> An AI-powered mock interview platform for placement prep.</p>
-                            <p class="text-sm text-gray-400 mb-2"><strong class="text-cyan-400">What it does:</strong> Simulates interviews, stores responses, and gives feedback using LLM APIs.</p>
-                            <p class="text-sm text-gray-400"><strong class="text-cyan-400">My role:</strong> Built the Django app, integrated OpenAI and Gemini APIs, and added voice replies using gTTS.</p>
-                        </div>
-                        <div class="flex flex-wrap gap-2">
-                            <span class="text-xs font-mono text-cyan-400">Django</span>
-                            <span class="text-xs font-mono text-cyan-400">Python</span>
-                            <span class="text-xs font-mono text-cyan-400">LLM APIs</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Overview</div>
+            <div class="pd-desc">A full food delivery web app built using the MEAN stack — designed to understand how a frontend framework communicates with a Node.js/MongoDB backend through REST APIs at scale.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Core Features</div>
+            <ul class="pd-features">
+              <li>Browse food items with categories and filters.</li>
+              <li>User login and session management.</li>
+              <li>Add-to-cart flow and checkout ordering.</li>
+              <li>Full REST API backend with AngularJS consuming endpoints.</li>
+            </ul>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Key Learning</div>
+            <div class="pd-challenge"><strong>📚 REST Architecture at scale</strong> — Understanding how AngularJS services, controllers, and HTTP interceptors communicate cleanly with an Express/MongoDB backend. This project solidified my understanding of full-stack data flow.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Tech Stack</div>
+            <div class="pd-chips"><span class="pd-chip">MongoDB</span><span class="pd-chip">Express.js</span><span class="pd-chip">AngularJS</span><span class="pd-chip">Node.js</span></div>
+          </div>
         </div>
-    </section>
 
-
-    <!-- Experience Section -->
-    <section id="experience" class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 reveal">
-        <div class="max-w-4xl mx-auto">
-            <div class="text-center mb-12">
-                <h2 class="text-2xl sm:text-3xl font-bold font-mono mb-2"><span class="text-cyan-500">04.</span> Experience</h2>
-                <div class="h-1 w-16 bg-cyan-500 rounded-full mx-auto"></div>
+        <!-- MOCKMATE -->
+        <div id="pd-mockmate" style="display:none">
+          <div class="pd-header">
+            <div class="pd-icon" style="background:linear-gradient(135deg,rgba(6,182,212,.2),rgba(8,145,178,.2));border:1px solid rgba(6,182,212,.3);font-size:1.6rem;">🤖</div>
+            <div>
+              <div class="pd-name">MockMate</div>
+              <div class="pd-type">AI Interview Prep · v1 · MCA 3rd Sem</div>
+              <div class="pd-links">
+                <a href="https://github.com/Pinkesh2905/mockmate" target="_blank" class="pd-link pd-link-gh"><i class="fab fa-github"></i> GitHub</a>
+              </div>
             </div>
-
-            <div class="relative border-l-2 border-gray-700 ml-4 space-y-8">
-                <!-- Experience 1: Vezapp -->
-                <div class="relative pl-8">
-                    <span class="absolute -left-2 top-2 w-4 h-4 bg-cyan-500 rounded-full glow"></span>
-                    <div class="glass glass-hover p-6 rounded-xl">
-                        <div class="flex flex-col sm:flex-row justify-between mb-4">
-                            <h3 class="text-xl font-bold">Intern – Engineering</h3>
-                            <span class="text-xs font-mono text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full mt-2 sm:mt-0 inline-block">Dec 2025 – Present</span>
-                        </div>
-                        <p class="text-gray-400 mb-4 flex items-center gap-2">
-                            <i class="fas fa-building text-sm"></i> Vezapp Solutions LLP
-                        </p>
-                        <ul class="space-y-2 text-gray-400 text-sm">
-                            <li class="flex items-start gap-2">
-                                <span class="text-cyan-500 mt-1">▹</span>
-                                <span>Engineering real-time data pipelines using SQL and Python for automated reporting.</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-cyan-500 mt-1">▹</span>
-                                <span>Developing interactive dashboards in Looker Studio and Power BI.</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-cyan-500 mt-1">▹</span>
-                                <span>Contributing to full-stack application logic and feature implementation.</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Experience 2: Self-Learning -->
-                <div class="relative pl-8">
-                    <span class="absolute -left-2 top-2 w-4 h-4 bg-gray-600 rounded-full"></span>
-                    <div class="glass glass-hover p-6 rounded-xl">
-                        <div class="flex flex-col sm:flex-row justify-between mb-4">
-                            <h3 class="text-xl font-bold">Self-Directed Learning & Projects</h3>
-                            <span class="text-xs font-mono text-gray-500 bg-gray-800 px-3 py-1 rounded-full mt-2 sm:mt-0 inline-block">2021 – Present</span>
-                        </div>
-                        <p class="text-gray-400 mb-4 flex items-center gap-2">
-                            <i class="fas fa-code text-sm"></i> Academic & Personal Projects
-                        </p>
-                        <p class="text-gray-400 text-sm mb-4">
-                            Built 8+ full-stack applications to master web development and data analytics, focusing on solving real-world problems through code.
-                        </p>
-                        <div class="flex flex-wrap gap-2">
-                            <span class="text-xs bg-gray-800 text-gray-300 px-3 py-1 rounded-full">MERN Stack</span>
-                            <span class="text-xs bg-gray-800 text-gray-300 px-3 py-1 rounded-full">Django</span>
-                            <span class="text-xs bg-gray-800 text-gray-300 px-3 py-1 rounded-full">Data Analytics</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Overview</div>
+            <div class="pd-desc">The original version of what became <strong style="color:var(--p2)">Elevo</strong>. MockMate was an AI-powered mock interview platform built during 3rd semester — focused on simulating real interviews with voice feedback.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Core Features</div>
+            <ul class="pd-features">
+              <li>Simulates interview sessions using LLM APIs.</li>
+              <li>Stores and evaluates responses with AI feedback.</li>
+              <li>Voice-based answers and replies using <strong>gTTS</strong>.</li>
+              <li>Resume parsing to tailor questions to your background.</li>
+            </ul>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Evolution</div>
+            <div class="pd-challenge"><strong>💡 MockMate → Elevo</strong> — After seeing what MockMate could do, I scaled it into a full career prep platform (Elevo) in 4th semester — adding aptitude tests, ATS scoring, coding modules, and a proper progress tracking system.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Tech Stack</div>
+            <div class="pd-chips"><span class="pd-chip">Django</span><span class="pd-chip">Python</span><span class="pd-chip">OpenAI API</span><span class="pd-chip">Gemini API</span><span class="pd-chip">gTTS</span><span class="pd-chip">HTML/CSS/JS</span></div>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+    <div class="wrsz" data-win="w-proj"></div>
+  </div>
 
-    <!-- Contact Section -->
-    <section id="contact" class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-12">
-                <p class="text-cyan-400 font-mono mb-4">What's Next?</p>
-                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Get In Touch</h2>
-                <p class="text-gray-400 max-w-2xl mx-auto">
-                    I'm currently open to new opportunities. Whether you have a question or just want to say hi, feel free to reach out!
-                </p>
-            </div>
-
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                <!-- Email -->
-                <div class="glass glass-hover p-8 rounded-2xl text-center">
-                    <div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-envelope text-2xl text-cyan-400"></i>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2">Email</h3>
-                    <a href="mailto:pinkeshd29@gmail.com" class="text-gray-400 hover:text-cyan-400 transition text-sm break-all">
-                        pinkeshd29@gmail.com
-                    </a>
-                </div>
-
-                <!-- Phone -->
-                <div class="glass glass-hover p-8 rounded-2xl text-center">
-                    <div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-phone text-2xl text-green-400"></i>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2">Phone</h3>
-                    <a href="tel:+919875034836" class="text-gray-400 hover:text-green-400 transition text-sm">
-                        +91 9875034836
-                    </a>
-                </div>
-
-                <!-- Location -->
-                <div class="glass glass-hover p-8 rounded-2xl text-center sm:col-span-2 lg:col-span-1">
-                    <div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-map-marker-alt text-2xl text-purple-400"></i>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2">Location</h3>
-                    <p class="text-gray-400 text-sm">Borsad, Gujarat, India</p>
-                </div>
-            </div>
-
-            <div class="text-center">
-                <div class="flex justify-center gap-6 mb-8">
-                    <a href="https://github.com/Pinkesh2905" target="_blank" class="text-gray-400 hover:text-white transition transform hover:scale-110">
-                        <i class="fab fa-github text-2xl"></i>
-                    </a>
-                    <a href="https://www.linkedin.com/in/pinkesh-darji-3731b9266/" target="_blank" class="text-gray-400 hover:text-cyan-400 transition transform hover:scale-110">
-                        <i class="fab fa-linkedin text-2xl"></i>
-                    </a>
-                    <a href="https://x.com/techexplorer29" target="_blank" class="text-gray-400 hover:text-blue-400 transition transform hover:scale-110">
-                        <i class="fab fa-x-twitter text-2xl"></i>
-                    </a>
-                </div>
-            </div>
+  <!-- SKILLS -->
+  <div class="win" id="w-skills" style="width:440px;top:70px;left:1090px;">
+    <div class="wtb" data-win="w-skills">
+      <div class="wc">
+        <button class="wc-x" onclick="closeWin('w-skills')"><i class="fas fa-times"></i></button>
+        <button class="wc-m" onclick="minWin('w-skills')"><i class="fas fa-minus"></i></button>
+        <button class="wc-f" onclick="maxWin('w-skills')"><i class="fas fa-expand"></i></button>
+      </div>
+      <i class="fas fa-code wt-icon"></i>
+      <span class="wt-title">skills — tech stack</span>
+    </div>
+    <div class="wb wb-scroll" style="height:460px;">
+      <div class="skills-body">
+        <div>
+          <div class="sg-title"><i class="fas fa-palette" style="color:var(--c)"></i> Frontend</div>
+          <div class="skills-grid">
+            <div class="sk" style="--clr:var(--c)"><i class="fab fa-react" style="color:var(--c)"></i><span>React</span><div class="sk-bar"><div class="sk-bar-fill" data-w="85" style="background:var(--c)"></div></div></div>
+            <div class="sk"><i class="fab fa-angular" style="color:#f43f5e"></i><span>Angular</span><div class="sk-bar"><div class="sk-bar-fill" data-w="72" style="background:#f43f5e"></div></div></div>
+            <div class="sk"><i class="fab fa-js" style="color:var(--a)"></i><span>JavaScript</span><div class="sk-bar"><div class="sk-bar-fill" data-w="88" style="background:var(--a)"></div></div></div>
+            <div class="sk"><i class="fas fa-wind" style="color:var(--c)"></i><span>Tailwind</span><div class="sk-bar"><div class="sk-bar-fill" data-w="90" style="background:var(--c)"></div></div></div>
+            <div class="sk"><i class="fab fa-html5" style="color:#f97316"></i><span>HTML/CSS</span><div class="sk-bar"><div class="sk-bar-fill" data-w="92" style="background:#f97316"></div></div></div>
+          </div>
         </div>
-    </section>
+        <div>
+          <div class="sg-title"><i class="fas fa-server" style="color:var(--g)"></i> Backend</div>
+          <div class="skills-grid">
+            <div class="sk"><i class="fab fa-python" style="color:#fbbf24"></i><span>Python</span><div class="sk-bar"><div class="sk-bar-fill" data-w="87" style="background:#fbbf24"></div></div></div>
+            <div class="sk"><i class="fas fa-server" style="color:var(--g)"></i><span>Django</span><div class="sk-bar"><div class="sk-bar-fill" data-w="83" style="background:var(--g)"></div></div></div>
+            <div class="sk"><i class="fab fa-node" style="color:#84cc16"></i><span>Node.js</span><div class="sk-bar"><div class="sk-bar-fill" data-w="74" style="background:#84cc16"></div></div></div>
+            <div class="sk"><i class="fas fa-leaf" style="color:var(--g)"></i><span>MongoDB</span><div class="sk-bar"><div class="sk-bar-fill" data-w="78" style="background:var(--g)"></div></div></div>
+            <div class="sk"><i class="fas fa-database" style="color:#3b82f6"></i><span>PostgreSQL</span><div class="sk-bar"><div class="sk-bar-fill" data-w="76" style="background:#3b82f6"></div></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="sg-title"><i class="fas fa-chart-bar" style="color:var(--p2)"></i> Data & Analytics</div>
+          <div class="skills-grid">
+            <div class="sk"><i class="fas fa-chart-bar" style="color:var(--a)"></i><span>Power BI</span><div class="sk-bar"><div class="sk-bar-fill" data-w="81" style="background:var(--a)"></div></div></div>
+            <div class="sk"><i class="fas fa-chart-pie" style="color:#3b82f6"></i><span>Looker</span><div class="sk-bar"><div class="sk-bar-fill" data-w="78" style="background:#3b82f6"></div></div></div>
+            <div class="sk"><i class="fas fa-table" style="color:var(--g)"></i><span>SQL</span><div class="sk-bar"><div class="sk-bar-fill" data-w="86" style="background:var(--g)"></div></div></div>
+            <div class="sk"><i class="fas fa-brain" style="color:var(--p2)"></i><span>ML / AI</span><div class="sk-bar"><div class="sk-bar-fill" data-w="66" style="background:var(--p2)"></div></div></div>
+            <div class="sk"><i class="fas fa-robot" style="color:var(--c)"></i><span>LLM APIs</span><div class="sk-bar"><div class="sk-bar-fill" data-w="79" style="background:var(--c)"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wrsz" data-win="w-skills"></div>
+  </div>
 
-    <!-- Footer -->
-    <footer class="py-8 text-center border-t border-gray-800">
-        <p class="font-mono text-sm text-gray-500">
-            Built with <span class="text-red-500">❤</span> by <span class="text-cyan-500">Pinkesh</span> © <span id="year"></span>
-        </p>
-    </footer>
+  <!-- EXPERIENCE -->
+  <div class="win" id="w-exp" style="width:500px;top:380px;left:660px;">
+    <div class="wtb" data-win="w-exp">
+      <div class="wc">
+        <button class="wc-x" onclick="closeWin('w-exp')"><i class="fas fa-times"></i></button>
+        <button class="wc-m" onclick="minWin('w-exp')"><i class="fas fa-minus"></i></button>
+        <button class="wc-f" onclick="maxWin('w-exp')"><i class="fas fa-expand"></i></button>
+      </div>
+      <i class="fas fa-briefcase wt-icon"></i>
+      <span class="wt-title">work history</span>
+    </div>
+    <div class="wb wb-scroll" style="height:380px;">
+      <div class="exp-body">
+        <div class="exp-card current">
+          <div class="exp-now">Currently Active</div>
+          <div class="exp-role">Intern — Data & Engineering</div>
+          <div class="exp-company"><i class="fas fa-building" style="font-size:.75rem"></i> Vezapp Solutions LLP</div>
+          <div class="exp-period">Dec 2025 – Present &nbsp;·&nbsp; Surat, Gujarat</div>
+          <ul class="exp-list">
+            <li>Designing and maintaining <strong>SQL table schemas</strong> for digitalized foundry logbook applications — replacing manual paper-based data entry with structured relational databases.</li>
+            <li>Syncing SQL tables with client-facing applications to ensure <strong>real-time data accuracy</strong> across the pipeline.</li>
+            <li>Building production-grade <strong>interactive dashboards</strong> in Looker Studio and Power BI for operational analytics and reporting.</li>
+            <li>Contributing to <strong>full-stack feature development</strong> in the core application platform.</li>
+          </ul>
+          <div class="exp-tags">
+            <span class="exp-tag">SQL</span><span class="exp-tag">Looker Studio</span><span class="exp-tag">Power BI</span><span class="exp-tag">Data Pipelines</span><span class="exp-tag">Full Stack</span>
+          </div>
+        </div>
+        <div class="exp-card past">
+          <div class="exp-role">Self-Directed Engineering</div>
+          <div class="exp-company" style="color:var(--a)"><i class="fas fa-code" style="font-size:.75rem"></i> Academic & Personal Projects</div>
+          <div class="exp-period">2021 – Present &nbsp;·&nbsp; BSc → MCA</div>
+          <p style="font-size:.74rem;color:var(--text2);line-height:1.7;margin-bottom:10px;">Built 8+ full-stack applications across BSc and MCA — from wellness platforms to AI career prep tools. Each project chosen to solve a real problem, not just complete an assignment.</p>
+          <div class="exp-tags">
+            <span class="exp-tag">MEAN Stack</span><span class="exp-tag">Django</span><span class="exp-tag">AI/ML</span><span class="exp-tag">Data Analytics</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wrsz" data-win="w-exp"></div>
+  </div>
 
-    <script>
-        document.getElementById('year').textContent = new Date().getFullYear();
+  <!-- DASHBOARD -->
+  <div class="win" id="w-dash" style="width:520px;top:65px;left:850px;">
+    <div class="wtb" data-win="w-dash">
+      <div class="wc">
+        <button class="wc-x" onclick="closeWin('w-dash')"><i class="fas fa-times"></i></button>
+        <button class="wc-m" onclick="minWin('w-dash')"><i class="fas fa-minus"></i></button>
+        <button class="wc-f" onclick="maxWin('w-dash')"><i class="fas fa-expand"></i></button>
+      </div>
+      <i class="fas fa-chart-bar wt-icon"></i>
+      <span class="wt-title">stats.dashboard — Pinkesh Darji</span>
+    </div>
+    <div class="wb wb-scroll" style="height:400px;">
+      <div class="dash-body">
+        <div class="dash-kpi-row">
+          <div class="kpi"><div class="kpi-label">Projects</div><div class="kpi-val" style="color:var(--c)">4+</div><div class="kpi-sub">shipped apps</div></div>
+          <div class="kpi"><div class="kpi-label">Coding</div><div class="kpi-val" style="color:var(--p2)">4+</div><div class="kpi-sub">years active</div></div>
+          <div class="kpi"><div class="kpi-label">Stack</div><div class="kpi-val" style="color:var(--a)">15+</div><div class="kpi-sub">technologies</div></div>
+          <div class="kpi"><div class="kpi-label">Status</div><div class="kpi-val" style="color:var(--g);font-size:1.1rem;margin-top:4px;">● ON</div><div class="kpi-sub">Vezapp intern</div></div>
+        </div>
+        <div class="dash-row">
+          <div class="dash-card">
+            <div class="dash-card-title">Proficiency</div>
+            <div class="mbar"><div class="mbar-label">Full Stack</div><div class="mbar-bg"><div class="mbar-fill" data-w="88" style="background:linear-gradient(90deg,var(--p),var(--c))"></div></div><div class="mbar-pct">88%</div></div>
+            <div class="mbar"><div class="mbar-label">SQL / Data</div><div class="mbar-bg"><div class="mbar-fill" data-w="83" style="background:linear-gradient(90deg,var(--g),#059669)"></div></div><div class="mbar-pct">83%</div></div>
+            <div class="mbar"><div class="mbar-label">Dashboards</div><div class="mbar-bg"><div class="mbar-fill" data-w="80" style="background:linear-gradient(90deg,var(--a),#d97706)"></div></div><div class="mbar-pct">80%</div></div>
+            <div class="mbar"><div class="mbar-label">AI / LLMs</div><div class="mbar-bg"><div class="mbar-fill" data-w="74" style="background:linear-gradient(90deg,var(--p2),var(--c))"></div></div><div class="mbar-pct">74%</div></div>
+            <div class="mbar"><div class="mbar-label">ML / Python</div><div class="mbar-bg"><div class="mbar-fill" data-w="66" style="background:linear-gradient(90deg,#ec4899,#be185d)"></div></div><div class="mbar-pct">66%</div></div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-title">Activity Feed</div>
+            <div class="activity-item"><div class="act-dot" style="background:var(--g)"></div><div class="act-text">Shipping SQL pipelines & dashboards at Vezapp</div><div class="act-time">now</div></div>
+            <div class="activity-item"><div class="act-dot" style="background:var(--p)"></div><div class="act-text">Built Elevo — AI career prep platform (Sem 4)</div><div class="act-time">2025</div></div>
+            <div class="activity-item"><div class="act-dot" style="background:var(--c)"></div><div class="act-text">MockMate — AI interview system (Sem 3)</div><div class="act-time">2024</div></div>
+            <div class="activity-item"><div class="act-dot" style="background:var(--g)"></div><div class="act-text">Bloom Wellness — college case study</div><div class="act-time">2024</div></div>
+            <div class="activity-item"><div class="act-dot" style="background:var(--a)"></div><div class="act-text">Google Data Analytics Certification</div><div class="act-time">2024</div></div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title">Looking For</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+            <span class="badge badge-purple" style="font-size:.65rem;padding:4px 10px;">Full-time · Data Science</span>
+            <span class="badge badge-cyan" style="font-size:.65rem;padding:4px 10px;">Full-time · Software Engineering</span>
+            <span class="badge badge-green" style="font-size:.65rem;padding:4px 10px;">Open to Relocate</span>
+            <span class="badge badge-amber" style="font-size:.65rem;padding:4px 10px;">Available Immediately</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wrsz" data-win="w-dash"></div>
+  </div>
 
-        const mobileBtn = document.getElementById('mobile-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        
-        mobileBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            const icon = mobileBtn.querySelector('i');
-            if (mobileMenu.classList.contains('active')) {
-                icon.classList.replace('fa-bars', 'fa-times');
-            } else {
-                icon.classList.replace('fa-times', 'fa-bars');
-            }
-        });
+  <!-- CONTACT -->
+  <div class="win" id="w-contact" style="width:360px;top:300px;left:1100px;">
+    <div class="wtb" data-win="w-contact">
+      <div class="wc">
+        <button class="wc-x" onclick="closeWin('w-contact')"><i class="fas fa-times"></i></button>
+        <button class="wc-m" onclick="minWin('w-contact')"><i class="fas fa-minus"></i></button>
+        <button class="wc-f" onclick="maxWin('w-contact')"><i class="fas fa-expand"></i></button>
+      </div>
+      <i class="fas fa-paper-plane wt-icon"></i>
+      <span class="wt-title">contact</span>
+    </div>
+    <div class="wb wb-scroll" style="height:430px;">
+      <div class="contact-body">
+        <div class="contact-header">
+          <h3>Let's build something. 🚀</h3>
+          <p>Open to full-time roles in Data Science & Software Engineering. Drop a message or connect on any platform below.</p>
+        </div>
+        <a href="mailto:pinkeshd29@gmail.com" class="ci">
+          <div class="ci-ico" style="background:rgba(34,211,238,.1);color:var(--c)"><i class="fas fa-envelope"></i></div>
+          <div><div class="ci-label">Email</div><div class="ci-val">pinkeshd29@gmail.com</div></div>
+        </a>
+        <a href="tel:+919875034836" class="ci">
+          <div class="ci-ico" style="background:rgba(16,185,129,.1);color:var(--g)"><i class="fas fa-phone"></i></div>
+          <div><div class="ci-label">Phone</div><div class="ci-val">+91 9875034836</div></div>
+        </a>
+        <div class="ci" style="cursor:default;">
+          <div class="ci-ico" style="background:rgba(139,92,246,.1);color:var(--p2)"><i class="fas fa-map-marker-alt"></i></div>
+          <div><div class="ci-label">Location</div><div class="ci-val">Borsad, Gujarat, India</div></div>
+        </div>
+        <a href="https://github.com/Pinkesh2905" target="_blank" class="ci">
+          <div class="ci-ico" style="background:rgba(255,255,255,.06);color:#fff"><i class="fab fa-github"></i></div>
+          <div><div class="ci-label">GitHub</div><div class="ci-val">github.com/Pinkesh2905</div></div>
+        </a>
+        <a href="https://www.linkedin.com/in/pinkesh-darji-3731b9266/" target="_blank" class="ci">
+          <div class="ci-ico" style="background:rgba(14,165,233,.1);color:#0ea5e9"><i class="fab fa-linkedin"></i></div>
+          <div><div class="ci-label">LinkedIn</div><div class="ci-val">pinkesh-darji-3731b9266</div></div>
+        </a>
+        <a href="https://x.com/techexplorer29" target="_blank" class="ci">
+          <div class="ci-ico" style="background:rgba(255,255,255,.05);color:#fff"><i class="fab fa-x-twitter"></i></div>
+          <div><div class="ci-label">Twitter / X</div><div class="ci-val">@techexplorer29</div></div>
+        </a>
+        <a href="https://drive.google.com/file/d/1iCb_WYSOHj95oBcwHdvLXbSy4W3SVazw/view?usp=sharing" target="_blank" class="cert-row">
+          <div class="cert-icon" style="width:36px;height:36px;border-radius:7px;background:rgba(245,158,11,.1);display:flex;align-items:center;justify-content:center;font-size:.95rem;color:var(--a);flex-shrink:0;"><i class="fab fa-google"></i></div>
+          <div><div class="ci-label" style="color:var(--a)">Certification</div><div class="ci-val">Google Data Analytics</div><div style="font-size:.62rem;color:var(--text3)">Click to verify →</div></div>
+        </a>
+        <a href="https://drive.google.com/file/d/1EGecxcaeJKmkAaoCeTVoxAnAbeM1a2Np/view?usp=sharing" target="_blank" class="ci" style="background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.2);">
+          <div class="ci-ico" style="background:rgba(139,92,246,.15);color:var(--p2)"><i class="fas fa-file-pdf"></i></div>
+          <div><div class="ci-label" style="color:var(--p2)">Resume</div><div class="ci-val">Download / View PDF</div></div>
+        </a>
+      </div>
+    </div>
+    <div class="wrsz" data-win="w-contact"></div>
+  </div>
 
-        document.querySelectorAll('#mobile-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.remove('active');
-                mobileBtn.querySelector('i').classList.replace('fa-times', 'fa-bars');
-            });
-        });
+</div><!-- /desktop-area -->
 
-        const roles = ['Full Stack Developer', 'Data Analyst', 'Problem Solver', 'Tech Enthusiast'];
-        let roleIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
-        const typeElement = document.getElementById('typewriter');
+<!-- TASKBAR -->
+<div id="taskbar">
+  <button class="tb-start" onclick="toggleStart()">
+    <img src="https://i.postimg.cc/X78SxyTb/dp02.jpg" alt="P">
+    PINKESH
+  </button>
+  <div class="tb-sep"></div>
+  <div id="tb-apps"></div>
+  <div class="tb-sep"></div>
+  <div class="tb-right">
+    <div class="tb-badge"><span>Open to Work</span></div>
+    <div class="tb-clock" id="tb-clock">00:00<br>-- / -- / ----</div>
+  </div>
+</div>
 
-        function type() {
-            const current = roles[roleIndex];
-            
-            if (isDeleting) {
-                typeElement.textContent = current.substring(0, charIndex - 1);
-                charIndex--;
-            } else {
-                typeElement.textContent = current.substring(0, charIndex + 1);
-                charIndex++;
-            }
+<!-- START MENU -->
+<div id="smenu">
+  <div class="sm-head">
+    <img src="https://i.postimg.cc/X78SxyTb/dp02.jpg" class="sm-ava" alt="Pinkesh">
+    <div>
+      <div class="sm-name">Pinkesh Darji</div>
+      <div class="sm-status">Available for hire</div>
+    </div>
+  </div>
+  <div class="sm-list">
+    <div class="sm-item" onclick="openWin('w-about');toggleStart()"><i class="fas fa-user"></i> About Me</div>
+    <div class="sm-item" onclick="openWin('w-term');toggleStart()"><i class="fas fa-terminal"></i> Terminal</div>
+    <div class="sm-item" onclick="openWin('w-proj');toggleStart()"><i class="fas fa-rocket"></i> Projects</div>
+    <div class="sm-item" onclick="openWin('w-skills');toggleStart()"><i class="fas fa-code"></i> Skills</div>
+    <div class="sm-item" onclick="openWin('w-exp');toggleStart()"><i class="fas fa-briefcase"></i> Work History</div>
+    <div class="sm-item" onclick="openWin('w-dash');toggleStart()"><i class="fas fa-chart-bar"></i> Stats Dashboard</div>
+    <div class="sm-item" onclick="openWin('w-contact');toggleStart()"><i class="fas fa-paper-plane"></i> Contact</div>
+    <div class="sm-div"></div>
+    <a class="sm-item" href="https://drive.google.com/file/d/1EGecxcaeJKmkAaoCeTVoxAnAbeM1a2Np/view?usp=sharing" target="_blank"><i class="fas fa-download"></i> Download Resume</a>
+    <a class="sm-item" href="https://github.com/Pinkesh2905" target="_blank"><i class="fab fa-github"></i> GitHub Profile</a>
+  </div>
+</div>
 
-            if (!isDeleting && charIndex === current.length) {
-                setTimeout(() => isDeleting = true, 2000);
-            } else if (isDeleting && charIndex === 0) {
-                isDeleting = false;
-                roleIndex = (roleIndex + 1) % roles.length;
-            }
+</div><!-- /desktop -->
 
-            setTimeout(type, isDeleting ? 50 : 100);
-        }
+<script>
+/* ── MOUSE GLOW ── */
+const glow=document.getElementById('mouse-glow');
+let mouseX=0,mouseY=0;
+document.addEventListener('mousemove',e=>{
+  mouseX=e.clientX;
+  mouseY=e.clientY;
+  glow.style.transform=`translate3d(${mouseX}px,${mouseY}px,0) translate(-50%,-50%)`;
+});
 
-        setTimeout(type, 500);
+/* ── BOOT ── */
+const bootSeq=['Initializing kernel...','Mounting filesystem...','Loading user profile...','Starting window manager...','Configuring display...','Launching PinkeshOS...','Welcome back 👋'];
+let bi=0;
+const bmsg=document.getElementById('boot-msg');
+(function nextBoot(){
+  if(bi>=bootSeq.length){
+    document.getElementById('boot').classList.add('out');
+    setTimeout(()=>{
+      document.getElementById('boot').style.display='none';
+      bootDone();
+    },900);
+    return;
+  }
+  bmsg.textContent=bootSeq[bi++];
+  setTimeout(nextBoot,400+Math.random()*300);
+})();
 
-        const revealElements = document.querySelectorAll('.reveal');
-        
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                }
-            });
-        }, { threshold: 0.1 });
+function bootDone(){
+  // open default windows with stagger
+  setTimeout(()=>openWin('w-about'),100);
+  setTimeout(()=>openWin('w-term'),350);
+  // welcome notification
+  setTimeout(()=>notify('👋 Welcome to PinkeshOS','Double-click any icon or use the Start menu to explore.','var(--p)'),1200);
+  // second notification
+  setTimeout(()=>notify('💼 Currently Available','Looking for full-time roles in Data Science & SWE.','var(--g)'),3000);
+  startTerminal();
+  animateBars();
+}
 
-        revealElements.forEach(el => revealObserver.observe(el));
+/* ── CLOCK ── */
+function tick(){
+  const n=new Date();
+  const t=n.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  const sec=String(n.getSeconds()).padStart(2,'0');
+  const d=`${String(n.getDate()).padStart(2,'0')} / ${String(n.getMonth()+1).padStart(2,'0')} / ${n.getFullYear()}`;
+  
+  // Taskbar clock
+  document.getElementById('tb-clock').innerHTML=`${t}<br>${d}`;
+  
+  // Widget clock
+  const wTime = document.getElementById('widget-time');
+  const wDate = document.getElementById('widget-date');
+  if(wTime) wTime.textContent = t;
+  if(wDate) {
+    const days = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    wDate.textContent = `${days[n.getDay()]}, ${months[n.getMonth()]} ${String(n.getDate()).padStart(2,'0')}`;
+  }
+}
+tick();setInterval(tick,1000);
 
-        const navbar = document.getElementById('navbar');
-        let lastScroll = 0;
+/* ── WINDOW MANAGEMENT ── */
+let ztop=100;
+const winMeta={
+  'w-about':{icon:'fas fa-user',label:'about.me'},
+  'w-term':{icon:'fas fa-terminal',label:'terminal'},
+  'w-proj':{icon:'fas fa-rocket',label:'projects'},
+  'w-skills':{icon:'fas fa-code',label:'skills'},
+  'w-exp':{icon:'fas fa-briefcase',label:'work'},
+  'w-dash':{icon:'fas fa-chart-bar',label:'stats'},
+  'w-contact':{icon:'fas fa-paper-plane',label:'contact'}
+};
+const winState={};
 
-        window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-            
-            if (currentScroll > 100) {
-                navbar.style.background = 'rgba(10, 10, 15, 0.95)';
-                navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.5)';
-            } else {
-                navbar.style.background = 'rgba(255, 255, 255, 0.03)';
-                navbar.style.boxShadow = 'none';
-            }
-            
-            lastScroll = currentScroll;
-        });
+function focusWin(id){
+  ztop++;
+  const el=document.getElementById(id);
+  el.style.zIndex=ztop;
+  document.querySelectorAll('.win').forEach(w=>w.classList.remove('focused'));
+  el.classList.add('focused');
+  updateTaskbar();
+}
 
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-    </script>
+function openWin(id){
+  const el=document.getElementById(id);
+  winState[id]='open';
+  el.classList.add('visible');
+  // entrance animation
+  el.classList.add('win-opening');
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      el.classList.remove('win-opening');
+    });
+  });
+  focusWin(id);
+  if(id==='w-skills'||id==='w-dash') setTimeout(animateBars,200);
+}
+
+function closeWin(id){
+  const el=document.getElementById(id);
+  el.classList.add('minimizing');
+  setTimeout(()=>{
+    el.classList.remove('minimizing','visible','focused');
+    winState[id]='closed';
+    updateTaskbar();
+  },230);
+}
+
+function minWin(id){
+  const el=document.getElementById(id);
+  el.classList.add('minimizing');
+  setTimeout(()=>{
+    el.classList.remove('minimizing','visible','focused');
+    winState[id]='minimized';
+    updateTaskbar();
+  },230);
+}
+
+const maxStates={};
+function maxWin(id){
+  const el=document.getElementById(id);
+  const area=document.getElementById('desktop-area');
+  if(!maxStates[id]){
+    maxStates[id]={w:el.style.width,h:el.style.height||el.offsetHeight+'px',t:el.style.top,l:el.style.left};
+    el.style.transition='all .25s cubic-bezier(.4,0,.2,1)';
+    el.style.width=area.offsetWidth+'px';
+    el.style.height=area.offsetHeight+'px';
+    el.style.top='0';el.style.left='0';
+    setTimeout(()=>el.style.transition='',260);
+  } else {
+    const s=maxStates[id];
+    el.style.transition='all .25s cubic-bezier(.4,0,.2,1)';
+    el.style.width=s.w;el.style.height=s.h;
+    el.style.top=s.t;el.style.left=s.l;
+    setTimeout(()=>el.style.transition='',260);
+    delete maxStates[id];
+  }
+}
+
+function updateTaskbar(){
+  const c=document.getElementById('tb-apps');
+  c.innerHTML='';
+  Object.entries(winMeta).forEach(([id,m])=>{
+    const el=document.getElementById(id);
+    if(el.classList.contains('visible')){
+      const b=document.createElement('div');
+      b.className='tb-app'+(el.classList.contains('focused')?' active':'');
+      b.innerHTML=`<i class="${m.icon} tb-app-icon"></i><span>${m.label}</span>`;
+      b.onclick=()=>focusWin(id);
+      c.appendChild(b);
+    }
+  });
+}
+
+/* ── DRAG ── */
+document.querySelectorAll('.wtb').forEach(tb=>{
+  let drag=false,ox=0,oy=0;
+  
+  // Double-click to maximize
+  tb.addEventListener('dblclick', e => {
+    if(e.target.tagName==='BUTTON'||e.target.tagName==='I')return;
+    maxWin(tb.dataset.win);
+  });
+
+  tb.addEventListener('mousedown',e=>{
+    if(e.target.tagName==='BUTTON'||e.target.tagName==='I')return;
+    const win=document.getElementById(tb.dataset.win);
+    focusWin(tb.dataset.win);
+    drag=true;ox=e.clientX-win.offsetLeft;oy=e.clientY-win.offsetTop;
+    const mm=ev=>{if(!drag)return;win.style.left=(ev.clientX-ox)+'px';win.style.top=(ev.clientY-oy)+'px';};
+    document.addEventListener('mousemove',mm);
+    document.addEventListener('mouseup',()=>{drag=false;document.removeEventListener('mousemove',mm);},{once:true});
+  });
+});
+
+/* ── RESIZE ── */
+document.querySelectorAll('.wrsz').forEach(rh=>{
+  let res=false,sx=0,sy=0,sw=0,sh=0;
+  rh.addEventListener('mousedown',e=>{
+    e.stopPropagation();
+    const win=document.getElementById(rh.dataset.win);
+    res=true;sx=e.clientX;sy=e.clientY;sw=win.offsetWidth;sh=win.offsetHeight;
+    const mm=ev=>{
+      if(!res)return;
+      win.style.width=Math.max(340,sw+(ev.clientX-sx))+'px';
+      win.style.height=Math.max(220,sh+(ev.clientY-sy))+'px';
+    };
+    document.addEventListener('mousemove',mm);
+    document.addEventListener('mouseup',()=>{res=false;document.removeEventListener('mousemove',mm);},{once:true});
+  });
+});
+
+/* focus on click */
+document.querySelectorAll('.win').forEach(w=>{w.addEventListener('mousedown',()=>focusWin(w.id));});
+
+/* ── START MENU ── */
+let smOpen=false;
+function toggleStart(){
+  smOpen=!smOpen;
+  document.getElementById('smenu').classList.toggle('open',smOpen);
+}
+document.addEventListener('mousedown',e=>{
+  if(smOpen&&!e.target.closest('#smenu')&&!e.target.closest('.tb-start')){
+    smOpen=false;document.getElementById('smenu').classList.remove('open');
+  }
+});
+
+/* ── NOTIFICATIONS ── */
+function notify(title,msg,color){
+  const area=document.getElementById('notif-area');
+  const n=document.createElement('div');
+  n.className='notif';
+  n.innerHTML=`
+    <div class="notif-icon" style="background:${color}22;color:${color}"><i class="fas fa-bell"></i></div>
+    <div><div class="notif-title">${title}</div><div class="notif-msg">${msg}</div></div>
+  `;
+  area.appendChild(n);
+  setTimeout(()=>{
+    n.classList.add('out');
+    setTimeout(()=>n.remove(),260);
+  },4500);
+}
+
+/* ── ABOUT TABS ── */
+const aboutPanels={bio:'about-bio',edu:'about-edu',interests:'about-interests'};
+function switchTab(win,tab){
+  const tabs=document.querySelectorAll(`#w-${win} .atab`);
+  const panels=document.querySelectorAll(`#w-${win} .about-panel`);
+  tabs.forEach((t,i)=>t.classList.toggle('on',Object.keys(aboutPanels)[i]===tab));
+  panels.forEach(p=>p.classList.remove('on'));
+  document.getElementById(aboutPanels[tab]).classList.add('on');
+}
+
+/* ── PROJECTS NAV ── */
+function switchProj(name){
+  ['elevo','bloom','eatzy','mockmate'].forEach(p=>{
+    document.getElementById('pi-'+p).classList.toggle('on',p===name);
+    document.getElementById('pd-'+p).style.display=p===name?'block':'none';
+  });
+}
+
+/* ── SKILL BARS ── */
+function animateBars(){
+  document.querySelectorAll('.sk-bar-fill,.mbar-fill').forEach(b=>{
+    b.style.width=(b.dataset.w||0)+'%';
+  });
+}
+
+/* ── TERMINAL ── */
+const script=[
+  {t:'p',c:'neofetch'},
+  {t:'o',s:'hi',v:''},
+  {t:'o',s:'pu',v:'  ██████╗ ██╗███╗   ██╗██╗  ██╗███████╗███████╗██╗  ██╗'},
+  {t:'o',s:'pu',v:'  ██╔══██╗██║████╗  ██║██║ ██╔╝██╔════╝██╔════╝██║  ██║'},
+  {t:'o',s:'pu',v:'  ██████╔╝██║██╔██╗ ██║█████╔╝ █████╗  ███████╗███████║'},
+  {t:'o',s:'pu',v:'  ██╔═══╝ ██║██║╚██╗██║██╔═██╗ ██╔══╝  ╚════██║██╔══██║'},
+  {t:'o',s:'pu',v:'  ██║     ██║██║ ╚████║██║  ██╗███████╗███████║██║  ██║'},
+  {t:'o',s:'hi',v:'  ─────────────────────────────────────────────────────'},
+  {t:'o',s:'cy',v:'  OS          PinkeshOS v2.0'},
+  {t:'o',s:'cy',v:'  Role        Full Stack Dev & Data Analyst'},
+  {t:'o',s:'cy',v:'  Location    Borsad, Gujarat, India'},
+  {t:'o',s:'gr',v:'  Edu         MCA @ CHARUSAT · BSc CA @ SP University'},
+  {t:'o',s:'gr',v:'  Work        Intern @ Vezapp Solutions LLP'},
+  {t:'o',s:'am',v:'  Goal        Full-time · Data Science · SWE'},
+  {t:'o',s:'hi',v:'  ─────────────────────────────────────────────────────'},
+  {t:'o',s:'hi',v:''},
+  {t:'p',c:'cat interests.txt'},
+  {t:'o',s:'',v:'Cricket 🏏  ·  Music 🎵  ·  Tech YouTube 📺  ·  AI/ML 🤖  ·  Vibe Coding 🔥'},
+  {t:'o',s:'hi',v:''},
+  {t:'p',c:'ls ~/projects'},
+  {t:'o',s:'cy',v:'elevo/    bloom-wellness/    eatzy/    mockmate/'},
+  {t:'o',s:'hi',v:''},
+  {t:'p',c:'echo $STATUS'},
+  {t:'o',s:'gr',v:'● OPEN TO WORK — Looking for full-time roles in Data Science & SWE'},
+];
+const cmds={
+  help:{fn:()=>['Commands: whoami, skills, projects, contact, resume, experience, clear','Try: cat elevo.txt  ·  cat bloom.txt  ·  cat vezapp.txt']},
+  whoami:{fn:()=>['Pinkesh Darji — Full Stack Developer & Data Analyst','CHARUSAT University · MCA (2024-26)','SP University · BSc CA & IT (2021-24)','Status: Intern @ Vezapp Solutions LLP','Goal: Full-time roles in Data Science & Software Engineering']},
+  skills:{fn:()=>['Frontend:   React · Angular · JavaScript · Tailwind · HTML/CSS','Backend:    Python · Django · Node.js · MongoDB · PostgreSQL','Data:       SQL · Power BI · Looker Studio · Machine Learning','AI/LLM:     OpenAI API · Gemini API · gTTS · Prompt Engineering']},
+  projects:{fn:()=>['1. Elevo        — AI career prep platform (Sem 4 · Active)','   github.com/Pinkesh2905/Elevo','2. MockMate     — AI mock interviews · v1 (Sem 3)','   github.com/Pinkesh2905/mockmate','3. Bloom        — Mental wellness Django app','   bloom-pwns.onrender.com','4. EatZy        — Food delivery MEAN stack app','   github.com/Pinkesh2905/EatZy']},
+  experience:{fn:()=>['Vezapp Solutions LLP  ·  Dec 2025 – Present','· SQL schema design & sync for foundry digitalization apps','· Looker Studio & Power BI dashboards for production analytics','· Full-stack feature development']},
+  contact:{fn:()=>['Email:    pinkeshd29@gmail.com','Phone:    +91 9875034836','GitHub:   github.com/Pinkesh2905','LinkedIn: linkedin.com/in/pinkesh-darji-3731b9266/','X:        x.com/techexplorer29']},
+  resume:{fn:()=>{window.open('https://drive.google.com/file/d/1EGecxcaeJKmkAaoCeTVoxAnAbeM1a2Np/view?usp=sharing','_blank');return['Opening resume... ✓'];}},
+  clear:{fn:()=>{document.getElementById('term-out').innerHTML='';return[];}},
+  'cat elevo.txt':{fn:()=>['Elevo — AI-Powered Career Prep Platform','Built in MCA 4th Sem as evolution of MockMate.','Features: AI Mock Interviews · ATS Resume Analyzer · Coding Practice','         Aptitude Tests · Personalized Feedback · Progress Tracking','Stack: Django · Python · OpenAI · Gemini · PostgreSQL','GitHub: github.com/Pinkesh2905/Elevo']},
+  'cat bloom.txt':{fn:()=>['Bloom Wellness — Mental Health Web App','College case study project (BSc final year).','Features: Mood Tracking · Bloom Chatbot · Therapist Content · Auth','Challenge: Designing a warm rule-based chatbot without an LLM.','Stack: Django · Python · HTML/CSS · JS','Live: bloom-pwns.onrender.com']},
+  'cat vezapp.txt':{fn:()=>['Vezapp Solutions LLP — Current Internship','Vezapp builds customized digitalization apps for industrial clients','(foundries). I work on the data layer:','· Design SQL schemas for digitalized logbook data entry apps','· Sync SQL tables with client applications for real-time data','· Build analytics dashboards in Looker Studio & Power BI','· Contribute to full-stack features in the core platform']},
+};
+let ti=0;
+function startTerminal(){
+  const out=document.getElementById('term-out');
+  function next(){
+    if(ti>=script.length)return;
+    const l=script[ti++];
+    const d=document.createElement('div');
+    if(l.t==='p'){
+      d.className='tl';
+      d.innerHTML=`<span class="tp">pinkesh@portfolio:~$</span><span class="tc"> ${l.c}</span>`;
+    } else {
+      d.className=`to ${l.s||''}`;d.textContent=l.v;
+    }
+    out.appendChild(d);out.scrollTop=out.scrollHeight;
+    setTimeout(next,l.t==='p'?550:l.v===''?80:120);
+  }
+  next();
+}
+document.getElementById('term-in').addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  const raw=e.target.value.trim();
+  const val=raw.toLowerCase();
+  e.target.value='';
+  const out=document.getElementById('term-out');
+  const d=document.createElement('div');
+  d.className='tl';
+  d.innerHTML=`<span class="tp">pinkesh@portfolio:~$</span><span class="tc"> ${raw}</span>`;
+  out.appendChild(d);
+  const cmd=cmds[val];
+  if(cmd){
+    cmd.fn().forEach(r=>{
+      if(r==='')return;
+      const o=document.createElement('div');
+      o.className='to hi';o.textContent=r;out.appendChild(o);
+    });
+  } else if(val===''){
+  } else {
+    const o=document.createElement('div');
+    o.className='to re';
+    o.textContent=`command not found: ${raw}  (try 'help')`;
+    out.appendChild(o);
+  }
+  out.scrollTop=out.scrollHeight;
+});
+
+/* init */
+updateTaskbar();
+</script>
 </body>
 </html>
