@@ -671,8 +671,12 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
 .tag{padding:2px 7px;border-radius:3px;font-family:var(--mono);font-size:.58rem;border:1px solid var(--border);color:var(--text3);}
 
 /* window open/close states */
-.win{display:none;}
 .win.visible{display:flex;}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 /* ── RESPONSIVE OVERRIDES ────────────────────────────────── */
 @media(max-width:800px){
@@ -716,22 +720,57 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
   .info-key { width: 70px; font-size: .55rem; }
 
   /* Projects Window: Sidebar to Top Nav */
-  #w-proj .wb { flex-direction: column; }
+  #w-proj .wb { flex-direction: column !important; height: auto !important; flex: 1; }
   .proj-sidebar { 
     width: 100%; height: auto; 
     flex-direction: row; 
     border-right: none; border-bottom: 1px solid var(--border);
-    padding: 8px; overflow-x: auto; white-space: nowrap;
+    padding: 10px 15px; overflow-x: auto; white-space: nowrap;
     -webkit-overflow-scrolling: touch;
+    gap: 8px;
+    background: rgba(255,255,255,0.02);
   }
-  .proj-item { padding: 6px 12px; flex-shrink: 0; flex-direction: row; gap: 6px; }
-  .proj-item-icon { width: 22px; height: 22px; font-size: .65rem; }
-  .proj-item-name { font-size: .6rem; }
-  .proj-item-type { display: none; }
-  .proj-detail { padding: 15px; }
-  .pd-header { flex-direction: column; align-items: center; text-align: center; }
-  .pd-icon { width: 60px; height: 60px; font-size: 1.8rem; }
-  .pd-links { justify-content: center; width: 100%; }
+  .proj-sidebar::-webkit-scrollbar { display: none; } /* Hide scrollbar for cleaner look */
+  .proj-sidebar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .proj-item { 
+    padding: 8px 16px; border-radius: 20px; 
+    flex-shrink: 0; flex-direction: row; gap: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .proj-item.on { 
+    background: rgba(124, 58, 237, 0.2); 
+    border-color: var(--p); 
+    color: var(--p2);
+    box-shadow: 0 0 15px rgba(124, 58, 237, 0.2);
+  }
+  .proj-item-icon { width: 24px; height: 24px; font-size: .8rem; }
+  .proj-item-name { font-size: .75rem; font-weight: 700; }
+  .proj-item-type { display: none; } /* Still hide type to keep pills compact */
+
+  .proj-detail { padding: 25px 20px; }
+  .pd-header { flex-direction: column; align-items: center; text-align: center; gap: 15px; margin-bottom: 25px; }
+  .pd-icon { 
+    width: 80px; height: 80px; font-size: 2.5rem; 
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  }
+  .pd-name { font-size: 1.8rem; letter-spacing: -1px; }
+  .pd-type { font-size: .7rem; margin-top: 5px; opacity: 0.7; }
+  .pd-links { flex-direction: column; gap: 10px; width: 100%; margin-top: 20px; }
+  .pd-link { 
+    justify-content: center; padding: 12px; font-size: .75rem; 
+    border-radius: 12px; width: 100%;
+  }
+
+  .pd-section { margin-bottom: 24px; }
+  .pd-section-title { font-size: .6rem; letter-spacing: 4px; margin-bottom: 12px; }
+  .pd-desc { font-size: .9rem; line-height: 1.8; }
+  .pd-features li { font-size: .85rem; padding: 4px 0; }
+  .pd-challenge { padding: 20px; border-radius: 12px; font-size: .85rem; line-height: 1.8; }
+  .pd-chips { gap: 8px; }
+  .pd-chip { padding: 6px 14px; font-size: .7rem; border-radius: 8px; }
 
   /* Skills Window: Grid adjustment */
   .skills-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
@@ -1604,8 +1643,19 @@ function switchTab(win,tab){
 /* ── PROJECTS NAV ── */
 function switchProj(name){
   ['elevo','bloom','eatzy','mockmate'].forEach(p=>{
-    document.getElementById('pi-'+p).classList.toggle('on',p===name);
-    document.getElementById('pd-'+p).style.display=p===name?'block':'none';
+    const item = document.getElementById('pi-'+p);
+    const detail = document.getElementById('pd-'+p);
+    const isOn = p===name;
+    
+    item.classList.toggle('on', isOn);
+    detail.style.display = isOn ? 'block' : 'none';
+    
+    if(isOn) {
+      detail.style.animation = 'fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+      document.getElementById('proj-content').scrollTop = 0;
+      // Scroll the sidebar item into view if it's off-screen (mobile)
+      item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
   });
 }
 
