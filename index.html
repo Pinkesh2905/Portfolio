@@ -674,22 +674,101 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
 .win{display:none;}
 .win.visible{display:flex;}
 
+/* ── RESPONSIVE OVERRIDES ────────────────────────────────── */
 @media(max-width:800px){
   .wm{display:none;}
-  #clock-widget{transform: translate(-50%, -100%) scale(0.6);}
-  .dicons{flex-direction: row; flex-wrap: wrap; justify-content: center; width: 100%; top: auto; bottom: 80px; left: 0;}
-  .dic{width: 70px;}
-  .dic span{font-size:.5rem;}
-  .tb-badge span{display:none;}
+  #clock-widget{transform: translate(-50%, -100%) scale(0.65);}
   
-  .win{
-    width: 95% !important;
-    left: 2.5% !important;
-    top: 20px !important;
-    height: auto !important;
-    max-height: 80vh !important;
+  /* Desktop Icons: Bottom-aligned grid for better thumb reach */
+  .dicons{
+    position: absolute;
+    bottom: 70px; top: auto; left: 0; right: 0;
+    flex-direction: row; flex-wrap: wrap; 
+    justify-content: center; align-content: flex-end;
+    width: 100%; height: auto; max-height: 40%;
+    padding: 10px; gap: 4px;
   }
-  .wt-subtitle{display:none;}
+  .dic{width: 72px; padding: 8px 0;}
+  .dic-img{width: 42px; height: 42px; font-size: 1.1rem; border-radius: 12px;}
+  .dic span{font-size: .55rem; white-space: nowrap;}
+
+  /* Force Windows to Full Screen */
+  .win {
+    width: 100% !important;
+    height: calc(100% - 52px) !important; /* Taskbar height */
+    top: 0 !important;
+    left: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    transform: none !important;
+  }
+  .win.win-opening { transform: translateY(100%) !important; opacity: 1 !important; }
+  .wtb { padding: 0 10px; height: 48px; }
+  .wt-subtitle { display: none; }
+  .wrsz { display: none; } /* Disable resize on mobile */
+
+  /* About Window: Hero stacking */
+  .about-hero { flex-direction: column; align-items: center; text-align: center; padding: 20px; }
+  .about-photo { width: 90px; height: 90px; }
+  .about-badges { justify-content: center; }
+  .about-tabs { padding: 0 10px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+  .about-panel { padding: 20px 15px; }
+  .info-key { width: 70px; font-size: .55rem; }
+
+  /* Projects Window: Sidebar to Top Nav */
+  #w-proj .wb { flex-direction: column; }
+  .proj-sidebar { 
+    width: 100%; height: auto; 
+    flex-direction: row; 
+    border-right: none; border-bottom: 1px solid var(--border);
+    padding: 8px; overflow-x: auto; white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  .proj-item { padding: 6px 12px; flex-shrink: 0; flex-direction: row; gap: 6px; }
+  .proj-item-icon { width: 22px; height: 22px; font-size: .65rem; }
+  .proj-item-name { font-size: .6rem; }
+  .proj-item-type { display: none; }
+  .proj-detail { padding: 15px; }
+  .pd-header { flex-direction: column; align-items: center; text-align: center; }
+  .pd-icon { width: 60px; height: 60px; font-size: 1.8rem; }
+  .pd-links { justify-content: center; width: 100%; }
+
+  /* Skills Window: Grid adjustment */
+  .skills-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .sk { padding: 12px 6px; }
+  .sk i { font-size: 1.4rem; }
+
+  /* Stats Dashboard */
+  .dash-kpi-row { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .kpi { padding: 12px; }
+  .kpi-val { font-size: 1.5rem; }
+  .dash-row { grid-template-columns: 1fr; }
+
+  /* Contact */
+  .contact-header { padding: 15px; }
+  .contact-header h3 { font-size: 1.2rem; }
+  .ci { padding: 12px; gap: 12px; }
+  .ci-ico { width: 36px; height: 36px; font-size: 1rem; }
+
+  /* Taskbar Improvements */
+  #taskbar { height: 52px; padding: 0 10px; gap: 8px; }
+  .tb-start span { display: none; } /* Icon only start button on small screens */
+  .tb-start { padding: 8px 12px; }
+  #tb-apps { gap: 4px; }
+  .tb-app { max-width: 40px; padding: 0; justify-content: center; height: 38px; }
+  .tb-app span { display: none; }
+  .tb-app .tb-app-icon { font-size: 1rem; }
+  .tb-right { gap: 8px; }
+  .tb-badge { display: none; }
+  .tb-clock { font-size: .55rem; }
+
+  /* Start Menu */
+  #smenu { width: calc(100% - 32px); left: 16px; bottom: 62px; }
+}
+
+@media(max-width:480px) {
+  .skills-grid { grid-template-columns: 1fr 1fr; }
+  #widget-time { font-size: 4.5rem; }
 }
 </style>
 </head>
