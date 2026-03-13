@@ -77,7 +77,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
   display:flex;flex-direction:column;
   position:relative;overflow:hidden;
 }
-#desktop-area{flex:1;position:relative;overflow:hidden;order:1;}
+#desktop-area{flex:1;position:relative;overflow:hidden;order:1;min-height:0;}
 
 /* ambient glow that follows mouse */
 #mouse-glow{
@@ -126,6 +126,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
 }
 .tb-start:hover{background:var(--p2);transform:translateY(-2px);box-shadow: 0 6px 16px rgba(124, 58, 237, 0.5);}
 .tb-start img{width:22px;height:22px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,0.2);}
+.tb-start-label{display:inline;}
 .tb-sep{width:1px;height:24px;background:rgba(255,255,255,0.1);flex-shrink:0;}
 #tb-apps{display:flex;align-items:center;gap:6px;flex:1;overflow:hidden;}
 .tb-app{
@@ -156,17 +157,26 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
 /* ── WINDOWS ────────────────────────────────────────────── */
 .win{
   position:absolute;
-  display:flex;flex-direction:column;
+  display:none;flex-direction:column;
   background: var(--surface);
   backdrop-filter: blur(24px) saturate(160%);
   border:1px solid rgba(255, 255, 255, 0.1);
   border-radius:var(--win-radius);
   box-shadow: var(--shadow-lg);
+  max-width:min(92vw, 920px);
+  max-height:calc(100% - 84px);
   min-width:360px;min-height:240px;
   overflow:hidden;
   /* open animation */
   transform-origin: center center;
   transition: box-shadow 0.3s, opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.win.maxed{
+  max-width:none;
+  max-height:none;
+}
+.win.maxed > .wb{
+  height:auto !important;
 }
 .win.win-opening{opacity:0;transform:scale(.92) translateY(20px);}
 .win.focused{
@@ -645,9 +655,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
 
 /* ── CLOCK WIDGET ───────────────────────────────────── */
 #clock-widget{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-120%);
+  position:absolute;top:clamp(48px, 11vh, 120px);left:50%;transform:translateX(-50%);
   text-align:center;pointer-events:none;user-select:none;
-  opacity: 0.95; z-index: 5;
+  width:min(720px, calc(100% - 220px));
+  opacity: 0.95; z-index: 9;
 }
 #widget-time{
   font-family:var(--display);font-weight:800;font-size:7rem;
@@ -666,6 +677,122 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
   margin-top: 24px; letter-spacing: 1px;
 }
 
+#home-hub{
+  position:absolute;
+  left:50%;
+  bottom:56px;
+  transform:translateX(-50%);
+  width:min(680px, calc(100% - 48px));
+  max-height:calc(100dvh - 320px);
+  display:flex;
+  align-items:flex-end;
+  z-index:8;
+}
+.home-card{
+  width:100%;
+  padding:22px 24px;
+  max-height:100%;
+  overflow:auto;
+  border-radius:24px;
+  background:linear-gradient(135deg, rgba(11,11,19,0.86), rgba(17,17,30,0.62));
+  border:1px solid rgba(255,255,255,0.1);
+  backdrop-filter:blur(22px) saturate(150%);
+  box-shadow:0 20px 60px rgba(0,0,0,0.45);
+}
+.home-card::-webkit-scrollbar{width:0;}
+.home-kicker{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(124,58,237,.12);
+  border:1px solid rgba(124,58,237,.18);
+  color:var(--p2);
+  font-family:var(--mono);font-size:.62rem;letter-spacing:1.4px;text-transform:uppercase;
+}
+.home-kicker::before{
+  content:'';
+  width:7px;height:7px;border-radius:50%;
+  background:var(--g);
+  box-shadow:0 0 12px rgba(16,185,129,.65);
+}
+.home-title{
+  margin-top:14px;
+  font-family:var(--display);font-weight:800;
+  font-size:clamp(1.8rem, 4vw, 3rem);
+  color:var(--text);
+  letter-spacing:-1.4px;
+  line-height:1;
+}
+.home-copy{
+  margin-top:10px;
+  max-width:56ch;
+  font-size:.92rem;
+  color:var(--text2);
+  line-height:1.8;
+}
+.home-actions{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:10px;
+  margin-top:20px;
+}
+.home-action{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  min-height:48px;
+  padding:0 14px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.03);
+  color:var(--text);
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.6px;text-transform:uppercase;
+  cursor:pointer;
+  transition:transform .2s ease, border-color .2s ease, background .2s ease;
+}
+.home-action:hover{
+  transform:translateY(-2px);
+  border-color:rgba(124,58,237,.26);
+  background:rgba(124,58,237,.12);
+}
+.home-action.primary{
+  background:linear-gradient(135deg, rgba(124,58,237,.92), rgba(79,70,229,.92));
+  border-color:transparent;
+}
+.home-action.primary:hover{background:linear-gradient(135deg, rgba(167,139,250,.95), rgba(99,102,241,.95));}
+.home-meta{
+  display:flex;flex-wrap:wrap;gap:8px;
+  margin-top:16px;
+}
+.home-pill{
+  padding:6px 10px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  color:var(--text2);
+  font-family:var(--mono);font-size:.62rem;
+}
+.home-shortcuts{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin-top:16px;
+}
+.home-shortcut{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  min-height:42px;
+  padding:0 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.025);
+  color:var(--text2);
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.5px;text-transform:uppercase;
+  cursor:pointer;
+  transition:transform .2s ease, border-color .2s ease, background .2s ease, color .2s ease;
+}
+.home-shortcut:hover{
+  transform:translateY(-2px);
+  border-color:rgba(6,182,212,.24);
+  background:rgba(6,182,212,.08);
+  color:var(--text);
+}
+
 /* ── UTIL ───────────────────────────────────────────────── */
 .sep{height:1px;background:var(--border);}
 .tag{padding:2px 7px;border-radius:3px;font-family:var(--mono);font-size:.58rem;border:1px solid var(--border);color:var(--text3);}
@@ -681,25 +808,36 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
 /* ── RESPONSIVE OVERRIDES ────────────────────────────────── */
 @media(max-width:800px){
   .wm{display:none;}
-  #clock-widget{transform: translate(-50%, -100%) scale(0.65);}
-  
-  /* Desktop Icons: Bottom-aligned grid for better thumb reach */
-  .dicons{
-    position: absolute;
-    bottom: 70px; top: auto; left: 0; right: 0;
-    flex-direction: row; flex-wrap: wrap; 
-    justify-content: center; align-content: flex-end;
-    width: 100%; height: auto; max-height: 40%;
-    padding: 10px; gap: 4px;
+  #clock-widget{top:22px;left:50%;transform:translateX(-50%) scale(.82);width:100%;padding:0 16px;}
+  #widget-time{font-size:clamp(4rem, 18vw, 6rem);letter-spacing:-3px;}
+  #widget-date{font-size:.7rem;letter-spacing:2px;}
+  #widget-status{margin-top:16px;}
+  #home-hub{
+    top:190px;
+    bottom:68px;
+    width:calc(100% - 24px);
+    max-height:none;
+    display:block;
   }
-  .dic{width: 72px; padding: 8px 0;}
-  .dic-img{width: 42px; height: 42px; font-size: 1.1rem; border-radius: 12px;}
-  .dic span{font-size: .55rem; white-space: nowrap;}
+  .home-card{padding:18px 16px 16px;border-radius:20px;max-height:calc(100dvh - 260px);}
+  .home-title{font-size:2rem;}
+  .home-copy{font-size:.82rem;line-height:1.7;}
+  .home-actions{grid-template-columns:1fr 1fr;}
+  .home-action:last-child{grid-column:1 / -1;}
+  .home-meta{gap:6px;}
+  .home-pill{font-size:.58rem;}
+  .home-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr));}
+  
+  /* Use the home card as the mobile launcher instead of duplicating icons below it */
+  .dicons{display:none;}
 
   /* Force Windows to Full Screen */
   .win {
     width: 100% !important;
-    height: calc(100% - 52px) !important; /* Taskbar height */
+    height: calc(100dvh - 52px) !important; /* Taskbar height */
+    min-width: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
     top: 0 !important;
     left: 0 !important;
     border-radius: 0 !important;
@@ -791,8 +929,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
 
   /* Taskbar Improvements */
   #taskbar { height: 52px; padding: 0 10px; gap: 8px; }
-  .tb-start span { display: none; } /* Icon only start button on small screens */
+  .tb-sep{display:none;}
+  .tb-start{min-width:44px;justify-content:center;}
   .tb-start { padding: 8px 12px; }
+  .tb-start img{width:20px;height:20px;}
   #tb-apps { gap: 4px; }
   .tb-app { max-width: 40px; padding: 0; justify-content: center; height: 38px; }
   .tb-app span { display: none; }
@@ -805,9 +945,32 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
   #smenu { width: calc(100% - 32px); left: 16px; bottom: 62px; }
 }
 
+@media(max-width:640px){
+  #home-hub{top:176px;bottom:66px;width:calc(100% - 16px);}
+  .home-card{padding:16px 14px 14px;}
+  .home-title{font-size:1.7rem;line-height:1.05;}
+  .home-copy{font-size:.78rem;line-height:1.65;}
+  .home-actions{grid-template-columns:1fr;}
+  .home-action:last-child{grid-column:auto;}
+}
+
 @media(max-width:480px) {
+  #home-hub{top:166px;bottom:64px;width:calc(100% - 14px);}
+  .home-shortcuts{grid-template-columns:1fr 1fr;gap:8px;}
+  .home-shortcut{min-height:40px;font-size:.58rem;}
   .skills-grid { grid-template-columns: 1fr 1fr; }
   #widget-time { font-size: 4.5rem; }
+  #widget-status{font-size:.56rem;padding:5px 10px;}
+  .tb-clock{font-size:.5rem;}
+}
+
+@media(max-height:760px){
+  #clock-widget{top:36px;}
+  #home-hub{max-height:calc(100dvh - 250px);}
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *{scroll-behavior:auto !important;animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;}
 }
 </style>
 </head>
@@ -830,6 +993,30 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
     <div id="widget-time">00:00</div>
     <div id="widget-date">MONDAY, JAN 01</div>
     <div id="widget-status"><i class="fas fa-circle" style="font-size: 6px; animation: dot 2s infinite"></i> SYSTEM OPERATIONAL</div>
+  </div>
+
+  <div id="home-hub">
+    <div class="home-card">
+      <div class="home-kicker">Open to Full-Time Roles</div>
+      <div class="home-title">Pinkesh Darji</div>
+      <div class="home-copy">Full stack developer focused on AI-first products, practical dashboards, and career tools. Open a section from here or use the Start menu to explore the portfolio.</div>
+      <div class="home-actions">
+        <button type="button" class="home-action primary" onclick="openWin('w-proj')"><i class="fas fa-rocket"></i> View Projects</button>
+        <button type="button" class="home-action" onclick="openWin('w-about')"><i class="fas fa-user"></i> About Me</button>
+        <button type="button" class="home-action" onclick="openWin('w-contact')"><i class="fas fa-paper-plane"></i> Contact</button>
+      </div>
+      <div class="home-meta">
+        <span class="home-pill">MCA @ CHARUSAT</span>
+        <span class="home-pill">Intern @ Vezapp Solutions LLP</span>
+        <span class="home-pill">AI + Data + Web</span>
+      </div>
+      <div class="home-shortcuts">
+        <button type="button" class="home-shortcut" onclick="openWin('w-term')"><i class="fas fa-terminal"></i> Terminal</button>
+        <button type="button" class="home-shortcut" onclick="openWin('w-skills')"><i class="fas fa-code"></i> Skills</button>
+        <button type="button" class="home-shortcut" onclick="openWin('w-exp')"><i class="fas fa-briefcase"></i> Work</button>
+        <button type="button" class="home-shortcut" onclick="openWin('w-dash')"><i class="fas fa-chart-bar"></i> Stats</button>
+      </div>
+    </div>
   </div>
 
   <div class="wm">PINKESH<br>DARJI</div>
@@ -880,7 +1067,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
       <i class="fas fa-user wt-icon"></i>
       <span class="wt-title">about.me — Pinkesh Darji</span>
     </div>
-    <div class="wb">
+    <div class="wb wb-scroll">
       <div class="about-hero">
         <div class="about-photo-wrap">
           <img src="https://i.postimg.cc/X78SxyTb/dp02.jpg" class="about-photo" alt="Pinkesh">
@@ -996,7 +1183,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
         <button class="wc-f" onclick="maxWin('w-proj')"><i class="fas fa-expand"></i></button>
       </div>
       <i class="fas fa-rocket wt-icon"></i>
-      <span class="wt-title">Projects — 4 apps shipped</span>
+      <span class="wt-title">Projects — 3 apps shipped</span>
     </div>
     <div class="wb" style="flex-direction:row;height:420px;">
       <div class="proj-sidebar">
@@ -1013,10 +1200,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
           <div class="proj-item-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706)">🍔</div>
           <div><div class="proj-item-name">EatZy</div><div class="proj-item-type">MEAN Stack</div></div>
         </div>
-        <div class="proj-item" id="pi-mockmate" onclick="switchProj('mockmate')">
-          <div class="proj-item-icon" style="background:linear-gradient(135deg,#06b6d4,#0891b2)">🤖</div>
-          <div><div class="proj-item-name">MockMate</div><div class="proj-item-type">AI App · v1</div></div>
-        </div>
       </div>
 
       <!-- PROJECT DETAILS -->
@@ -1027,35 +1210,36 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
             <div class="pd-icon" style="background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(79,70,229,.2));border:1px solid rgba(124,58,237,.3);font-size:1.6rem;">🚀</div>
             <div>
               <div class="pd-name">Elevo</div>
-              <div class="pd-type">AI Career Prep Platform · MCA 4th Sem</div>
+              <div class="pd-type">AI Placement Prep Platform · Full-Stack Web App</div>
               <div class="pd-links">
+                <a href="https://elevo.13.51.206.127.nip.io/" target="_blank" class="pd-link pd-link-live"><i class="fas fa-external-link-alt"></i> Live Demo</a>
                 <a href="https://github.com/Pinkesh2905/Elevo" target="_blank" class="pd-link pd-link-gh"><i class="fab fa-github"></i> GitHub</a>
               </div>
             </div>
           </div>
           <div class="pd-section">
             <div class="pd-section-title">Overview</div>
-            <div class="pd-desc">Elevo is an <strong style="color:var(--p2)">end-to-end AI-powered placement preparation platform</strong> for students. It evolved from MockMate (3rd sem) into a complete career readiness system — covering everything from coding practice to resume analysis to mock interviews.</div>
+            <div class="pd-desc">Elevo is an <strong style="color:var(--p2)">AI-powered placement preparation platform</strong> built to bridge the gap between academic learning and industry readiness. It combines coding practice, aptitude prep, resume-based mock interviews, tutor-led learning, analytics, and performance tracking into one structured system for both individual learners and organizations such as colleges or training institutes.</div>
           </div>
           <div class="pd-section">
             <div class="pd-section-title">Core Features</div>
             <ul class="pd-features">
-              <li><strong>Resume-Based AI Mock Interviews</strong> — Parses your resume, identifies skills & roles, then generates a dynamic interview (Technical / HR) with questions tailored to your exact background.</li>
-              <li><strong>ATS Resume Analyzer</strong> — Scores your resume against job descriptions, gives actionable improvement insights.</li>
-              <li><strong>Coding Practice Module</strong> — Structured DSA and problem-solving exercises.</li>
-              <li><strong>Aptitude Tests</strong> — Auto-graded quizzes for placement exam prep.</li>
-              <li><strong>Personalized Feedback Engine</strong> — Response-aware AI that adapts follow-up questions based on what you answered.</li>
-              <li><strong>Progress Tracking</strong> — Dashboard showing readiness score, weak areas, and improvement over time.</li>
+              <li><strong>Unified preparation workflow</strong> — coding practice, aptitude tests, resume analysis, AI mock interviews, and readiness tracking in one platform instead of multiple disconnected tools.</li>
+              <li><strong>Role-based access control</strong> — supports students, tutors, admins, organization members, and institutional use cases with separate permissions and dashboards.</li>
+              <li><strong>Resume-based interview engine</strong> — analyzes uploaded resumes and generates tailored technical or HR interviews with AI feedback.</li>
+              <li><strong>Social learning and tutor content</strong> — includes a learning feed, tutor-managed material, and guided preparation resources.</li>
+              <li><strong>Analytics + subscription features</strong> — tracks performance trends, learner progress, and gated premium access for scalable rollout.</li>
+              <li><strong>Live coding practice</strong> — supports remote code execution and test-case validation for programming rounds.</li>
             </ul>
           </div>
           <div class="pd-section">
             <div class="pd-section-title">Hardest Challenge</div>
-            <div class="pd-challenge"><strong>🔥 The AI Interview Logic</strong> — Building an interview engine that <em>understands your resume</em>, extracts role-specific skills, and then generates context-aware follow-up questions based on how you actually respond — not just a static question bank — required careful prompt engineering and multi-turn conversation design with Gemini/OpenAI APIs.</div>
+            <div class="pd-challenge"><strong>🔥 Platform orchestration</strong> — The main challenge was designing one cohesive system where AI interviews, resume parsing, role-based flows, coding execution, analytics, and subscription logic all work together cleanly inside the same product without feeling fragmented.</div>
           </div>
           <div class="pd-section">
             <div class="pd-section-title">Tech Stack</div>
             <div class="pd-chips">
-              <span class="pd-chip">Django</span><span class="pd-chip">Python</span><span class="pd-chip">OpenAI API</span><span class="pd-chip">Gemini API</span><span class="pd-chip">gTTS</span><span class="pd-chip">PostgreSQL</span><span class="pd-chip">HTML/CSS/JS</span>
+              <span class="pd-chip">Python</span><span class="pd-chip">Django 5</span><span class="pd-chip">PostgreSQL</span><span class="pd-chip">Django REST Framework</span><span class="pd-chip">Gemini API</span><span class="pd-chip">OpenAI API</span><span class="pd-chip">JDoodle API</span><span class="pd-chip">Django-Q2</span><span class="pd-chip">Tailwind CSS</span><span class="pd-chip">Bootstrap Forms</span><span class="pd-chip">WhiteNoise</span><span class="pd-chip">Gunicorn</span><span class="pd-chip">Render</span><span class="pd-chip">pdfplumber</span><span class="pd-chip">docx2txt</span>
             </div>
           </div>
         </div>
@@ -1066,33 +1250,33 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
             <div class="pd-icon" style="background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(5,150,105,.2));border:1px solid rgba(16,185,129,.3);font-size:1.6rem;">🌸</div>
             <div>
               <div class="pd-name">Bloom Wellness</div>
-              <div class="pd-type">Mental Wellness Platform · BSc Case Study</div>
+              <div class="pd-type">Mental Wellness Platform · Full-Stack Django App</div>
               <div class="pd-links">
-                <a href="https://bloom-pwns.onrender.com/" target="_blank" class="pd-link pd-link-live"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+                <a href="https://bloom.13.51.206.127.nip.io" target="_blank" class="pd-link pd-link-live"><i class="fas fa-external-link-alt"></i> Live Demo</a>
                 <a href="https://github.com/Pinkesh2905/bloom" target="_blank" class="pd-link pd-link-gh"><i class="fab fa-github"></i> GitHub</a>
               </div>
             </div>
           </div>
           <div class="pd-section">
             <div class="pd-section-title">Overview</div>
-            <div class="pd-desc">A mental wellness web application built as a college case study. Designed around real user needs — helping people track their emotional state, access positivity tools, and feel less alone with their mental health.</div>
+            <div class="pd-desc">Bloom is a <strong style="color:var(--g)">full-stack mental wellness web application</strong> built with Django that combines emotional self-care tools with therapist discovery and appointment booking. It brings journaling, mood tracking, wellness chat, insights, and access to professional care into one connected digital mental health ecosystem.</div>
           </div>
           <div class="pd-section">
             <div class="pd-section-title">Core Features</div>
             <ul class="pd-features">
-              <li>Daily <strong>mood tracking</strong> with history visualization.</li>
-              <li><strong>Bloom Chatbot</strong> — a rule-based conversational bot focused on spreading positivity and lightening the user's mood.</li>
-              <li>Curated <strong>therapist content</strong> and mental wellness resources.</li>
-              <li>Secure <strong>authentication system</strong> with user profiles.</li>
+              <li><strong>User wellness workspace</strong> — account management, personal profiles, mood logging, reflective journal entries, and recent emotional history.</li>
+              <li><strong>Therapist discovery + booking</strong> — searchable therapist profiles, availability management, appointment booking, rescheduling, cancellation, reviews, and patient messaging.</li>
+              <li><strong>Hybrid AI wellness layer</strong> — chatbot sessions with sentiment and emotion analysis, contextual response logic, crisis keyword handling, coping strategies, and wellness goals.</li>
+              <li><strong>Insights dashboard</strong> — combines journal, mood, and chatbot activity into charts, KPIs, summaries, and pattern-based wellness insights.</li>
             </ul>
           </div>
           <div class="pd-section">
             <div class="pd-section-title">Hardest Challenge</div>
-            <div class="pd-challenge"><strong>🔥 Module Scoping</strong> — Deciding <em>which features actually solve the problem of mental wellness</em> without bloating the app. The chatbot design was especially tricky — building conversational logic that felt warm and helpful, not robotic, using only rule-based responses without an LLM.</div>
+            <div class="pd-challenge"><strong>🔥 Balancing care workflows with product depth</strong> — The challenge was designing a platform that supports both patient self-reflection and therapist operations without turning into a disconnected feature set. The chatbot and therapist utilities needed to feel supportive, context-aware, and responsible while still fitting a server-rendered Django architecture.</div>
           </div>
           <div class="pd-section">
             <div class="pd-section-title">Tech Stack</div>
-            <div class="pd-chips"><span class="pd-chip">Django</span><span class="pd-chip">Python</span><span class="pd-chip">HTML/CSS</span><span class="pd-chip">JavaScript</span><span class="pd-chip">SQLite</span></div>
+            <div class="pd-chips"><span class="pd-chip">Python</span><span class="pd-chip">Django 5</span><span class="pd-chip">Django Templates</span><span class="pd-chip">HTML/CSS</span><span class="pd-chip">SQLite</span><span class="pd-chip">OpenAI SDK</span><span class="pd-chip">Custom Sentiment Logic</span><span class="pd-chip">Pillow</span><span class="pd-chip">django-widget-tweaks</span><span class="pd-chip">Gunicorn</span><span class="pd-chip">SMTP Email</span></div>
           </div>
         </div>
 
@@ -1131,40 +1315,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
           </div>
         </div>
 
-        <!-- MOCKMATE -->
-        <div id="pd-mockmate" style="display:none">
-          <div class="pd-header">
-            <div class="pd-icon" style="background:linear-gradient(135deg,rgba(6,182,212,.2),rgba(8,145,178,.2));border:1px solid rgba(6,182,212,.3);font-size:1.6rem;">🤖</div>
-            <div>
-              <div class="pd-name">MockMate</div>
-              <div class="pd-type">AI Interview Prep · v1 · MCA 3rd Sem</div>
-              <div class="pd-links">
-                <a href="https://github.com/Pinkesh2905/mockmate" target="_blank" class="pd-link pd-link-gh"><i class="fab fa-github"></i> GitHub</a>
-              </div>
-            </div>
-          </div>
-          <div class="pd-section">
-            <div class="pd-section-title">Overview</div>
-            <div class="pd-desc">The original version of what became <strong style="color:var(--p2)">Elevo</strong>. MockMate was an AI-powered mock interview platform built during 3rd semester — focused on simulating real interviews with voice feedback.</div>
-          </div>
-          <div class="pd-section">
-            <div class="pd-section-title">Core Features</div>
-            <ul class="pd-features">
-              <li>Simulates interview sessions using LLM APIs.</li>
-              <li>Stores and evaluates responses with AI feedback.</li>
-              <li>Voice-based answers and replies using <strong>gTTS</strong>.</li>
-              <li>Resume parsing to tailor questions to your background.</li>
-            </ul>
-          </div>
-          <div class="pd-section">
-            <div class="pd-section-title">Evolution</div>
-            <div class="pd-challenge"><strong>💡 MockMate → Elevo</strong> — After seeing what MockMate could do, I scaled it into a full career prep platform (Elevo) in 4th semester — adding aptitude tests, ATS scoring, coding modules, and a proper progress tracking system.</div>
-          </div>
-          <div class="pd-section">
-            <div class="pd-section-title">Tech Stack</div>
-            <div class="pd-chips"><span class="pd-chip">Django</span><span class="pd-chip">Python</span><span class="pd-chip">OpenAI API</span><span class="pd-chip">Gemini API</span><span class="pd-chip">gTTS</span><span class="pd-chip">HTML/CSS/JS</span></div>
-          </div>
-        </div>
       </div>
     </div>
     <div class="wrsz" data-win="w-proj"></div>
@@ -1292,7 +1442,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
             <div class="dash-card-title">Activity Feed</div>
             <div class="activity-item"><div class="act-dot" style="background:var(--g)"></div><div class="act-text">Shipping SQL pipelines & dashboards at Vezapp</div><div class="act-time">now</div></div>
             <div class="activity-item"><div class="act-dot" style="background:var(--p)"></div><div class="act-text">Built Elevo — AI career prep platform (Sem 4)</div><div class="act-time">2025</div></div>
-            <div class="activity-item"><div class="act-dot" style="background:var(--c)"></div><div class="act-text">MockMate — AI interview system (Sem 3)</div><div class="act-time">2024</div></div>
+            <div class="activity-item"><div class="act-dot" style="background:var(--c)"></div><div class="act-text">Shipped live Elevo platform with institution-ready workflows</div><div class="act-time">2026</div></div>
             <div class="activity-item"><div class="act-dot" style="background:var(--g)"></div><div class="act-text">Bloom Wellness — college case study</div><div class="act-time">2024</div></div>
             <div class="activity-item"><div class="act-dot" style="background:var(--a)"></div><div class="act-text">Google Data Analytics Certification</div><div class="act-time">2024</div></div>
           </div>
@@ -1371,7 +1521,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
 <div id="taskbar">
   <button class="tb-start" onclick="toggleStart()">
     <img src="https://i.postimg.cc/X78SxyTb/dp02.jpg" alt="P">
-    PINKESH
+    <span class="tb-start-label">PINKESH</span>
   </button>
   <div class="tb-sep"></div>
   <div id="tb-apps"></div>
@@ -1392,13 +1542,13 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
     </div>
   </div>
   <div class="sm-list">
-    <div class="sm-item" onclick="openWin('w-about');toggleStart()"><i class="fas fa-user"></i> About Me</div>
-    <div class="sm-item" onclick="openWin('w-term');toggleStart()"><i class="fas fa-terminal"></i> Terminal</div>
-    <div class="sm-item" onclick="openWin('w-proj');toggleStart()"><i class="fas fa-rocket"></i> Projects</div>
-    <div class="sm-item" onclick="openWin('w-skills');toggleStart()"><i class="fas fa-code"></i> Skills</div>
-    <div class="sm-item" onclick="openWin('w-exp');toggleStart()"><i class="fas fa-briefcase"></i> Work History</div>
-    <div class="sm-item" onclick="openWin('w-dash');toggleStart()"><i class="fas fa-chart-bar"></i> Stats Dashboard</div>
-    <div class="sm-item" onclick="openWin('w-contact');toggleStart()"><i class="fas fa-paper-plane"></i> Contact</div>
+    <div class="sm-item" onclick="openWin('w-about')"><i class="fas fa-user"></i> About Me</div>
+    <div class="sm-item" onclick="openWin('w-term')"><i class="fas fa-terminal"></i> Terminal</div>
+    <div class="sm-item" onclick="openWin('w-proj')"><i class="fas fa-rocket"></i> Projects</div>
+    <div class="sm-item" onclick="openWin('w-skills')"><i class="fas fa-code"></i> Skills</div>
+    <div class="sm-item" onclick="openWin('w-exp')"><i class="fas fa-briefcase"></i> Work History</div>
+    <div class="sm-item" onclick="openWin('w-dash')"><i class="fas fa-chart-bar"></i> Stats Dashboard</div>
+    <div class="sm-item" onclick="openWin('w-contact')"><i class="fas fa-paper-plane"></i> Contact</div>
     <div class="sm-div"></div>
     <a class="sm-item" href="https://drive.google.com/file/d/1EGecxcaeJKmkAaoCeTVoxAnAbeM1a2Np/view?usp=sharing" target="_blank"><i class="fas fa-download"></i> Download Resume</a>
     <a class="sm-item" href="https://github.com/Pinkesh2905" target="_blank"><i class="fab fa-github"></i> GitHub Profile</a>
@@ -1410,12 +1560,22 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
 <script>
 /* ── MOUSE GLOW ── */
 const glow=document.getElementById('mouse-glow');
+const mobileMq=window.matchMedia('(max-width: 800px)');
+const prefersReducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const coarsePointer=window.matchMedia('(pointer: coarse)').matches;
 let mouseX=0,mouseY=0;
-document.addEventListener('mousemove',e=>{
-  mouseX=e.clientX;
-  mouseY=e.clientY;
-  glow.style.transform=`translate3d(${mouseX}px,${mouseY}px,0) translate(-50%,-50%)`;
-});
+function isMobileView(){
+  return mobileMq.matches;
+}
+if(prefersReducedMotion||coarsePointer){
+  glow.style.display='none';
+} else {
+  document.addEventListener('mousemove',e=>{
+    mouseX=e.clientX;
+    mouseY=e.clientY;
+    glow.style.transform=`translate3d(${mouseX}px,${mouseY}px,0) translate(-50%,-50%)`;
+  });
+}
 
 /* ── BOOT ── */
 const bootSeq=['Initializing kernel...','Mounting filesystem...','Loading user profile...','Starting window manager...','Configuring display...','Launching PinkeshOS...','Welcome back 👋'];
@@ -1435,15 +1595,7 @@ const bmsg=document.getElementById('boot-msg');
 })();
 
 function bootDone(){
-  // open default windows with stagger
-  setTimeout(()=>openWin('w-about'),100);
-  setTimeout(()=>openWin('w-term'),350);
-  // welcome notification
-  setTimeout(()=>notify('👋 Welcome to PinkeshOS','Double-click any icon or use the Start menu to explore.','var(--p)'),1200);
-  // second notification
-  setTimeout(()=>notify('💼 Currently Available','Looking for full-time roles in Data Science & SWE.','var(--g)'),3000);
-  startTerminal();
-  animateBars();
+  updateTaskbar();
 }
 
 /* ── CLOCK ── */
@@ -1470,6 +1622,8 @@ tick();setInterval(tick,1000);
 
 /* ── WINDOW MANAGEMENT ── */
 let ztop=100;
+const desktopArea=document.getElementById('desktop-area');
+const WINDOW_MARGIN=12;
 const winMeta={
   'w-about':{icon:'fas fa-user',label:'about.me'},
   'w-term':{icon:'fas fa-terminal',label:'terminal'},
@@ -1480,20 +1634,88 @@ const winMeta={
   'w-contact':{icon:'fas fa-paper-plane',label:'contact'}
 };
 const winState={};
+let terminalStarted=false;
+
+function getDesktopBounds(){
+  return {
+    width: desktopArea.clientWidth,
+    height: desktopArea.clientHeight
+  };
+}
+
+function ensureWindowInBounds(el){
+  if(!el||isMobileView())return;
+  const area=getDesktopBounds();
+  const maxWidth=Math.max(340,area.width-(WINDOW_MARGIN*2));
+  const maxHeight=Math.max(240,area.height-(WINDOW_MARGIN*2));
+  const width=Math.min(el.offsetWidth||parseFloat(el.style.width)||maxWidth,maxWidth);
+  const height=Math.min(el.offsetHeight||parseFloat(el.style.height)||maxHeight,maxHeight);
+  const left=Math.min(
+    Math.max(parseFloat(el.style.left)||el.offsetLeft||WINDOW_MARGIN,WINDOW_MARGIN),
+    Math.max(WINDOW_MARGIN,area.width-width-WINDOW_MARGIN)
+  );
+  const top=Math.min(
+    Math.max(parseFloat(el.style.top)||el.offsetTop||WINDOW_MARGIN,WINDOW_MARGIN),
+    Math.max(WINDOW_MARGIN,area.height-height-WINDOW_MARGIN)
+  );
+  el.style.width=width+'px';
+  el.style.height=height+'px';
+  el.style.left=left+'px';
+  el.style.top=top+'px';
+}
+
+function syncWindowLayouts(){
+  document.querySelectorAll('.win.visible').forEach(el=>{
+    if(el.classList.contains('maxed')&&!isMobileView()){
+      const area=getDesktopBounds();
+      el.style.width=Math.max(340,area.width-(WINDOW_MARGIN*2))+'px';
+      el.style.height=Math.max(240,area.height-(WINDOW_MARGIN*2))+'px';
+      el.style.left=WINDOW_MARGIN+'px';
+      el.style.top=WINDOW_MARGIN+'px';
+      return;
+    }
+    ensureWindowInBounds(el);
+  });
+}
 
 function focusWin(id){
   ztop++;
   const el=document.getElementById(id);
+  if(!el||!el.classList.contains('visible'))return;
   el.style.zIndex=ztop;
   document.querySelectorAll('.win').forEach(w=>w.classList.remove('focused'));
   el.classList.add('focused');
   updateTaskbar();
 }
 
+function closeStartMenu(){
+  smOpen=false;
+  document.getElementById('smenu').classList.remove('open');
+}
+
+function hideWindowInstant(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.classList.remove('minimizing','visible','focused');
+  winState[id]='closed';
+}
+
 function openWin(id){
   const el=document.getElementById(id);
+  if(!el)return;
+  closeStartMenu();
+  if(isMobileView()){
+    document.querySelectorAll('.win.visible').forEach(win=>{
+      if(win.id!==id) hideWindowInstant(win.id);
+    });
+  }
+  if(el.classList.contains('visible')){
+    focusWin(id);
+    return;
+  }
   winState[id]='open';
   el.classList.add('visible');
+  ensureWindowInBounds(el);
   // entrance animation
   el.classList.add('win-opening');
   requestAnimationFrame(()=>{
@@ -1502,6 +1724,10 @@ function openWin(id){
     });
   });
   focusWin(id);
+  if(id==='w-term'&&!terminalStarted){
+    startTerminal();
+    terminalStarted=true;
+  }
   if(id==='w-skills'||id==='w-dash') setTimeout(animateBars,200);
 }
 
@@ -1527,22 +1753,27 @@ function minWin(id){
 
 const maxStates={};
 function maxWin(id){
+  if(isMobileView())return;
   const el=document.getElementById(id);
-  const area=document.getElementById('desktop-area');
+  const area=getDesktopBounds();
   if(!maxStates[id]){
-    maxStates[id]={w:el.style.width,h:el.style.height||el.offsetHeight+'px',t:el.style.top,l:el.style.left};
+    maxStates[id]={w:el.style.width||el.offsetWidth+'px',h:el.style.height||el.offsetHeight+'px',t:el.style.top||el.offsetTop+'px',l:el.style.left||el.offsetLeft+'px'};
     el.style.transition='all .25s cubic-bezier(.4,0,.2,1)';
-    el.style.width=area.offsetWidth+'px';
-    el.style.height=area.offsetHeight+'px';
-    el.style.top='0';el.style.left='0';
+    el.classList.add('maxed');
+    el.style.width=Math.max(340,area.width-(WINDOW_MARGIN*2))+'px';
+    el.style.height=Math.max(240,area.height-(WINDOW_MARGIN*2))+'px';
+    el.style.top=WINDOW_MARGIN+'px';
+    el.style.left=WINDOW_MARGIN+'px';
     setTimeout(()=>el.style.transition='',260);
   } else {
     const s=maxStates[id];
     el.style.transition='all .25s cubic-bezier(.4,0,.2,1)';
+    el.classList.remove('maxed');
     el.style.width=s.w;el.style.height=s.h;
     el.style.top=s.t;el.style.left=s.l;
     setTimeout(()=>el.style.transition='',260);
     delete maxStates[id];
+    ensureWindowInBounds(el);
   }
 }
 
@@ -1575,8 +1806,18 @@ document.querySelectorAll('.wtb').forEach(tb=>{
     if(e.target.tagName==='BUTTON'||e.target.tagName==='I')return;
     const win=document.getElementById(tb.dataset.win);
     focusWin(tb.dataset.win);
+    if(win.classList.contains('maxed')){
+      maxWin(tb.dataset.win);
+    }
     drag=true;ox=e.clientX-win.offsetLeft;oy=e.clientY-win.offsetTop;
-    const mm=ev=>{if(!drag)return;win.style.left=(ev.clientX-ox)+'px';win.style.top=(ev.clientY-oy)+'px';};
+    const mm=ev=>{
+      if(!drag)return;
+      const area=getDesktopBounds();
+      const nextLeft=Math.min(Math.max(ev.clientX-ox,0),Math.max(0,area.width-win.offsetWidth));
+      const nextTop=Math.min(Math.max(ev.clientY-oy,0),Math.max(0,area.height-win.offsetHeight));
+      win.style.left=nextLeft+'px';
+      win.style.top=nextTop+'px';
+    };
     document.addEventListener('mousemove',mm);
     document.addEventListener('mouseup',()=>{drag=false;document.removeEventListener('mousemove',mm);},{once:true});
   });
@@ -1588,11 +1829,16 @@ document.querySelectorAll('.wrsz').forEach(rh=>{
   rh.addEventListener('mousedown',e=>{
     e.stopPropagation();
     const win=document.getElementById(rh.dataset.win);
+    if(win.classList.contains('maxed')){
+      delete maxStates[rh.dataset.win];
+      win.classList.remove('maxed');
+    }
     res=true;sx=e.clientX;sy=e.clientY;sw=win.offsetWidth;sh=win.offsetHeight;
     const mm=ev=>{
       if(!res)return;
-      win.style.width=Math.max(340,sw+(ev.clientX-sx))+'px';
-      win.style.height=Math.max(220,sh+(ev.clientY-sy))+'px';
+      const area=getDesktopBounds();
+      win.style.width=Math.min(Math.max(340,sw+(ev.clientX-sx)),area.width-win.offsetLeft-WINDOW_MARGIN)+'px';
+      win.style.height=Math.min(Math.max(220,sh+(ev.clientY-sy)),area.height-win.offsetTop-WINDOW_MARGIN)+'px';
     };
     document.addEventListener('mousemove',mm);
     document.addEventListener('mouseup',()=>{res=false;document.removeEventListener('mousemove',mm);},{once:true});
@@ -1610,9 +1856,13 @@ function toggleStart(){
 }
 document.addEventListener('mousedown',e=>{
   if(smOpen&&!e.target.closest('#smenu')&&!e.target.closest('.tb-start')){
-    smOpen=false;document.getElementById('smenu').classList.remove('open');
+    closeStartMenu();
   }
 });
+window.addEventListener('resize',syncWindowLayouts);
+if(mobileMq.addEventListener){
+  mobileMq.addEventListener('change',syncWindowLayouts);
+}
 
 /* ── NOTIFICATIONS ── */
 function notify(title,msg,color){
@@ -1642,7 +1892,7 @@ function switchTab(win,tab){
 
 /* ── PROJECTS NAV ── */
 function switchProj(name){
-  ['elevo','bloom','eatzy','mockmate'].forEach(p=>{
+  ['elevo','bloom','eatzy'].forEach(p=>{
     const item = document.getElementById('pi-'+p);
     const detail = document.getElementById('pd-'+p);
     const isOn = p===name;
@@ -1688,7 +1938,7 @@ const script=[
   {t:'o',s:'',v:'Cricket 🏏  ·  Music 🎵  ·  Tech YouTube 📺  ·  AI/ML 🤖  ·  Vibe Coding 🔥'},
   {t:'o',s:'hi',v:''},
   {t:'p',c:'ls ~/projects'},
-  {t:'o',s:'cy',v:'elevo/    bloom-wellness/    eatzy/    mockmate/'},
+  {t:'o',s:'cy',v:'elevo/    bloom-wellness/    eatzy/'},
   {t:'o',s:'hi',v:''},
   {t:'p',c:'echo $STATUS'},
   {t:'o',s:'gr',v:'● OPEN TO WORK — Looking for full-time roles in Data Science & SWE'},
@@ -1697,13 +1947,13 @@ const cmds={
   help:{fn:()=>['Commands: whoami, skills, projects, contact, resume, experience, clear','Try: cat elevo.txt  ·  cat bloom.txt  ·  cat vezapp.txt']},
   whoami:{fn:()=>['Pinkesh Darji — Full Stack Developer & Data Analyst','CHARUSAT University · MCA (2024-26)','SP University · BSc CA & IT (2021-24)','Status: Intern @ Vezapp Solutions LLP','Goal: Full-time roles in Data Science & Software Engineering']},
   skills:{fn:()=>['Frontend:   React · Angular · JavaScript · Tailwind · HTML/CSS','Backend:    Python · Django · Node.js · MongoDB · PostgreSQL','Data:       SQL · Power BI · Looker Studio · Machine Learning','AI/LLM:     OpenAI API · Gemini API · gTTS · Prompt Engineering']},
-  projects:{fn:()=>['1. Elevo        — AI career prep platform (Sem 4 · Active)','   github.com/Pinkesh2905/Elevo','2. MockMate     — AI mock interviews · v1 (Sem 3)','   github.com/Pinkesh2905/mockmate','3. Bloom        — Mental wellness Django app','   bloom-pwns.onrender.com','4. EatZy        — Food delivery MEAN stack app','   github.com/Pinkesh2905/EatZy']},
+  projects:{fn:()=>['1. Elevo        — AI placement prep platform','   elevo.13.51.206.127.nip.io','   github.com/Pinkesh2905/Elevo','2. Bloom        — Mental wellness Django app','   bloom.13.51.206.127.nip.io','3. EatZy        — Food delivery MEAN stack app','   github.com/Pinkesh2905/EatZy']},
   experience:{fn:()=>['Vezapp Solutions LLP  ·  Dec 2025 – Present','· SQL schema design & sync for foundry digitalization apps','· Looker Studio & Power BI dashboards for production analytics','· Full-stack feature development']},
   contact:{fn:()=>['Email:    pinkeshd29@gmail.com','Phone:    +91 9875034836','GitHub:   github.com/Pinkesh2905','LinkedIn: linkedin.com/in/pinkesh-darji-3731b9266/','X:        x.com/techexplorer29']},
   resume:{fn:()=>{window.open('https://drive.google.com/file/d/1EGecxcaeJKmkAaoCeTVoxAnAbeM1a2Np/view?usp=sharing','_blank');return['Opening resume... ✓'];}},
   clear:{fn:()=>{document.getElementById('term-out').innerHTML='';return[];}},
-  'cat elevo.txt':{fn:()=>['Elevo — AI-Powered Career Prep Platform','Built in MCA 4th Sem as evolution of MockMate.','Features: AI Mock Interviews · ATS Resume Analyzer · Coding Practice','         Aptitude Tests · Personalized Feedback · Progress Tracking','Stack: Django · Python · OpenAI · Gemini · PostgreSQL','GitHub: github.com/Pinkesh2905/Elevo']},
-  'cat bloom.txt':{fn:()=>['Bloom Wellness — Mental Health Web App','College case study project (BSc final year).','Features: Mood Tracking · Bloom Chatbot · Therapist Content · Auth','Challenge: Designing a warm rule-based chatbot without an LLM.','Stack: Django · Python · HTML/CSS · JS','Live: bloom-pwns.onrender.com']},
+  'cat elevo.txt':{fn:()=>['Elevo — AI-Powered Placement Preparation Platform','Unifies coding, aptitude, resume interviews, analytics, and role-based workflows.','Supports students, tutors, admins, and organizations on one platform.','AI: Gemini API primary · OpenAI fallback · JDoodle for code execution.','Stack: Django 5 · PostgreSQL · DRF · Django-Q2 · Tailwind · Bootstrap Forms','Live: elevo.13.51.206.127.nip.io','GitHub: github.com/Pinkesh2905/Elevo']},
+  'cat bloom.txt':{fn:()=>['Bloom Wellness — Mental Wellness Platform','Combines journaling, mood tracking, therapist discovery, and appointment booking.','Includes AI-assisted chatbot flows, therapist messaging, and wellness insights dashboards.','Built for both patient self-care and therapist-facing workflows.','Stack: Django 5 · Templates · OpenAI SDK · SQLite · Pillow · SMTP','Live: bloom.13.51.206.127.nip.io']},
   'cat vezapp.txt':{fn:()=>['Vezapp Solutions LLP — Current Internship','Vezapp builds customized digitalization apps for industrial clients','(foundries). I work on the data layer:','· Design SQL schemas for digitalized logbook data entry apps','· Sync SQL tables with client applications for real-time data','· Build analytics dashboards in Looker Studio & Power BI','· Contribute to full-stack features in the core platform']},
 };
 let ti=0;
