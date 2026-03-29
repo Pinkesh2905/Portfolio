@@ -372,48 +372,390 @@ function revealElement(element, delay = 0) {
     }, delay);
 }
 
-
-// Parallax Hero
+// Parallax Effect for Hero Section
 function initializeParallax() {
-    const hero = document.getElementById('hero');
-    if (!hero) return;
+    const heroSection = document.getElementById('hero');
+    if (!heroSection) return;
+    
     window.addEventListener('scroll', () => {
-        hero.style.backgroundPositionY = `${window.scrollY * 0.4}px`;
+        const scrolled = window.pageYOffset;
+        const rate = scrolled * -0.5;
+        heroSection.style.transform = `translateY(${rate}px)`;
     });
 }
 
-// Contact Form
-function initializeContactForm() {
-    const form = document.getElementById('contactForm');
-    if (!form) return;
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const name = form.querySelector('[name="name"]').value.trim();
-        const email = form.querySelector('[name="email"]').value.trim();
-        const message = form.querySelector('[name="message"]').value.trim();
-
-        if (!name || !email || !message) {
-            alert('Please fill all fields.');
-            return;
-        }
-        alert('Message sent successfully!');
-        form.reset();
+// Interactive Hover Effects
+function initializeInteractiveEffects() {
+    // Skill cards hover effect
+    const skillCards = document.querySelectorAll('.skill-card');
+    skillCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-10px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0) scale(1)';
+        });
     });
-}
-
-// Lazy Loading
-function initializeLazyLoading() {
-    const images = document.querySelectorAll('img[data-src]');
-    if (!images.length) return;
-    const imgObserver = new IntersectionObserver((entries, obs) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src;
-                img.removeAttribute('data-src');
-                obs.unobserve(img);
+    
+    // Project cards hover effect
+    const projectCards = document.querySelectorAll('.project-card');
+    projectCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            const image = card.querySelector('.project-image img');
+            if (image) {
+                image.style.transform = 'scale(1.1)';
+            }
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            const image = card.querySelector('.project-image img');
+            if (image) {
+                image.style.transform = 'scale(1)';
             }
         });
     });
-    images.forEach(img => imgObserver.observe(img));
+}
+
+// Mouse Trail Effect
+function initializeMouseTrail() {
+    const trail = [];
+    const maxTrailLength = 10;
+    
+    document.addEventListener('mousemove', (e) => {
+        // Create trail dot
+        const dot = document.createElement('div');
+        dot.className = 'mouse-trail';
+        dot.style.cssText = `
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: linear-gradient(45deg, var(--primary-color), #8b5cf6);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            left: ${e.clientX - 2}px;
+            top: ${e.clientY - 2}px;
+            transition: opacity 0.5s ease;
+        `;
+        
+        document.body.appendChild(dot);
+        trail.push(dot);
+        
+        // Remove excess trail dots
+        if (trail.length > maxTrailLength) {
+            const oldDot = trail.shift();
+            if (oldDot) {
+                oldDot.style.opacity = '0';
+                setTimeout(() => oldDot.remove(), 500);
+            }
+        }
+    });
+}
+
+// Easter Egg - Konami Code
+function initializeEasterEgg() {
+    const konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65]; // ↑↑↓↓←→←→BA
+    let konamiIndex = 0;
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.keyCode === konamiCode[konamiIndex]) {
+            konamiIndex++;
+            if (konamiIndex === konamiCode.length) {
+                triggerEasterEgg();
+                konamiIndex = 0;
+            }
+        } else {
+            konamiIndex = 0;
+        }
+    });
+    
+    function triggerEasterEgg() {
+        // Create confetti effect
+        createConfetti();
+        
+        // Show easter egg message
+        const message = document.createElement('div');
+        message.innerHTML = `
+            <div style="
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(45deg, var(--primary-color), #8b5cf6);
+                color: white;
+                padding: 2rem;
+                border-radius: 1rem;
+                text-align: center;
+                z-index: 10000;
+                box-shadow: var(--shadow-xl);
+                animation: bounceIn 0.6s ease;
+            ">
+                <h3>🎉 Easter Egg Found! 🎉</h3>
+                <p>You discovered the Konami Code!</p>
+                <p>Thanks for exploring my portfolio!</p>
+                <button onclick="this.parentElement.parentElement.remove()" style="
+                    background: white;
+                    color: var(--primary-color);
+                    border: none;
+                    padding: 0.5rem 1rem;
+                    border-radius: 0.5rem;
+                    margin-top: 1rem;
+                    cursor: pointer;
+                    font-weight: 600;
+                ">Close</button>
+            </div>
+        `;
+        document.body.appendChild(message);
+        
+        // Remove after 10 seconds if not closed manually
+        setTimeout(() => {
+            if (message.parentElement) {
+                message.remove();
+            }
+        }, 10000);
+    }
+}
+
+// Confetti Effect
+function createConfetti() {
+    const colors = ['#3b82f6', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444'];
+    const confettiCount = 100;
+    
+    for (let i = 0; i < confettiCount; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.style.cssText = `
+                position: fixed;
+                width: 10px;
+                height: 10px;
+                background: ${colors[Math.floor(Math.random() * colors.length)]};
+                left: ${Math.random() * window.innerWidth}px;
+                top: -10px;
+                z-index: 9999;
+                pointer-events: none;
+                border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                animation: confettiFall 3s linear forwards;
+            `;
+            
+            document.body.appendChild(confetti);
+            
+            setTimeout(() => confetti.remove(), 3000);
+        }, i * 30);
+    }
+}
+
+// Add CSS for animations
+function addDynamicStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes bounceIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+            70% {
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes confettiFall {
+            to {
+                transform: translateY(${window.innerHeight + 20}px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        .mouse-trail {
+            animation: trailFade 0.5s ease-out forwards;
+        }
+        
+        @keyframes trailFade {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: scale(0);
+            }
+        }
+        
+        /* Loading animations */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(50px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        
+        .fade-in-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            animation: fadeInLeft 0.8s ease forwards;
+        }
+        
+        .fade-in-right {
+            opacity: 0;
+            transform: translateX(50px);
+            animation: fadeInRight 0.8s ease forwards;
+        }
+        
+        /* Stagger animations */
+        .fade-in-left:nth-child(1) { animation-delay: 0.1s; }
+        .fade-in-left:nth-child(2) { animation-delay: 0.2s; }
+        .fade-in-left:nth-child(3) { animation-delay: 0.3s; }
+        
+        .contact-card:nth-child(1) { animation-delay: 0.1s; }
+        .contact-card:nth-child(2) { animation-delay: 0.2s; }
+        .contact-card:nth-child(3) { animation-delay: 0.3s; }
+        
+        /* Responsive animations */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* Smooth focus styles */
+        .nav-link:focus,
+        .btn-primary:focus,
+        .btn-secondary:focus,
+        .social-link:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+        
+        /* Dark mode media query support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-dark: #f8fafc;
+                --text-light: #cbd5e1;
+                --bg-light: #1e293b;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Performance optimization - Lazy loading for images
+function initializeLazyLoading() {
+    const images = document.querySelectorAll('img[data-src]');
+    
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.classList.remove('lazy');
+                    observer.unobserve(img);
+                }
+            });
+        });
+        
+        images.forEach(img => imageObserver.observe(img));
+    } else {
+        // Fallback for older browsers
+        images.forEach(img => {
+            img.src = img.dataset.src;
+            img.classList.remove('lazy');
+        });
+    }
+}
+
+// Theme toggle functionality (bonus feature)
+function initializeThemeToggle() {
+    // Check for saved theme or default to light
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    
+    // Create theme toggle button (optional)
+    const themeToggle = document.createElement('button');
+    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+    themeToggle.className = 'theme-toggle';
+    themeToggle.style.cssText = `
+        position: fixed;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: none;
+        background: var(--primary-color);
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        box-shadow: var(--shadow-md);
+    `;
+    
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        themeToggle.innerHTML = newTheme === 'dark' 
+            ? '<i class="fas fa-sun"></i>' 
+            : '<i class="fas fa-moon"></i>';
+    });
+    
+    // Uncomment to add theme toggle
+    // document.body.appendChild(themeToggle);
+}
+
+// Initialize all interactive features
+function initializeAllFeatures() {
+    addDynamicStyles();
+    initializeInteractiveEffects();
+    initializeEasterEgg();
+    initializeLazyLoading();
+    initializeThemeToggle();
+    // initializeMouseTrail(); // Uncomment if you want mouse trail effect
+    // initializeParallax(); // Uncomment if you want parallax effect
+}
+
+// Call initialization after DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Add a small delay to ensure everything is ready
+    setTimeout(initializeAllFeatures, 100);
+});
+
+// Error handling for missing elements
+function safeQuerySelector(selector, callback) {
+    const element = document.querySelector(selector);
+    if (element && typeof callback === 'function') {
+        callback(element);
+    }
+}
+
+// Utility function for debouncing scroll events
+function debounce(func, wait, immediate) {
+    let timeout;
+    return function executedFunction() {
+        const context = this;
+        const args = arguments;
+        const later = function() {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        };
+        const callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
 }

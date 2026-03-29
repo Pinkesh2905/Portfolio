@@ -435,6 +435,43 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
   font-size:.78rem;color:var(--text2);line-height:1.75;
 }
 .pd-challenge strong{color:var(--r); font-weight: 600;}
+.pd-metrics{
+  width:100%;
+  border-collapse:collapse;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;
+  overflow:hidden;
+  background:rgba(255,255,255,.02);
+}
+.pd-metrics th,
+.pd-metrics td{
+  padding:10px 12px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  text-align:left;
+  font-size:.72rem;
+}
+.pd-metrics th{
+  font-family:var(--mono);
+  font-size:.58rem;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:var(--text3);
+  background:rgba(255,255,255,.03);
+}
+.pd-metrics td{color:var(--text2);}
+.pd-metrics tr:last-child td{border-bottom:none;}
+.pd-metrics td strong{color:var(--g);}
+.pd-note{
+  margin-top:10px;
+  padding:14px 16px;
+  border-radius:10px;
+  background:rgba(6,182,212,.06);
+  border:1px solid rgba(6,182,212,.14);
+  font-size:.76rem;
+  line-height:1.7;
+  color:var(--text2);
+}
+.pd-note strong{color:var(--c2);}
 
 /* ── SKILLS ─────────────────────────────────────────────── */
 .skills-body{padding:18px 20px;display:flex;flex-direction:column;gap:18px;}
@@ -1183,7 +1220,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
         <button class="wc-f" onclick="maxWin('w-proj')"><i class="fas fa-expand"></i></button>
       </div>
       <i class="fas fa-rocket wt-icon"></i>
-      <span class="wt-title">Projects — 3 apps shipped</span>
+      <span class="wt-title">Projects — 5 apps shipped</span>
     </div>
     <div class="wb" style="flex-direction:row;height:420px;">
       <div class="proj-sidebar">
@@ -1199,6 +1236,14 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
         <div class="proj-item" id="pi-eatzy" onclick="switchProj('eatzy')">
           <div class="proj-item-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706)">🍔</div>
           <div><div class="proj-item-name">EatZy</div><div class="proj-item-type">MEAN Stack</div></div>
+        </div>
+        <div class="proj-item" id="pi-ipl" onclick="switchProj('ipl')">
+          <div class="proj-item-icon" style="background:linear-gradient(135deg,#06b6d4,#2563eb)"><i class="fas fa-chart-line"></i></div>
+          <div><div class="proj-item-name">IPL Predictor</div><div class="proj-item-type">ML + Streamlit</div></div>
+        </div>
+        <div class="proj-item" id="pi-housevue" onclick="switchProj('housevue')">
+          <div class="proj-item-icon" style="background:linear-gradient(135deg,#ec4899,#8b5cf6)"><i class="fas fa-house"></i></div>
+          <div><div class="proj-item-name">HouseVue</div><div class="proj-item-type">ML + Streamlit</div></div>
         </div>
       </div>
 
@@ -1316,6 +1361,147 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
           </div>
         </div>
 
+        <!-- IPL WIN PREDICTOR -->
+        <div id="pd-ipl" style="display:none">
+          <div class="pd-header">
+            <div class="pd-icon" style="background:linear-gradient(135deg,rgba(6,182,212,.18),rgba(37,99,235,.2));border:1px solid rgba(6,182,212,.28);font-size:1.45rem;"><i class="fas fa-chart-line"></i></div>
+            <div>
+              <div class="pd-name">IPL Win Probability Predictor</div>
+              <div class="pd-type">Sports Analytics · Machine Learning Product</div>
+              <div class="pd-links">
+                <a href="https://pinkesh-iplwinpredictor.streamlit.app" target="_blank" class="pd-link pd-link-live"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+                <a href="https://github.com/Pinkesh2905/IPL-WinPredictor" target="_blank" class="pd-link pd-link-gh"><i class="fab fa-github"></i> GitHub</a>
+              </div>
+            </div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Tagline</div>
+            <div class="pd-desc">Because cricket matches are won in the data, before they're won on the field.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Overview</div>
+            <div class="pd-desc">What if you could quantify pressure instead of just feel it? This project is a <strong style="color:var(--c2)">live ML-powered web app</strong> that reads the current state of a T20 match &mdash; score, overs, wickets, target, and chase tempo &mdash; and predicts in real time who is winning and by how much. Not a vibe. A number. With a reason behind it.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">The Problem</div>
+            <div class="pd-desc">Cricket analysts and fans instinctively know when a team is under pressure, but gut feel does not scale. The goal was to turn match intuition into a <strong style="color:var(--p2)">reproducible, explainable machine learning system</strong>, then wrap it in an interface clean enough to belong on a broadcast screen.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Feature Engineering</div>
+            <ul class="pd-features">
+              <li><strong>Pressure Index (RRR - CRR)</strong> &mdash; one number that captures how hard the chase really is. Positive means the batting side is behind the curve. Negative means cruising.</li>
+              <li><strong>Required Run Rate vs Current Run Rate</strong> &mdash; models the two speeds of the innings and the gap between them.</li>
+              <li><strong>Innings Progress (0 to 1)</strong> &mdash; gives the model match phase awareness, because death overs change everything.</li>
+              <li><strong>Wickets Left</strong> &mdash; framed as remaining resources, not just collapse history.</li>
+            </ul>
+            <div class="pd-note"><strong>Insight</strong> &mdash; once these features were engineered, the problem became close to linearly separable. Better features beat fancier models here.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Model Building</div>
+            <table class="pd-metrics">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Accuracy</th>
+                  <th>ROC-AUC</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Logistic Regression</strong></td>
+                  <td>97.6%</td>
+                  <td>0.9888</td>
+                </tr>
+                <tr>
+                  <td>Random Forest</td>
+                  <td>97.5%</td>
+                  <td>0.9888</td>
+                </tr>
+                <tr>
+                  <td>Gradient Boosting</td>
+                  <td>97.5%</td>
+                  <td>0.9884</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="pd-note"><strong>Pipeline</strong> &mdash; trained on 44,000+ synthetic IPL-style match snapshots, validated with 5-fold StratifiedKFold to handle class imbalance, then packaged as ColumnTransformer &rarr; StandardScaler + OneHotEncoder &rarr; Model. Serialized with Joblib.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">UI &amp; Product Design</div>
+            <ul class="pd-features">
+              <li><strong>Dark sports-analytics UI</strong> &mdash; minimal layout with all signal and no clutter.</li>
+              <li><strong>Live win % display</strong> &mdash; giant probability readout with color-coded confidence.</li>
+              <li><strong>Split probability bar</strong> &mdash; both teams shown side by side, not buried in a single stat.</li>
+              <li><strong>Contextual insight text</strong> &mdash; translates match state into plain English.</li>
+              <li><strong>What-If simulator</strong> &mdash; lets users test scenarios like a 15-run over and see instant updates.</li>
+              <li><strong>Probability curve + momentum badges</strong> &mdash; turns changing score states into readable product signals.</li>
+            </ul>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Deployment</div>
+            <div class="pd-desc">Deployed on <strong style="color:var(--text)">Streamlit Cloud</strong> with zero infrastructure overhead. One URL. Any device. Immediate access.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Tech Stack</div>
+            <div class="pd-chips">
+              <span class="pd-chip">Python</span><span class="pd-chip">Scikit-learn</span><span class="pd-chip">Streamlit</span><span class="pd-chip">Plotly</span><span class="pd-chip">Pandas</span><span class="pd-chip">NumPy</span><span class="pd-chip">Joblib</span><span class="pd-chip">Custom CSS</span>
+            </div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Takeaway</div>
+            <div class="pd-challenge"><strong>End-to-end thinking</strong> &mdash; This project is not just about cricket. It shows the ability to take a messy real-world problem, engineer the right features, choose the right model instead of the fanciest one, and ship the result as a polished usable product.</div>
+          </div>
+        </div>
+
+        <!-- HOUSEVUE -->
+        <div id="pd-housevue" style="display:none">
+          <div class="pd-header">
+            <div class="pd-icon" style="background:linear-gradient(135deg,rgba(236,72,153,.18),rgba(139,92,246,.2));border:1px solid rgba(236,72,153,.28);font-size:1.45rem;"><i class="fas fa-house"></i></div>
+            <div>
+              <div class="pd-name">HouseVue</div>
+              <div class="pd-type">ML-Powered House Price Prediction App</div>
+              <div class="pd-links">
+                <a href="https://pinkesh-housevue.streamlit.app/" target="_blank" class="pd-link pd-link-live"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+                <a href="https://github.com/Pinkesh2905/Housevue" target="_blank" class="pd-link pd-link-gh"><i class="fab fa-github"></i> GitHub</a>
+              </div>
+            </div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Overview</div>
+            <div class="pd-desc">HouseVue is an <strong style="color:var(--p2)">end-to-end machine learning web application</strong> that predicts residential property prices based on key house features such as area, bedrooms, bathrooms, floors, condition, year built, and location. The project combines data preprocessing, model training, hyperparameter tuning, and an interactive Streamlit interface to deliver real-time price estimates with performance insights.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Detailed Description</div>
+            <div class="pd-desc">This project was built to demonstrate the complete workflow of a machine learning application, from data preparation to deployment. I developed a regression-based prediction system using Python and Scikit-Learn, where multiple models were benchmarked to identify the best-performing approach. The final solution was integrated into a Streamlit web app that allows users to enter property details and instantly receive predicted house prices.</div>
+            <div class="pd-note"><strong>Product depth</strong> &mdash; I also added model performance metrics, feature importance analysis, sensitivity insights, and market overview sections. The project was prepared for deployment with a production-ready structure, dependency management, and GitHub integration.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Core Features</div>
+            <ul class="pd-features">
+              <li>Predicts house prices from user-input property details.</li>
+              <li>Benchmarks multiple regression models to select the best performer.</li>
+              <li>Uses preprocessing pipelines for cleaner and more reliable predictions.</li>
+              <li>Applies hyperparameter tuning to improve model accuracy.</li>
+              <li>Shows feature importance and model insights.</li>
+              <li>Provides an interactive and deployment-ready Streamlit UI.</li>
+            </ul>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">What I Learned</div>
+            <ul class="pd-features">
+              <li>How to build and deploy an end-to-end machine learning project.</li>
+              <li>How to preprocess structured data using Scikit-Learn pipelines.</li>
+              <li>How to compare and tune regression models for better performance.</li>
+              <li>How to turn an ML model into an interactive web application using Streamlit.</li>
+              <li>How to structure a project for GitHub and deployment platforms.</li>
+            </ul>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Tech Stack</div>
+            <div class="pd-chips"><span class="pd-chip">Python</span><span class="pd-chip">Scikit-Learn</span><span class="pd-chip">Streamlit</span><span class="pd-chip">Pandas</span><span class="pd-chip">NumPy</span><span class="pd-chip">Matplotlib</span><span class="pd-chip">Joblib</span><span class="pd-chip">Git</span><span class="pd-chip">GitHub</span></div>
+          </div>
+        </div>
+
       </div>
     </div>
     <div class="wrsz" data-win="w-proj"></div>
@@ -1349,7 +1535,9 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
           <div class="skills-grid">
             <div class="sk"><i class="fab fa-python" style="color:#fbbf24"></i><span>Python</span><div class="sk-bar"><div class="sk-bar-fill" data-w="87" style="background:#fbbf24"></div></div></div>
             <div class="sk"><i class="fas fa-server" style="color:var(--g)"></i><span>Django</span><div class="sk-bar"><div class="sk-bar-fill" data-w="83" style="background:var(--g)"></div></div></div>
+            <div class="sk"><i class="fas fa-layer-group" style="color:#22c55e"></i><span>Django REST</span><div class="sk-bar"><div class="sk-bar-fill" data-w="79" style="background:#22c55e"></div></div></div>
             <div class="sk"><i class="fab fa-node" style="color:#84cc16"></i><span>Node.js</span><div class="sk-bar"><div class="sk-bar-fill" data-w="74" style="background:#84cc16"></div></div></div>
+            <div class="sk"><i class="fas fa-plug" style="color:#06b6d4"></i><span>REST APIs</span><div class="sk-bar"><div class="sk-bar-fill" data-w="84" style="background:#06b6d4"></div></div></div>
             <div class="sk"><i class="fas fa-leaf" style="color:var(--g)"></i><span>MongoDB</span><div class="sk-bar"><div class="sk-bar-fill" data-w="78" style="background:var(--g)"></div></div></div>
             <div class="sk"><i class="fas fa-database" style="color:#3b82f6"></i><span>PostgreSQL</span><div class="sk-bar"><div class="sk-bar-fill" data-w="76" style="background:#3b82f6"></div></div></div>
           </div>
@@ -1360,8 +1548,12 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
             <div class="sk"><i class="fas fa-chart-bar" style="color:var(--a)"></i><span>Power BI</span><div class="sk-bar"><div class="sk-bar-fill" data-w="81" style="background:var(--a)"></div></div></div>
             <div class="sk"><i class="fas fa-chart-pie" style="color:#3b82f6"></i><span>Looker</span><div class="sk-bar"><div class="sk-bar-fill" data-w="78" style="background:#3b82f6"></div></div></div>
             <div class="sk"><i class="fas fa-table" style="color:var(--g)"></i><span>SQL</span><div class="sk-bar"><div class="sk-bar-fill" data-w="86" style="background:var(--g)"></div></div></div>
+            <div class="sk"><i class="fas fa-sliders" style="color:#38bdf8"></i><span>Streamlit</span><div class="sk-bar"><div class="sk-bar-fill" data-w="82" style="background:#38bdf8"></div></div></div>
+            <div class="sk"><i class="fas fa-brain" style="color:#8b5cf6"></i><span>Scikit-Learn</span><div class="sk-bar"><div class="sk-bar-fill" data-w="80" style="background:#8b5cf6"></div></div></div>
+            <div class="sk"><i class="fas fa-table-columns" style="color:#10b981"></i><span>Pandas</span><div class="sk-bar"><div class="sk-bar-fill" data-w="84" style="background:#10b981"></div></div></div>
             <div class="sk"><i class="fas fa-brain" style="color:var(--p2)"></i><span>ML / AI</span><div class="sk-bar"><div class="sk-bar-fill" data-w="66" style="background:var(--p2)"></div></div></div>
             <div class="sk"><i class="fas fa-robot" style="color:var(--c)"></i><span>LLM APIs</span><div class="sk-bar"><div class="sk-bar-fill" data-w="79" style="background:var(--c)"></div></div></div>
+            <div class="sk"><i class="fab fa-github" style="color:#a1a1aa"></i><span>Git/GitHub</span><div class="sk-bar"><div class="sk-bar-fill" data-w="85" style="background:#a1a1aa"></div></div></div>
           </div>
         </div>
       </div>
@@ -1425,7 +1617,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
     <div class="wb wb-scroll" style="height:400px;">
       <div class="dash-body">
         <div class="dash-kpi-row">
-          <div class="kpi"><div class="kpi-label">Projects</div><div class="kpi-val" style="color:var(--c)">4+</div><div class="kpi-sub">shipped apps</div></div>
+          <div class="kpi"><div class="kpi-label">Projects</div><div class="kpi-val" style="color:var(--c)">5+</div><div class="kpi-sub">shipped apps</div></div>
           <div class="kpi"><div class="kpi-label">Coding</div><div class="kpi-val" style="color:var(--p2)">4+</div><div class="kpi-sub">years active</div></div>
           <div class="kpi"><div class="kpi-label">Stack</div><div class="kpi-val" style="color:var(--a)">15+</div><div class="kpi-sub">technologies</div></div>
           <div class="kpi"><div class="kpi-label">Status</div><div class="kpi-val" style="color:var(--g);font-size:1.1rem;margin-top:4px;">● ON</div><div class="kpi-sub">Vezapp intern</div></div>
@@ -1507,9 +1699,13 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
           <div class="cert-icon" style="width:36px;height:36px;border-radius:7px;background:rgba(245,158,11,.1);display:flex;align-items:center;justify-content:center;font-size:.95rem;color:var(--a);flex-shrink:0;"><i class="fab fa-google"></i></div>
           <div><div class="ci-label" style="color:var(--a)">Certification</div><div class="ci-val">Google Data Analytics</div><div style="font-size:.62rem;color:var(--text3)">Click to verify →</div></div>
         </a>
-        <a href="https://drive.google.com/file/d/1EGecxcaeJKmkAaoCeTVoxAnAbeM1a2Np/view?usp=sharing" target="_blank" class="ci" style="background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.2);">
+        <a href="https://drive.google.com/file/d/1xol8S44Z1L2D7SKrkzMl8O2nFRH1lfOy/view?usp=sharing" target="_blank" class="ci" style="background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.2);">
           <div class="ci-ico" style="background:rgba(139,92,246,.15);color:var(--p2)"><i class="fas fa-file-pdf"></i></div>
-          <div><div class="ci-label" style="color:var(--p2)">Resume</div><div class="ci-val">Download / View PDF</div></div>
+          <div><div class="ci-label" style="color:var(--p2)">Resume · Data Science</div><div class="ci-val">View PDF</div></div>
+        </a>
+        <a href="https://drive.google.com/file/d/1LrsH9eMYbhXZpBsEe-WXzEkQo2oXGcGj/view?usp=sharing" target="_blank" class="ci" style="background:rgba(6,182,212,.08);border-color:rgba(6,182,212,.2);">
+          <div class="ci-ico" style="background:rgba(6,182,212,.15);color:var(--c)"><i class="fas fa-file-pdf"></i></div>
+          <div><div class="ci-label" style="color:var(--c)">Resume · Software Dev</div><div class="ci-val">View PDF</div></div>
         </a>
       </div>
     </div>
@@ -1551,7 +1747,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
     <div class="sm-item" onclick="openWin('w-dash')"><i class="fas fa-chart-bar"></i> Stats Dashboard</div>
     <div class="sm-item" onclick="openWin('w-contact')"><i class="fas fa-paper-plane"></i> Contact</div>
     <div class="sm-div"></div>
-    <a class="sm-item" href="https://drive.google.com/file/d/1EGecxcaeJKmkAaoCeTVoxAnAbeM1a2Np/view?usp=sharing" target="_blank"><i class="fas fa-download"></i> Download Resume</a>
+    <a class="sm-item" href="https://drive.google.com/file/d/1xol8S44Z1L2D7SKrkzMl8O2nFRH1lfOy/view?usp=sharing" target="_blank"><i class="fas fa-download"></i> Resume · Data Science</a>
+    <a class="sm-item" href="https://drive.google.com/file/d/1LrsH9eMYbhXZpBsEe-WXzEkQo2oXGcGj/view?usp=sharing" target="_blank"><i class="fas fa-download"></i> Resume · Software Dev</a>
     <a class="sm-item" href="https://github.com/Pinkesh2905" target="_blank"><i class="fab fa-github"></i> GitHub Profile</a>
   </div>
 </div>
@@ -1701,6 +1898,10 @@ function hideWindowInstant(id){
   winState[id]='closed';
 }
 
+function getFocusedVisibleWindow(){
+  return document.querySelector('.win.visible.focused');
+}
+
 function openWin(id){
   const el=document.getElementById(id);
   if(!el)return;
@@ -1709,6 +1910,11 @@ function openWin(id){
     document.querySelectorAll('.win.visible').forEach(win=>{
       if(win.id!==id) hideWindowInstant(win.id);
     });
+  } else {
+    const currentWin=getFocusedVisibleWindow();
+    if(currentWin&&currentWin.id!==id){
+      minWin(currentWin.id);
+    }
   }
   if(el.classList.contains('visible')){
     focusWin(id);
@@ -1893,7 +2099,7 @@ function switchTab(win,tab){
 
 /* ── PROJECTS NAV ── */
 function switchProj(name){
-  ['elevo','bloom','eatzy'].forEach(p=>{
+  ['elevo','bloom','eatzy','ipl','housevue'].forEach(p=>{
     const item = document.getElementById('pi-'+p);
     const detail = document.getElementById('pd-'+p);
     const isOn = p===name;
@@ -1939,22 +2145,26 @@ const script=[
   {t:'o',s:'',v:'Cricket 🏏  ·  Music 🎵  ·  Tech YouTube 📺  ·  AI/ML 🤖  ·  Vibe Coding 🔥'},
   {t:'o',s:'hi',v:''},
   {t:'p',c:'ls ~/projects'},
-  {t:'o',s:'cy',v:'elevo/    bloom-wellness/    eatzy/'},
+  {t:'o',s:'cy',v:'elevo/    bloom-wellness/    eatzy/    ipl-win-predictor/    housevue/'},
   {t:'o',s:'hi',v:''},
   {t:'p',c:'echo $STATUS'},
   {t:'o',s:'gr',v:'● OPEN TO WORK — Looking for full-time roles in Data Science & SWE'},
 ];
 const cmds={
-  help:{fn:()=>['Commands: whoami, skills, projects, contact, resume, experience, clear','Try: cat elevo.txt  ·  cat bloom.txt  ·  cat vezapp.txt']},
+  help:{fn:()=>['Commands: whoami, skills, projects, contact, resume, resume ds, resume dev, experience, clear','Try: cat elevo.txt  ·  cat bloom.txt  ·  cat ipl.txt  ·  cat housevue.txt  ·  cat vezapp.txt']},
   whoami:{fn:()=>['Pinkesh Darji — Full Stack Developer & Data Analyst','CHARUSAT University · MCA (2024-26)','SP University · BSc CA & IT (2021-24)','Status: Intern @ Vezapp Solutions LLP','Goal: Full-time roles in Data Science & Software Engineering']},
-  skills:{fn:()=>['Frontend:   React · Angular · JavaScript · Tailwind · HTML/CSS','Backend:    Python · Django · Node.js · MongoDB · PostgreSQL','Data:       SQL · Power BI · Looker Studio · Machine Learning','AI/LLM:     OpenAI API · Gemini API · gTTS · Prompt Engineering']},
-  projects:{fn:()=>['1. Elevo        — AI placement prep platform','   elevo.13.51.206.127.nip.io','   github.com/Pinkesh2905/Elevo','2. Bloom        — Mental wellness Django app','   bloom.13.51.206.127.nip.io','3. EatZy        — Food delivery MEAN stack app','   github.com/Pinkesh2905/EatZy']},
+  skills:{fn:()=>['Frontend:   React · Angular · JavaScript · Tailwind · HTML/CSS','Backend:    Python · Django · Django REST · REST APIs · Node.js · MongoDB · PostgreSQL','Data:       SQL · Pandas · Scikit-Learn · Streamlit · Power BI · Looker Studio · Machine Learning','AI/LLM:     OpenAI API · Gemini API · Git/GitHub · Prompt Engineering']},
+  projects:{fn:()=>['1. Elevo         — AI placement prep platform','   elevo.13.51.206.127.nip.io','   github.com/Pinkesh2905/Elevo','2. Bloom         — Mental wellness Django app','   bloom.13.51.206.127.nip.io','3. EatZy         — Food delivery MEAN stack app','   github.com/Pinkesh2905/EatZy','4. IPL Predictor — Live cricket win probability app','   pinkesh-iplwinpredictor.streamlit.app','   github.com/Pinkesh2905/IPL-WinPredictor','5. HouseVue      — ML house price prediction app','   pinkesh-housevue.streamlit.app','   github.com/Pinkesh2905/Housevue']},
   experience:{fn:()=>['Vezapp Solutions LLP  ·  Dec 2025 – Present','· SQL schema design & sync for foundry digitalization apps','· Looker Studio & Power BI dashboards for production analytics','· Full-stack feature development']},
   contact:{fn:()=>['Email:    pinkeshd29@gmail.com','Phone:    +91 9875034836','GitHub:   github.com/Pinkesh2905','LinkedIn: linkedin.com/in/pinkesh-darji-3731b9266/','X:        x.com/techexplorer29']},
-  resume:{fn:()=>{window.open('https://drive.google.com/file/d/1EGecxcaeJKmkAaoCeTVoxAnAbeM1a2Np/view?usp=sharing','_blank');return['Opening resume... ✓'];}},
+  resume:{fn:()=>{window.open('https://drive.google.com/file/d/1xol8S44Z1L2D7SKrkzMl8O2nFRH1lfOy/view?usp=sharing','_blank');window.open('https://drive.google.com/file/d/1LrsH9eMYbhXZpBsEe-WXzEkQo2oXGcGj/view?usp=sharing','_blank');return['Opening both resumes... ✓','Data Science: drive.google.com/file/d/1xol8S44Z1L2D7SKrkzMl8O2nFRH1lfOy','Software Dev: drive.google.com/file/d/1LrsH9eMYbhXZpBsEe-WXzEkQo2oXGcGj'];}},
+  'resume ds':{fn:()=>{window.open('https://drive.google.com/file/d/1xol8S44Z1L2D7SKrkzMl8O2nFRH1lfOy/view?usp=sharing','_blank');return['Opening Data Science resume... ✓'];}},
+  'resume dev':{fn:()=>{window.open('https://drive.google.com/file/d/1LrsH9eMYbhXZpBsEe-WXzEkQo2oXGcGj/view?usp=sharing','_blank');return['Opening Software Developer resume... ✓'];}},
   clear:{fn:()=>{document.getElementById('term-out').innerHTML='';return[];}},
   'cat elevo.txt':{fn:()=>['Elevo — AI-Powered Placement Preparation Platform','Unifies coding, aptitude, resume interviews, analytics, and role-based workflows.','Supports students, tutors, admins, and organizations on one platform.','AI: Gemini API primary · OpenAI fallback · JDoodle for code execution.','Stack: Django 5 · PostgreSQL · DRF · Django-Q2 · Tailwind · Bootstrap Forms','Live: elevo.13.51.206.127.nip.io','GitHub: github.com/Pinkesh2905/Elevo']},
   'cat bloom.txt':{fn:()=>['Bloom Wellness — Mental Wellness Platform','Combines journaling, mood tracking, therapist discovery, and appointment booking.','Includes AI-assisted chatbot flows, therapist messaging, and wellness insights dashboards.','Built for both patient self-care and therapist-facing workflows.','Stack: Django 5 · Templates · OpenAI SDK · SQLite · Pillow · SMTP','Live: bloom.13.51.206.127.nip.io']},
+  'cat ipl.txt':{fn:()=>['IPL Win Probability Predictor — Live ML cricket analytics app','Quantifies T20 chase pressure using score, overs, wickets, target, and run-rate context.','Feature engineering centered on Pressure Index, run-rate gap, innings progress, and wickets left.','Logistic Regression won on cross-validated ROC-AUC after the engineered features made the problem nearly linearly separable.','Built with Streamlit + Plotly and deployed on Streamlit Cloud.','Live: pinkesh-iplwinpredictor.streamlit.app','GitHub: github.com/Pinkesh2905/IPL-WinPredictor']},
+  'cat housevue.txt':{fn:()=>['HouseVue — ML-Powered House Price Prediction App','End-to-end regression app that predicts residential property prices from area, bedrooms, bathrooms, floors, condition, year built, and location.','Benchmarks multiple regression models, uses preprocessing pipelines, and applies hyperparameter tuning for better accuracy.','Includes performance metrics, feature importance analysis, sensitivity insights, and a market overview section.','Built with Python, Scikit-Learn, Streamlit, Pandas, NumPy, Matplotlib, and Joblib.','Live: pinkesh-housevue.streamlit.app','GitHub: github.com/Pinkesh2905/Housevue']},
   'cat vezapp.txt':{fn:()=>['Vezapp Solutions LLP — Current Internship','Vezapp builds customized digitalization apps for industrial clients','(foundries). I work on the data layer:','· Design SQL schemas for digitalized logbook data entry apps','· Sync SQL tables with client applications for real-time data','· Build analytics dashboards in Looker Studio & Power BI','· Contribute to full-stack features in the core platform']},
 };
 let ti=0;
