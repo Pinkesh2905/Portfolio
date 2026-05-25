@@ -1220,7 +1220,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
         <button class="wc-f" onclick="maxWin('w-proj')"><i class="fas fa-expand"></i></button>
       </div>
       <i class="fas fa-rocket wt-icon"></i>
-      <span class="wt-title">Projects — 5 apps shipped</span>
+      <span class="wt-title">Projects — 6 apps shipped</span>
     </div>
     <div class="wb" style="flex-direction:row;height:420px;">
       <div class="proj-sidebar">
@@ -1244,6 +1244,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
         <div class="proj-item" id="pi-housevue" onclick="switchProj('housevue')">
           <div class="proj-item-icon" style="background:linear-gradient(135deg,#ec4899,#8b5cf6)"><i class="fas fa-house"></i></div>
           <div><div class="proj-item-name">HouseVue</div><div class="proj-item-type">ML + Streamlit</div></div>
+        </div>
+        <div class="proj-item" id="pi-aura" onclick="switchProj('aura')">
+          <div class="proj-item-icon" style="background:linear-gradient(135deg,#a855f7,#d946ef)"><i class="fas fa-music"></i></div>
+          <div><div class="proj-item-name">Aura</div><div class="proj-item-type">AI Music App</div></div>
         </div>
       </div>
 
@@ -1499,6 +1503,39 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);}
           <div class="pd-section">
             <div class="pd-section-title">Tech Stack</div>
             <div class="pd-chips"><span class="pd-chip">Python</span><span class="pd-chip">Scikit-Learn</span><span class="pd-chip">Streamlit</span><span class="pd-chip">Pandas</span><span class="pd-chip">NumPy</span><span class="pd-chip">Matplotlib</span><span class="pd-chip">Joblib</span><span class="pd-chip">Git</span><span class="pd-chip">GitHub</span></div>
+          </div>
+        </div>
+
+        <!-- AURA -->
+        <div id="pd-aura" style="display:none">
+          <div class="pd-header">
+            <div class="pd-icon" style="background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(217,70,239,.2));border:1px solid rgba(168,85,247,.3);font-size:1.6rem;"><i class="fas fa-music"></i></div>
+            <div>
+              <div class="pd-name">Aura</div>
+              <div class="pd-type">Intelligent AI-Powered Music Platform</div>
+              <div class="pd-links">
+                <a href="https://auramusic-plum.vercel.app/" target="_blank" class="pd-link pd-link-live"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+                <a href="https://github.com/Pinkesh2905/AuraMusic" target="_blank" class="pd-link pd-link-gh"><i class="fab fa-github"></i> GitHub</a>
+              </div>
+            </div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Overview</div>
+            <div class="pd-desc">Aura is a <strong style="color:var(--p2)">highly personalized, intelligent music streaming application</strong> designed to bridge the gap between user emotions and musical discovery. Powered by AI, it dynamically analyzes listening habits, synchronizes with users' moods, and generates adaptive, mood-based playlists using natural language prompts. The platform features an immersive, interactive user interface with dynamic visualizers (like the "Intelligent Aura" centerpiece orb), a "Vibe Tuner" for AI-curated listening experiences (e.g., "Late Night Indie Haze", "Chaos Hype Pulse"), and seamless Spotify Web Playback integration. Aura goes beyond standard music players by delivering an aesthetic, emotionally resonant audio experience.</div>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Future Enhancements</div>
+            <ul class="pd-features">
+              <li><strong>Aura Capsules:</strong> Introduce collaborative and time-capsule shared playlists where users can blend their "auras" with friends.</li>
+              <li><strong>Real-Time Social Listening:</strong> Implement listening parties and live friend activity feeds for a synchronized community experience.</li>
+              <li><strong>Deeper AI Audio Analysis:</strong> Integrate generative AI to create continuous ambient transitions between tracks or custom lo-fi beats based on current weather/time of day.</li>
+              <li><strong>Dynamic "Wrapped" Experience:</strong> Offer an ongoing, real-time visual representation of user listening statistics and genre evolution, avoiding the wait for an end-of-year summary.</li>
+              <li><strong>Progressive Web App (PWA):</strong> Enhance offline capabilities and mobile-native feel for uninterrupted on-the-go listening.</li>
+            </ul>
+          </div>
+          <div class="pd-section">
+            <div class="pd-section-title">Tech Stack</div>
+            <div class="pd-chips"><span class="pd-chip">Next.js 16</span><span class="pd-chip">React 19</span><span class="pd-chip">Tailwind CSS v4</span><span class="pd-chip">Framer Motion</span><span class="pd-chip">Zustand</span><span class="pd-chip">Google GenAI SDK</span><span class="pd-chip">Spotify API</span><span class="pd-chip">Prisma</span><span class="pd-chip">PostgreSQL</span><span class="pd-chip">NextAuth.js</span></div>
           </div>
         </div>
 
@@ -2099,7 +2136,7 @@ function switchTab(win,tab){
 
 /* ── PROJECTS NAV ── */
 function switchProj(name){
-  ['elevo','bloom','eatzy','ipl','housevue'].forEach(p=>{
+  ['elevo','bloom','eatzy','ipl','housevue','aura'].forEach(p=>{
     const item = document.getElementById('pi-'+p);
     const detail = document.getElementById('pd-'+p);
     const isOn = p===name;
@@ -2145,16 +2182,16 @@ const script=[
   {t:'o',s:'',v:'Cricket 🏏  ·  Music 🎵  ·  Tech YouTube 📺  ·  AI/ML 🤖  ·  Vibe Coding 🔥'},
   {t:'o',s:'hi',v:''},
   {t:'p',c:'ls ~/projects'},
-  {t:'o',s:'cy',v:'elevo/    bloom-wellness/    eatzy/    ipl-win-predictor/    housevue/'},
+  {t:'o',s:'cy',v:'elevo/    bloom-wellness/    eatzy/    ipl-win-predictor/    housevue/    aura/'},
   {t:'o',s:'hi',v:''},
   {t:'p',c:'echo $STATUS'},
   {t:'o',s:'gr',v:'● OPEN TO WORK — Looking for full-time roles in Data Science & SWE'},
 ];
 const cmds={
-  help:{fn:()=>['Commands: whoami, skills, projects, contact, resume, resume ds, resume dev, experience, clear','Try: cat elevo.txt  ·  cat bloom.txt  ·  cat ipl.txt  ·  cat housevue.txt  ·  cat vezapp.txt']},
+  help:{fn:()=>['Commands: whoami, skills, projects, contact, resume, resume ds, resume dev, experience, clear','Try: cat elevo.txt  ·  cat bloom.txt  ·  cat ipl.txt  ·  cat housevue.txt  ·  cat aura.txt  ·  cat vezapp.txt']},
   whoami:{fn:()=>['Pinkesh Darji — Full Stack Developer & Data Analyst','CHARUSAT University · MCA (2024-26)','SP University · BSc CA & IT (2021-24)','Status: Intern @ Vezapp Solutions LLP','Goal: Full-time roles in Data Science & Software Engineering']},
   skills:{fn:()=>['Frontend:   React · Angular · JavaScript · Tailwind · HTML/CSS','Backend:    Python · Django · Django REST · REST APIs · Node.js · MongoDB · PostgreSQL','Data:       SQL · Pandas · Scikit-Learn · Streamlit · Power BI · Looker Studio · Machine Learning','AI/LLM:     OpenAI API · Gemini API · Git/GitHub · Prompt Engineering']},
-  projects:{fn:()=>['1. Elevo         — AI placement prep platform','   https://elevo.life','   github.com/Pinkesh2905/Elevo','2. Bloom         — Mental wellness Django app','   bloom.13.51.206.127.nip.io','3. EatZy         — Food delivery MEAN stack app','   github.com/Pinkesh2905/EatZy','4. IPL Predictor — Live cricket win probability app','   pinkesh-iplwinpredictor.streamlit.app','   github.com/Pinkesh2905/IPL-WinPredictor','5. HouseVue      — ML house price prediction app','   pinkesh-housevue.streamlit.app','   github.com/Pinkesh2905/Housevue']},
+  projects:{fn:()=>['1. Elevo         — AI placement prep platform','   https://elevo.life','   github.com/Pinkesh2905/Elevo','2. Bloom         — Mental wellness Django app','   bloom.13.51.206.127.nip.io','3. EatZy         — Food delivery MEAN stack app','   github.com/Pinkesh2905/EatZy','4. IPL Predictor — Live cricket win probability app','   pinkesh-iplwinpredictor.streamlit.app','   github.com/Pinkesh2905/IPL-WinPredictor','5. HouseVue      — ML house price prediction app','   pinkesh-housevue.streamlit.app','   github.com/Pinkesh2905/Housevue','6. Aura          — AI-Powered Music Platform','   auramusic-plum.vercel.app','   github.com/Pinkesh2905/AuraMusic']},
   experience:{fn:()=>['Vezapp Solutions LLP  ·  Dec 2025 – Present','· SQL schema design & sync for foundry digitalization apps','· Looker Studio & Power BI dashboards for production analytics','· Full-stack feature development']},
   contact:{fn:()=>['Email:    pinkeshd29@gmail.com','Phone:    +91 9875034836','GitHub:   github.com/Pinkesh2905','LinkedIn: linkedin.com/in/pinkesh-darji-3731b9266/','X:        x.com/techexplorer29']},
   resume:{fn:()=>{window.open('https://drive.google.com/file/d/1xol8S44Z1L2D7SKrkzMl8O2nFRH1lfOy/view?usp=sharing','_blank');window.open('https://drive.google.com/file/d/1LrsH9eMYbhXZpBsEe-WXzEkQo2oXGcGj/view?usp=sharing','_blank');return['Opening both resumes... ✓','Data Science: drive.google.com/file/d/1xol8S44Z1L2D7SKrkzMl8O2nFRH1lfOy','Software Dev: drive.google.com/file/d/1LrsH9eMYbhXZpBsEe-WXzEkQo2oXGcGj'];}},
@@ -2165,6 +2202,7 @@ const cmds={
   'cat bloom.txt':{fn:()=>['Bloom Wellness — Mental Wellness Platform','Combines journaling, mood tracking, therapist discovery, and appointment booking.','Includes AI-assisted chatbot flows, therapist messaging, and wellness insights dashboards.','Built for both patient self-care and therapist-facing workflows.','Stack: Django 5 · Templates · OpenAI SDK · SQLite · Pillow · SMTP','Live: bloom.13.51.206.127.nip.io']},
   'cat ipl.txt':{fn:()=>['IPL Win Probability Predictor — Live ML cricket analytics app','Quantifies T20 chase pressure using score, overs, wickets, target, and run-rate context.','Feature engineering centered on Pressure Index, run-rate gap, innings progress, and wickets left.','Logistic Regression won on cross-validated ROC-AUC after the engineered features made the problem nearly linearly separable.','Built with Streamlit + Plotly and deployed on Streamlit Cloud.','Live: pinkesh-iplwinpredictor.streamlit.app','GitHub: github.com/Pinkesh2905/IPL-WinPredictor']},
   'cat housevue.txt':{fn:()=>['HouseVue — ML-Powered House Price Prediction App','End-to-end regression app that predicts residential property prices from area, bedrooms, bathrooms, floors, condition, year built, and location.','Benchmarks multiple regression models, uses preprocessing pipelines, and applies hyperparameter tuning for better accuracy.','Includes performance metrics, feature importance analysis, sensitivity insights, and a market overview section.','Built with Python, Scikit-Learn, Streamlit, Pandas, NumPy, Matplotlib, and Joblib.','Live: pinkesh-housevue.streamlit.app','GitHub: github.com/Pinkesh2905/Housevue']},
+  'cat aura.txt':{fn:()=>['Aura — Intelligent AI-Powered Music Platform','Highly personalized, intelligent music streaming application designed to bridge the gap between user emotions and musical discovery.','Powered by AI, it dynamically analyzes listening habits, synchronizes with users\' moods, and generates adaptive, mood-based playlists.','Stack: Next.js 16, React 19, Tailwind CSS v4, Framer Motion, Zustand, Google GenAI SDK, Spotify API, Prisma, PostgreSQL','Live: https://auramusic-plum.vercel.app/','GitHub: github.com/Pinkesh2905/AuraMusic']},
   'cat vezapp.txt':{fn:()=>['Vezapp Solutions LLP — Current Internship','Vezapp builds customized digitalization apps for industrial clients','(foundries). I work on the data layer:','· Design SQL schemas for digitalized logbook data entry apps','· Sync SQL tables with client applications for real-time data','· Build analytics dashboards in Looker Studio & Power BI','· Contribute to full-stack features in the core platform']},
 };
 let ti=0;
