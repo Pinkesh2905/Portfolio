@@ -21,9 +21,9 @@ export const identity = {
   name: 'Pinkesh Darji',
   title: 'Data Analyst – BI & AI Solutions',
   oneLiner:
-    'I turn factory and business data into clear dashboards, plans and AI assistants that people can actually ask questions to.',
-  status: 'Open to Data Analyst roles',
-  statusLong: 'Open to Data Analyst roles · Ahmedabad / Vadodara',
+    'I turn factory and business data into clear dashboards, plans and AI assistants, and I build the software behind them with Claude Code.',
+  status: 'Open to Data Analyst & Developer roles',
+  statusLong: 'Open to Data Analyst and Software Developer roles · Ahmedabad / Vadodara',
   company: 'Vezapp Solutions LLP',
   companyCity: 'Vadodara',
   location: 'Borsad, Gujarat, India',
@@ -50,10 +50,11 @@ export const about = {
   paragraphs: [
     "I'm a Data Analyst at Vezapp Solutions in Vadodara, working with foundry and manufacturing clients. My day-to-day is SQL on client production databases, Looker Studio dashboards, cleaning and loading client data, and setting up shop-floor data-entry apps.",
     'I also build AI tools on top of that data, like assistants that let plant managers ask "how many moulds were rejected last week?" in plain English instead of opening a dashboard.',
+    "I'm also open to software developer roles. Building working products is what interests me most, especially with AI tools like Claude Code. Vezapp Planner (Django, Next.js, PostgreSQL), the AI data assistants for clients and a live store system for a freelance client were all built that way.",
     "**How I work with AI:** I build my tools with Claude Code. My part is understanding what the client needs, giving the AI the right data structure and rules, checking every answer against the real data, and fixing what's wrong.",
   ],
   credentials: 'MCA (CHARUSAT) · Google Data Analytics certified.',
-  interests: ['Data analytics', 'AI tools', 'Building products for real businesses'],
+  interests: ['Data analytics', 'Software development', 'Building with AI tools'],
 };
 
 export const experience = [
@@ -188,7 +189,7 @@ export const projects = [
     icon: 'briefcase',
     gradient: 'linear-gradient(135deg,#f97316,#f59e0b)',
     summary:
-      'Order, inventory, payment and delivery system used daily by the store, with sales and payment reports.',
+      'Order, inventory, payment and delivery system used daily by the store, with sales and payment reports. Built with Django using AI coding tools (Claude Code, Antigravity), and each feature was tested with the store owner before handover.',
     tools: ['Django', 'PostgreSQL'],
     shots: [],
     links: [{ label: 'GitHub', href: 'https://github.com/Pinkesh2905/HomeArtFurniture' }],
@@ -224,12 +225,13 @@ export const skills = [
   { group: 'SQL', items: ['MySQL on AWS RDS (joins, GROUP BY, subqueries, indexes)'] },
   { group: 'Dashboards & reporting', items: ['Looker Studio', 'Power BI (basic)', 'Excel', 'Google Sheets'] },
   { group: 'Python', items: ['Pandas', 'NumPy', 'Matplotlib'] },
-  { group: 'Tools', items: ['Clappia (no-code apps)', 'Django', 'Git/GitHub'] },
-  { group: 'AI tools', items: ['Claude', 'Claude Code', 'ChatGPT', 'Gemini'] },
+  { group: 'Software development', items: ['Django', 'Next.js', 'PostgreSQL', 'Git/GitHub'] },
+  { group: 'AI tools', items: ['Claude Code (building apps and data tools)', 'Claude API and MCP servers', 'Claude', 'ChatGPT', 'Gemini'] },
+  { group: 'Tools', items: ['Clappia (no-code apps)'] },
 ];
 
 /** Four short lines for the home-screen "Skills" widget. */
-export const skillsWidget = ['SQL', 'Looker Studio', 'Excel', 'Python'];
+export const skillsWidget = ['SQL', 'Looker Studio', 'Python · Django', 'Claude Code'];
 
 export const education = {
   degrees: [
