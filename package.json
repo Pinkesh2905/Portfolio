@@ -1,0 +1,9 @@
+{
+  "name": "pinkesh-portfolio",
+  "private": true,
+  "type": "module",
+  "description": "Static portfolio (no build step). `npm run build:simple` regenerates simple.html from js/content.js.",
+  "scripts": {
+    "build:simple": "node scripts/build-simple.mjs"
+  }
+}

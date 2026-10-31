@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://pinkesh-portfolio-seven.vercel.app/sitemap.xml
