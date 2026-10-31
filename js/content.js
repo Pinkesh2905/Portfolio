@@ -35,7 +35,7 @@ export const identity = {
   linkedin: 'https://www.linkedin.com/in/pinkesh29',
   resume: 'Pinkesh_Darji_Resume.pdf',
   simple: 'simple.html',
-  siteUrl: 'https://pinkesh-portfolio-seven.vercel.app',
+  siteUrl: 'https://pinkeshh.vercel.app',
   avatar: { webp: 'images/avatar.webp', jpg: 'images/avatar.jpg' },
   portrait: { webp: 'images/portrait.webp', jpg: 'images/portrait.jpg' },
 };
