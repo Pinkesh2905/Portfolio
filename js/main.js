@@ -108,7 +108,7 @@ function smallWidgets() {
 function renderMenubar() {
   const mb = $('#menubar');
   mb.innerHTML = `
-    <a class="mb-brand" href="#about" data-nav="about">${picture(identity.avatar, 'Pinkesh Darji', '', 'width="20" height="20"')}<strong>${esc(identity.name)}</strong></a>
+    <a class="mb-brand" href="#about" data-nav="about">${picture(identity.avatar, '', '', 'width="20" height="20"')}<strong>${esc(identity.name)}</strong></a>
     <nav class="mb-menus" aria-label="Menu">
       ${['about', 'experience', 'projects', 'contact'].map((id) => `<a href="#${id}" data-nav="${id}">${id[0].toUpperCase() + id.slice(1)}</a>`).join('')}
     </nav>
