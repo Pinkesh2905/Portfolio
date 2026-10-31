@@ -4,6 +4,8 @@ import { ICONS, BRAND } from './icons.js';
 const { identity } = C;
 const $ = (sel, root = document) => root.querySelector(sel);
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const mqDesktop = matchMedia('(min-width: 1024px)');
+const isDesktop = () => mqDesktop.matches;
 
 /* ── helpers ─────────────────────────────────────────────── */
 const esc = (s) =>
@@ -27,13 +29,22 @@ function picture(src, alt, cls = '', attrs = '') {
 }
 const ext = 'target="_blank" rel="noopener noreferrer"';
 
-/* ── status bar clock (IST, h:mm) ────────────────────────── */
+/* ── clock (IST): status bar h:mm on phones, date + time in the desktop menu bar ── */
 const clockFmt = new Intl.DateTimeFormat('en-IN', {
   timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit', hour12: true,
 });
+const dateFmt = new Intl.DateTimeFormat('en-IN', {
+  timeZone: 'Asia/Kolkata', weekday: 'short', day: 'numeric', month: 'short',
+});
+function paintClock() {
+  const now = new Date();
+  const p = Object.fromEntries(clockFmt.formatToParts(now).map((x) => [x.type, x.value]));
+  $('#sb-time').textContent = `${p.hour}:${p.minute}`;
+  const mb = $('#mb-time');
+  if (mb) mb.textContent = `${dateFmt.format(now).replace(',', '')}  ${p.hour}:${p.minute} ${String(p.dayPeriod || '').toUpperCase()}`;
+}
 function tickClock() {
-  const parts = Object.fromEntries(clockFmt.formatToParts(new Date()).map((p) => [p.type, p.value]));
-  $('#sb-time').textContent = `${parts.hour}:${parts.minute}`;
+  paintClock();
   setTimeout(tickClock, 60000 - (Date.now() % 60000) + 50);
 }
 
@@ -52,13 +63,16 @@ function squircle(a, size = 30) {
   return `<span class="squircle" style="background:${a.gradient}">${glyph(a, size)}</span>`;
 }
 
-function renderHome() {
-  const now = C.now;
-  $('#home-scroll').innerHTML = `
+function profileWidget(avatarPx) {
+  return `
     <section class="profile glass" aria-label="Profile">
+      <button class="more-btn" id="more-btn" type="button" aria-label="More options" aria-haspopup="true" aria-expanded="false">${icon('more-horizontal', 20)}</button>
+      <div class="more-menu glass" id="more-menu" hidden>
+        <a href="${identity.simple}">${icon('list', 16)} Simple view</a>
+      </div>
       <div class="profile-top">
         <div class="avatar-wrap">
-          ${picture(identity.avatar, 'Pinkesh Darji', '', 'width="68" height="68" fetchpriority="high"')}
+          ${picture(identity.avatar, 'Pinkesh Darji', '', `width="${avatarPx}" height="${avatarPx}" fetchpriority="high"`)}
           <span class="avail-dot" aria-hidden="true"></span>
         </div>
         <div>
@@ -72,8 +86,12 @@ function renderHome() {
         <a class="wbtn primary" href="${identity.resume}" ${ext}>${icon('file-text', 18)} Resume</a>
         <a class="wbtn secondary" href="#contact" data-nav="contact">${icon('mail', 18)} Contact</a>
       </div>
-    </section>
+    </section>`;
+}
 
+function smallWidgets() {
+  const now = C.now;
+  return `
     <div class="widgets">
       <section class="widget glass" aria-label="Now">
         <h2>Now</h2>
@@ -84,8 +102,44 @@ function renderHome() {
         <h2>Skills</h2>
         <ul>${C.skillsWidget.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>
       </section>
-    </div>
+    </div>`;
+}
 
+function renderMenubar() {
+  const mb = $('#menubar');
+  mb.innerHTML = `
+    <a class="mb-brand" href="#about" data-nav="about">${picture(identity.avatar, 'Pinkesh Darji', '', 'width="20" height="20"')}<strong>${esc(identity.name)}</strong></a>
+    <nav class="mb-menus" aria-label="Menu">
+      ${['about', 'experience', 'projects', 'contact'].map((id) => `<a href="#${id}" data-nav="${id}">${id[0].toUpperCase() + id.slice(1)}</a>`).join('')}
+    </nav>
+    <span class="mb-spacer"></span>
+    <a class="mb-simple" href="${identity.simple}">Simple view</a>
+    <span class="mb-time" id="mb-time"></span>`;
+}
+
+function renderHome() {
+  const desktop = isDesktop();
+  $('#menubar').hidden = !desktop;
+
+  if (desktop) {
+    renderMenubar();
+    $('#home-scroll').innerHTML = `${profileWidget(84)}${smallWidgets()}`;
+    $('#dock').className = 'dock glass';
+    $('#dock').setAttribute('aria-label', 'Apps');
+    $('#dock').innerHTML = C.apps
+      .map((a) => {
+        const inner = `${squircle(a, 28)}<span class="tip" aria-hidden="true">${esc(a.label)}</span>`;
+        return a.type === 'app'
+          ? `<a class="dock-item" href="#${a.id}" data-nav="${a.id}" data-app="${a.id}" aria-label="${esc(a.label)}">${inner}</a>`
+          : `<a class="dock-item" href="${a.href}" ${ext} data-app="${a.id}" aria-label="${esc(a.label)} (opens in a new tab)">${inner}</a>`;
+      })
+      .join('');
+    return;
+  }
+
+  $('#home-scroll').innerHTML = `
+    ${profileWidget(68)}
+    ${smallWidgets()}
     <nav class="grid" aria-label="Apps">
       ${C.apps
         .map((a) =>
@@ -97,6 +151,7 @@ function renderHome() {
     </nav>`;
 
   $('#dock').className = 'dock glass';
+  $('#dock').setAttribute('aria-label', 'Quick contact');
   $('#dock').innerHTML = C.dock
     .map(
       (d) =>
@@ -128,7 +183,9 @@ const screens = {
       ${group(`<div class="pad">${C.about.paragraphs.map((p) => `<p class="body-text">${rich(p)}</p>`).join('')}
         <p class="body-text muted">${esc(C.about.credentials)}</p></div>`)}
       ${groupTitle('Interests')}
-      ${group(`<div class="pad chips">${C.about.interests.map((i) => `<span class="chip">${esc(i)}</span>`).join('')}</div>`)}`,
+      ${group(`<div class="pad chips">${C.about.interests.map((i) => `<span class="chip">${esc(i)}</span>`).join('')}</div>`)}
+      ${groupTitle('More')}
+      ${group(linkRow({ icon: 'list', gradient: 'linear-gradient(160deg,#94a3b8,#334155)', title: 'Simple view', sub: 'Plain, fast, print-friendly page', href: identity.simple }))}`,
   }),
 
   experience: () => ({
@@ -310,29 +367,46 @@ function mountTerminal(host) {
   });
 }
 
-/* ── router + app shell ──────────────────────────────────── */
+/* ── router + app shells ─────────────────────────────────── */
+// Phone/tablet: one app at a time (full-screen / centered sheet). Desktop: draggable windows.
 const VALID = ['about', 'experience', 'projects', 'skills', 'education', 'contact', 'terminal'];
-let current = null; // { id, el, sub, trigger, closing }
+let current = null; // phone/tablet: { id, el, sub, trigger, closing }
+const wins = new Map(); // desktop: id -> { id, el, sub, minimized, z }
+let frontId = null;
+let zTop = 100;
+let cascade = 0;
 let navIndex = 0;
+let pendingTrigger = null;
+const MENU_H = 28;
 
 const parseHash = () => {
   const [id, sub] = decodeURIComponent(location.hash.replace(/^#\/?/, '')).split('/');
   return VALID.includes(id) ? { id, sub: sub || '' } : { id: '', sub: '' };
 };
-
-let pendingTrigger = null;
+const pathOf = (a) => a.id + (a.sub ? `/${a.sub}` : '');
+const setHash = (path) =>
+  history.replaceState(history.state, '', path ? `#${path}` : location.pathname + location.search);
 
 function navigate(path, trigger) {
+  if (location.hash === `#${path}`) {
+    pendingTrigger = trigger || null;
+    route(true);
+    return;
+  }
   const from = location.hash.replace(/^#\/?/, '');
   pendingTrigger = trigger || null;
   history.pushState({ idx: ++navIndex, from }, '', `#${path}`);
   route(true);
 }
 
+const activeApp = () => (isDesktop() ? (frontId && wins.get(frontId)) || null : current);
+
 /** Back = browser back when we pushed the previous screen ourselves, otherwise replace in place. */
 function goBack() {
-  if (!current) return;
-  const target = current.sub ? 'projects' : '';
+  const a = activeApp();
+  if (!a) return;
+  if (!a.sub && isDesktop()) return closeWindow(a.id, true);
+  const target = a.sub ? 'projects' : '';
   const st = history.state || {};
   if (st.idx > 0 && st.from === target) history.back();
   else {
@@ -350,37 +424,54 @@ function applyScreen(app, view) {
   app.setAttribute('aria-label', view.title);
   app.classList.toggle('term', !!view.terminal);
   app.classList.toggle('compact', !showLarge);
-  document.body.classList.toggle('term-open', !!view.terminal);
+  app.classList.toggle('has-back', !!view.back);
   scroller.scrollTop = 0;
   app.classList.remove('scrolled');
   if (view.terminal) mountTerminal($('#term-host', scroller));
+  syncTermBar();
+}
+/** Terminal is dark in both schemes, so the phone status bar must stay white over it. */
+function syncTermBar() {
+  const front = activeApp();
+  document.body.classList.toggle('term-open', !isDesktop() && !!front && front.el.classList.contains('term'));
 }
 
-function buildApp(id, sub) {
+function shell(id, sub, kind) {
   const el = document.createElement('div');
-  el.className = 'app';
   el.setAttribute('role', 'dialog');
-  el.setAttribute('aria-modal', 'true');
+  el.setAttribute('aria-modal', kind === 'win' ? 'false' : 'true');
   el.tabIndex = -1;
-  el.innerHTML = `
-    <div class="app-nav">
-      <button class="back" type="button" aria-label="Back">${icon('chevron-left', 26)}<span class="back-label">Home</span></button>
-      <span class="nav-title" aria-hidden="true"></span><span></span>
-    </div>
-    <div class="app-scroll"></div>`;
+  if (kind === 'win') {
+    el.className = 'win';
+    el.innerHTML = `
+      <div class="titlebar">
+        <div class="lights">
+          <button class="tl tl-close" type="button" aria-label="Close window"></button>
+          <button class="tl tl-min" type="button" aria-label="Minimise window"></button>
+          <button class="tl tl-zoom" type="button" aria-label="Zoom window"></button>
+        </div>
+        <button class="back" type="button" aria-label="Back">${icon('chevron-left', 18)}<span class="back-label">Home</span></button>
+        <span class="nav-title"></span>
+      </div>
+      <div class="app-scroll"></div>`;
+  } else {
+    el.className = 'app';
+    el.innerHTML = `
+      <div class="app-nav">
+        <button class="back" type="button" aria-label="Back">${icon('chevron-left', 26)}<span class="back-label">Home</span></button>
+        <span class="nav-title" aria-hidden="true"></span><span></span>
+      </div>
+      <div class="app-scroll"></div>`;
+  }
   applyScreen(el, screens[id](sub));
   const scroller = $('.app-scroll', el);
   scroller.addEventListener('scroll', () => el.classList.toggle('scrolled', scroller.scrollTop > 36), { passive: true });
   $('.back', el).addEventListener('click', goBack);
-  el.addEventListener('click', (ev) => {
-    const copy = ev.target.closest('[data-copy]');
-    if (copy) copyText(copy.dataset.copy);
-  });
-  attachSwipe(el, scroller);
   return el;
 }
 
-function attachSwipe(el, scroller) {
+function attachSwipe(el) {
+  const scroller = $('.app-scroll', el);
   let start = null;
   el.addEventListener('touchstart', (ev) => {
     const t = ev.touches[0];
@@ -409,26 +500,30 @@ async function copyText(text) {
   toast('Copied');
 }
 
-function triggerFor(id) {
-  return pendingTrigger || document.querySelector(`.home [data-app="${id}"]`);
-}
+const iconFor = (id) => document.querySelector(`[data-app="${id}"]`);
+const originOf = (el, trigger) => {
+  const r = trigger.getBoundingClientRect();
+  const b = el.getBoundingClientRect();
+  return `${r.left + r.width / 2 - b.left}px ${r.top + r.height / 2 - b.top}px`;
+};
 
+/* phone / tablet ------------------------------------------- */
 function openApp(id, sub, animate) {
-  const layer = $('#app-layer');
-  const el = buildApp(id, sub);
-  const trigger = triggerFor(id);
+  const el = shell(id, sub, 'app');
+  attachSwipe(el);
+  const trigger = pendingTrigger || iconFor(id);
   pendingTrigger = null;
-  layer.appendChild(el);
+  $('#app-layer').appendChild(el);
   current = { id, el, sub, trigger, closing: false };
   document.body.classList.add('app-open');
+  syncTermBar();
   $('#home').inert = true;
+  $('#dock').inert = true;
 
   if (animate && !reduceMotion() && trigger) {
-    const r = trigger.getBoundingClientRect();
-    const b = el.getBoundingClientRect();
-    el.style.transformOrigin = `${r.left + r.width / 2 - b.left}px ${r.top + r.height / 2 - b.top}px`;
+    el.style.transformOrigin = originOf(el, trigger);
     el.animate(
-      [{ transform: 'scale(0.14)', opacity: 0, borderRadius: '30px' }, { transform: 'scale(1)', opacity: 1, borderRadius: '0px' }],
+      [{ transform: 'scale(0.14)', opacity: 0, borderRadius: '30px' }, { transform: 'scale(1)', opacity: 1, borderRadius: getComputedStyle(el).borderRadius }],
       { duration: 320, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
     );
   } else if (animate) {
@@ -443,18 +538,17 @@ function closeApp(animate) {
   current.closing = true;
   document.body.classList.remove('app-open', 'term-open');
   $('#home').inert = false;
+  $('#dock').inert = false;
   const finish = () => {
     el.remove();
     if (current && current.el === el) current = null;
-    const back = trigger && document.contains(trigger) ? trigger : document.querySelector(`.home [data-app="${id}"]`);
+    const back = trigger && document.contains(trigger) ? trigger : iconFor(id);
     if (back) back.focus({ preventScroll: true });
   };
   if (animate && !reduceMotion() && trigger && document.contains(trigger)) {
-    const r = trigger.getBoundingClientRect();
-    const b = el.getBoundingClientRect();
-    el.style.transformOrigin = `${r.left + r.width / 2 - b.left}px ${r.top + r.height / 2 - b.top}px`;
+    el.style.transformOrigin = originOf(el, trigger);
     el.animate(
-      [{ transform: 'scale(1)', opacity: 1, borderRadius: '0px' }, { transform: 'scale(0.14)', opacity: 0, borderRadius: '30px' }],
+      [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(0.14)', opacity: 0 }],
       { duration: 260, easing: 'cubic-bezier(0.4, 0, 0.8, 0.4)', fill: 'forwards' },
     ).onfinish = finish;
   } else if (animate) {
@@ -462,12 +556,9 @@ function closeApp(animate) {
   } else finish();
 }
 
-function route(animate) {
+function phoneRoute(animate) {
   const { id, sub } = parseHash();
-  if (!id) {
-    closeApp(animate);
-    return;
-  }
+  if (!id) return closeApp(animate);
   if (current && !current.closing && current.id === id) {
     if (current.sub !== sub) {
       current.sub = sub;
@@ -482,16 +573,188 @@ function route(animate) {
   openApp(id, sub, animate);
 }
 
+/* desktop windows ------------------------------------------ */
+function dockDot(id, open) {
+  const d = document.querySelector(`.dock [data-app="${id}"]`);
+  if (d) d.classList.toggle('open', open);
+}
+
+function focusWindow(id) {
+  const w = wins.get(id);
+  if (!w) return;
+  w.z = ++zTop;
+  w.el.style.zIndex = w.z;
+  frontId = id;
+  wins.forEach((x) => x.el.classList.toggle('focused', x === w));
+}
+
+function enableDrag(w) {
+  const bar = $('.titlebar', w.el);
+  let d = null;
+  bar.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('button') || w.el.classList.contains('maxed')) return;
+    d = { x: e.clientX - w.el.offsetLeft, y: e.clientY - w.el.offsetTop };
+    bar.setPointerCapture(e.pointerId);
+  });
+  bar.addEventListener('pointermove', (e) => {
+    if (!d) return;
+    const left = Math.min(Math.max(e.clientX - d.x, 120 - w.el.offsetWidth), innerWidth - 120);
+    const top = Math.min(Math.max(e.clientY - d.y, MENU_H), innerHeight - 60);
+    w.el.style.left = `${left}px`;
+    w.el.style.top = `${top}px`;
+  });
+  const end = () => { d = null; };
+  bar.addEventListener('pointerup', end);
+  bar.addEventListener('pointercancel', end);
+  bar.addEventListener('dblclick', (e) => { if (!e.target.closest('button')) w.el.classList.toggle('maxed'); });
+}
+
+function openWindow(id, sub, animate) {
+  const el = shell(id, sub, 'win');
+  const w = { id, el, sub, minimized: false, z: 0 };
+  const W = Math.min(880, innerWidth - 120);
+  const H = Math.min(660, innerHeight - MENU_H - 120);
+  const off = (cascade++ % 5) * 26;
+  el.style.width = `${W}px`;
+  el.style.height = `${H}px`;
+  el.style.left = `${Math.round((innerWidth - W) / 2 + off)}px`;
+  el.style.top = `${Math.round(MENU_H + Math.max(14, (innerHeight - MENU_H - 110 - H) / 2) + off)}px`;
+  wins.set(id, w);
+  $('#app-layer').appendChild(el);
+  dockDot(id, true);
+  focusWindow(id);
+  enableDrag(w);
+
+  el.addEventListener('pointerdown', () => {
+    if (frontId !== id) { focusWindow(id); setHash(pathOf(w)); }
+  });
+  $('.tl-close', el).addEventListener('click', () => closeWindow(id, true));
+  $('.tl-min', el).addEventListener('click', () => minimizeWindow(id));
+  $('.tl-zoom', el).addEventListener('click', () => el.classList.toggle('maxed'));
+
+  const trigger = pendingTrigger && document.contains(pendingTrigger) ? pendingTrigger : iconFor(id);
+  pendingTrigger = null;
+  if (animate && !reduceMotion() && trigger) {
+    el.style.transformOrigin = originOf(el, trigger);
+    el.animate([{ transform: 'scale(0.5)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 240, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+  } else if (animate) {
+    el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 140 });
+  }
+  el.focus({ preventScroll: true });
+}
+
+function minimizeWindow(id) {
+  const w = wins.get(id);
+  if (!w) return;
+  w.minimized = true;
+  w.el.classList.add('minimized');
+  w.el.classList.remove('focused');
+  if (frontId === id) {
+    frontId = null;
+    const next = [...wins.values()].filter((x) => !x.minimized).sort((a, b) => b.z - a.z)[0];
+    if (next) { focusWindow(next.id); setHash(pathOf(next)); } else setHash('');
+  }
+}
+
+function closeWindow(id, userAction, syncHash = true) {
+  const w = wins.get(id);
+  if (!w) return;
+  wins.delete(id);
+  dockDot(id, false);
+  const remove = () => w.el.remove();
+  if (userAction && !reduceMotion()) {
+    w.el.style.pointerEvents = 'none';
+    w.el.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(0.94)' }], { duration: 140, fill: 'forwards' }).onfinish = remove;
+  } else remove();
+  if (frontId === id) {
+    frontId = null;
+    if (syncHash) {
+      const next = [...wins.values()].filter((x) => !x.minimized).sort((a, b) => b.z - a.z)[0];
+      if (next) { focusWindow(next.id); setHash(pathOf(next)); next.el.focus({ preventScroll: true }); }
+      else setHash('');
+    }
+    if (userAction) iconFor(id)?.focus({ preventScroll: true });
+  }
+}
+
+function desktopRoute(animate) {
+  const { id, sub } = parseHash();
+  if (!id) {
+    [...wins.keys()].forEach((k) => closeWindow(k, false, false));
+    return;
+  }
+  const w = wins.get(id);
+  if (!w) return openWindow(id, sub, animate);
+  if (w.minimized) {
+    w.minimized = false;
+    w.el.classList.remove('minimized');
+  }
+  if (w.sub !== sub) {
+    w.sub = sub;
+    applyScreen(w.el, screens[id](sub));
+  }
+  focusWindow(id);
+  w.el.focus({ preventScroll: true });
+}
+
+function route(animate) {
+  if (isDesktop()) desktopRoute(animate);
+  else phoneRoute(animate);
+}
+
+/** Drop every open app/window (used when the layout mode changes). */
+function teardown() {
+  current = null;
+  wins.clear();
+  frontId = null;
+  $('#app-layer').innerHTML = '';
+  document.body.classList.remove('app-open', 'term-open');
+  $('#home').inert = false;
+  $('#dock').inert = false;
+}
+
 /* ── global events ───────────────────────────────────────── */
 document.addEventListener('click', (ev) => {
+  const copy = ev.target.closest('[data-copy]');
+  if (copy) return copyText(copy.dataset.copy);
+
+  const more = ev.target.closest('#more-btn');
+  const menu = $('#more-menu');
+  if (menu) {
+    if (more) {
+      const open = menu.hidden;
+      menu.hidden = !open;
+      more.setAttribute('aria-expanded', String(open));
+      return;
+    }
+    if (!menu.hidden && !ev.target.closest('#more-menu')) {
+      menu.hidden = true;
+      $('#more-btn').setAttribute('aria-expanded', 'false');
+    }
+  }
+
   const a = ev.target.closest('a[data-nav], a.row[href^="#"], a.feature[href^="#"]');
   if (!a || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button) return;
   const path = a.dataset.nav || a.getAttribute('href').slice(1);
   ev.preventDefault();
-  navigate(path, a.closest('.home') ? a : null);
+  navigate(path, a.closest('.home, .dock') ? a : null);
 });
 
 document.addEventListener('keydown', (ev) => {
+  const menu = $('#more-menu');
+  if (ev.key === 'Escape' && menu && !menu.hidden) {
+    menu.hidden = true;
+    $('#more-btn').setAttribute('aria-expanded', 'false');
+    $('#more-btn').focus();
+    return;
+  }
+  if (isDesktop()) {
+    if (ev.key === 'Escape' && frontId) {
+      ev.preventDefault();
+      closeWindow(frontId, true);
+    }
+    return;
+  }
   if (!current) return;
   if (ev.key === 'Escape') {
     ev.preventDefault();
@@ -510,8 +773,31 @@ addEventListener('popstate', (ev) => {
   route(true);
 });
 
+/* dock magnification (desktop, mouse only) */
+function wireDock() {
+  const dock = $('#dock');
+  const items = () => [...dock.querySelectorAll('.dock-item')];
+  dock.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse' || reduceMotion()) return;
+    items().forEach((it) => {
+      const r = it.getBoundingClientRect();
+      const d = Math.abs(e.clientX - (r.left + r.width / 2));
+      const k = Math.max(0, 1 - d / 120);
+      it.style.setProperty('--s', (1 + 0.55 * k * k).toFixed(3));
+    });
+  });
+  dock.addEventListener('pointerleave', () => items().forEach((it) => it.style.removeProperty('--s')));
+}
+
 /* ── boot (no splash screen: content renders immediately) ── */
+let clockStarted = false;
+function mount() {
+  teardown();
+  renderHome();
+  if (isDesktop()) wireDock();
+  if (!clockStarted) { clockStarted = true; tickClock(); } else paintClock();
+  route(false);
+}
 history.replaceState({ idx: 0 }, '');
-renderHome();
-tickClock();
-route(false);
+mount();
+mqDesktop.addEventListener('change', mount);

@@ -34,6 +34,8 @@ export const identity = {
   // The resume uses linkedin.com/in/pinkesh29; the old site used a different slug. One URL only.
   linkedin: 'https://www.linkedin.com/in/pinkesh29',
   resume: 'Pinkesh_Darji_Resume.pdf',
+  simple: 'simple.html',
+  siteUrl: 'https://pinkesh-portfolio-seven.vercel.app',
   avatar: { webp: 'images/avatar.webp', jpg: 'images/avatar.jpg' },
   portrait: { webp: 'images/portrait.webp', jpg: 'images/portrait.jpg' },
 };
