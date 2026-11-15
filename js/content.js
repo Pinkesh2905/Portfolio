@@ -41,7 +41,7 @@ export const identity = {
 };
 
 export const now = {
-  text: 'Building a production planner for foundries',
+  text: 'Testing a production planner for foundries',
   linkLabel: 'Vezapp Planner',
   projectId: 'vezapp-planner',
 };
@@ -83,7 +83,7 @@ export const projects = [
     name: 'Vezapp Planner',
     tagline: 'Production planning for foundries',
     featured: true,
-    status: 'Built at Vezapp · Working',
+    status: 'Built at Vezapp · In testing',
     icon: 'layers',
     gradient: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
     problem:
@@ -102,13 +102,13 @@ export const projects = [
     name: 'Vezapp AI',
     tagline: 'Ask your factory data',
     featured: true,
-    status: 'Built at Vezapp · In progress',
+    status: 'Built at Vezapp · In use by clients',
     icon: 'sparkles',
     gradient: 'linear-gradient(135deg,#0ea5e9,#6366f1)',
     problem:
       'Plant managers wanted answers from their production data without opening dashboards or installing Claude Desktop.',
     did: "A website where each client company logs in and asks questions in plain English. The AI turns the question into a read-only SQL query on that company's data and answers in plain language. Each company can only see its own data.",
-    result: 'Replaces the desktop-only assistants with one web login for all clients.',
+    result: 'Built and now used by real clients. Replaces the desktop-only assistants with one web login for all clients.',
     // TODO: add the tech stack of the Vezapp AI website.
     tools: [],
     builtWithClaudeCode: true,

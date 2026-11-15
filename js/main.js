@@ -1,5 +1,6 @@
 import * as C from './content.js';
 import { ICONS, BRAND } from './icons.js';
+import { startWallpaper } from './wallpaper.js';
 
 const { identity } = C;
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -65,7 +66,7 @@ function squircle(a, size = 30) {
 
 function profileWidget(avatarPx) {
   return `
-    <section class="profile glass" aria-label="Profile">
+    <section class="profile glass" data-glow aria-label="Profile">
       <button class="more-btn" id="more-btn" type="button" aria-label="More options" aria-haspopup="true" aria-expanded="false">${icon('more-horizontal', 20)}</button>
       <div class="more-menu glass" id="more-menu" hidden>
         <a href="${identity.simple}">${icon('list', 16)} Simple view</a>
@@ -93,12 +94,12 @@ function smallWidgets() {
   const now = C.now;
   return `
     <div class="widgets">
-      <section class="widget glass" aria-label="Now">
-        <h2>Now</h2>
+      <section class="widget glass" data-glow aria-label="Now">
+        <h2><span class="live" aria-hidden="true"></span>Now</h2>
         <p>${esc(now.text)}</p>
         <a class="wlink" href="#projects/${now.projectId}" data-nav="projects/${now.projectId}">${esc(now.linkLabel)} →</a>
       </section>
-      <section class="widget glass" aria-label="Skills">
+      <section class="widget glass" data-glow aria-label="Skills">
         <h2>Skills</h2>
         <ul>${C.skillsWidget.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>
       </section>
@@ -113,13 +114,49 @@ function renderMenubar() {
       ${['about', 'experience', 'projects', 'contact'].map((id) => `<a href="#${id}" data-nav="${id}">${id[0].toUpperCase() + id.slice(1)}</a>`).join('')}
     </nav>
     <span class="mb-spacer"></span>
+    <button class="mb-search" type="button" data-spotlight aria-label="Search (Ctrl or Command K)">${icon('search', 14)}<span>Search</span><kbd>${modKey}K</kbd></button>
     <a class="mb-simple" href="${identity.simple}">Simple view</a>
     <span class="mb-time" id="mb-time"></span>`;
+}
+
+const modKey = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) ? '⌘' : 'Ctrl ';
+
+/** Desktop only: the headline and featured work, so the desktop is never an empty wallpaper. */
+function heroBlock() {
+  const [head, tail] = identity.oneLiner.split(', and ');
+  let i = 0;
+  const words = `${head}.`
+    .split(' ')
+    .map((w) => `<span class="w${/^(dashboards|plans|AI|assistants)\b/.test(w) ? ' hl' : ''}" style="--i:${i++}">${esc(w)}</span>`)
+    .join(' ');
+  const featured = C.projects.filter((p) => p.featured);
+  return `
+    <section class="hero" aria-label="Introduction">
+      <p class="eyebrow"><span class="live" aria-hidden="true"></span>${esc(identity.statusLong)}</p>
+      <h2 class="headline">${words}</h2>
+      ${tail ? `<p class="hero-sub">And ${esc(tail)}</p>` : ''}
+      <div class="hero-cta">
+        <a class="hbtn primary" href="#projects" data-nav="projects">See my work ${icon('arrow-right', 18)}</a>
+        <a class="hbtn" href="#terminal" data-nav="terminal">${icon('terminal', 18)} Open terminal</a>
+      </div>
+      <div class="hero-cards">
+        ${featured
+          .map(
+            (p, n) => `<a class="hcard glass" data-glow data-tilt style="--i:${n}" href="#projects/${p.id}" data-nav="projects/${p.id}">
+              <span class="hcard-ic" style="background:${p.gradient}">${icon(p.icon, 20)}</span>
+              <strong>${esc(p.name)}</strong>
+              <span class="hcard-t">${esc(p.tagline)}</span>
+            </a>`,
+          )
+          .join('')}
+      </div>
+    </section>`;
 }
 
 function renderHome() {
   const desktop = isDesktop();
   $('#menubar').hidden = !desktop;
+  $('#hero-host').innerHTML = desktop ? heroBlock() : '';
 
   if (desktop) {
     renderMenubar();
@@ -127,11 +164,11 @@ function renderHome() {
     $('#dock').className = 'dock glass';
     $('#dock').setAttribute('aria-label', 'Apps');
     $('#dock').innerHTML = C.apps
-      .map((a) => {
+      .map((a, n) => {
         const inner = `${squircle(a, 28)}<span class="tip" aria-hidden="true">${esc(a.label)}</span>`;
         return a.type === 'app'
-          ? `<a class="dock-item" href="#${a.id}" data-nav="${a.id}" data-app="${a.id}" aria-label="${esc(a.label)}">${inner}</a>`
-          : `<a class="dock-item" href="${a.href}" ${ext} data-app="${a.id}" aria-label="${esc(a.label)} (opens in a new tab)">${inner}</a>`;
+          ? `<a class="dock-item" style="--i:${n}" href="#${a.id}" data-nav="${a.id}" data-app="${a.id}" aria-label="${esc(a.label)}">${inner}</a>`
+          : `<a class="dock-item" style="--i:${n}" href="${a.href}" ${ext} data-app="${a.id}" aria-label="${esc(a.label)} (opens in a new tab)">${inner}</a>`;
       })
       .join('');
     return;
@@ -142,10 +179,10 @@ function renderHome() {
     ${smallWidgets()}
     <nav class="grid" aria-label="Apps">
       ${C.apps
-        .map((a) =>
+        .map((a, n) =>
           a.type === 'app'
-            ? `<a class="icon-btn" href="#${a.id}" data-nav="${a.id}" data-app="${a.id}">${squircle(a)}<span class="lbl">${esc(a.label)}</span></a>`
-            : `<a class="icon-btn" href="${a.href}" ${ext} data-app="${a.id}">${squircle(a)}<span class="lbl">${esc(a.label)}</span></a>`,
+            ? `<a class="icon-btn" style="--i:${n}" href="#${a.id}" data-nav="${a.id}" data-app="${a.id}">${squircle(a)}<span class="lbl">${esc(a.label)}</span></a>`
+            : `<a class="icon-btn" style="--i:${n}" href="${a.href}" ${ext} data-app="${a.id}">${squircle(a)}<span class="lbl">${esc(a.label)}</span></a>`,
         )
         .join('')}
     </nav>`;
@@ -155,7 +192,7 @@ function renderHome() {
   $('#dock').innerHTML = C.dock
     .map(
       (d) =>
-        `<a class="icon-btn" style="width:60px" href="${d.href}" ${d.external ? ext : ''} aria-label="${esc(d.label)}"><span class="squircle" style="background:${d.gradient}">${glyph(d, 30)}</span></a>`,
+        `<a class="icon-btn" href="${d.href}" ${d.external ? ext : ''} aria-label="${esc(d.label)}"><span class="squircle" style="background:${d.gradient}">${glyph(d, 30)}</span></a>`,
     )
     .join('');
 }
@@ -177,7 +214,7 @@ const screens = {
   about: () => ({
     title: 'About',
     html: `
-      <div class="hero-photo-wrap">${picture(identity.portrait, 'Portrait of Pinkesh Darji', 'hero-photo', 'width="1200" height="1200" loading="lazy"')}</div>
+      <div class="hero-photo-wrap">${picture(identity.portrait, 'Portrait of Pinkesh Darji', 'hero-photo', 'width="1121" height="1403"')}</div>
       <div class="who"><h2>${esc(identity.name)}</h2><p>${esc(identity.title)}</p></div>
       ${groupTitle('Hello')}
       ${group(`<div class="pad">${C.about.paragraphs.map((p) => `<p class="body-text">${rich(p)}</p>`).join('')}
@@ -210,14 +247,14 @@ const screens = {
       title: 'Projects',
       html: `
         ${groupTitle('Featured')}
-        ${featured
+        <div class="features">${featured
           .map(
             (p) => `<a class="feature" href="#projects/${p.id}" data-nav="projects/${p.id}">
-              <div class="cover" style="background:${p.gradient}">${icon(p.icon, 54)}<span class="tag">${esc(p.status)}</span></div>
+              <div class="cover" style="background:${p.gradient}"><span class="cover-ic">${icon(p.icon, 54)}</span><span class="tag">${esc(p.status)}</span></div>
               <div class="fb"><h3>${esc(p.name)}</h3><p>${esc(p.tagline)}</p></div>
             </a>`,
           )
-          .join('')}
+          .join('')}</div>
         ${groupTitle('Other projects')}
         ${group(
           other
@@ -240,7 +277,7 @@ const screens = {
   skills: () => ({
     title: 'Skills',
     html: C.skills
-      .map((g) => `${groupTitle(g.group)}${group(g.items.map((i) => `<div class="row"><span class="t">${esc(i)}</span></div>`).join(''))}`)
+      .map((g) => `${groupTitle(g.group)}${group(`<div class="pad chips">${g.items.map((i) => `<span class="chip">${esc(i)}</span>`).join('')}</div>`)}`)
       .join(''),
   }),
 
@@ -415,7 +452,30 @@ function goBack() {
   }
 }
 
-function applyScreen(app, view) {
+/** Content rises into place as it enters the scroller: staggered on open, one by one on scroll. */
+function reveal(scroller, dir) {
+  if (reduceMotion() || !('IntersectionObserver' in window)) return;
+  scroller.style.setProperty('--dx', `${dir * 26}px`);
+  const io = new IntersectionObserver(
+    (entries) => {
+      let n = 0;
+      entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        en.target.style.setProperty('--d', `${Math.min(n++, 9) * 45}ms`);
+        en.target.classList.add('in');
+        io.unobserve(en.target);
+      });
+    },
+    { root: scroller, rootMargin: '0px 0px -4% 0px' },
+  );
+  scroller.querySelectorAll('.large-title, .app-body > *, .features > *').forEach((k) => {
+    if (k.classList.contains('features')) return;
+    k.classList.add('rv');
+    io.observe(k);
+  });
+}
+
+function applyScreen(app, view, dir = 0) {
   const scroller = $('.app-scroll', app);
   $('.nav-title', app).textContent = view.title;
   $('.back-label', app).textContent = view.back || 'Home';
@@ -428,6 +488,7 @@ function applyScreen(app, view) {
   scroller.scrollTop = 0;
   app.classList.remove('scrolled');
   if (view.terminal) mountTerminal($('#term-host', scroller));
+  else reveal(scroller, dir);
   syncTermBar();
 }
 /** Terminal is dark in both schemes, so the phone status bar must stay white over it. */
@@ -500,6 +561,7 @@ async function copyText(text) {
   toast('Copied');
 }
 
+const SPRING = 'cubic-bezier(0.22, 1.12, 0.36, 1)';
 const iconFor = (id) => document.querySelector(`[data-app="${id}"]`);
 const originOf = (el, trigger) => {
   const r = trigger.getBoundingClientRect();
@@ -523,8 +585,8 @@ function openApp(id, sub, animate) {
   if (animate && !reduceMotion() && trigger) {
     el.style.transformOrigin = originOf(el, trigger);
     el.animate(
-      [{ transform: 'scale(0.14)', opacity: 0, borderRadius: '30px' }, { transform: 'scale(1)', opacity: 1, borderRadius: getComputedStyle(el).borderRadius }],
-      { duration: 320, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+      [{ transform: 'scale(0.12)', opacity: 0, borderRadius: '60px' }, { opacity: 1, offset: 0.35 }, { transform: 'scale(1)', opacity: 1, borderRadius: getComputedStyle(el).borderRadius }],
+      { duration: 460, easing: SPRING },
     );
   } else if (animate) {
     el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160 });
@@ -548,8 +610,8 @@ function closeApp(animate) {
   if (animate && !reduceMotion() && trigger && document.contains(trigger)) {
     el.style.transformOrigin = originOf(el, trigger);
     el.animate(
-      [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(0.14)', opacity: 0 }],
-      { duration: 260, easing: 'cubic-bezier(0.4, 0, 0.8, 0.4)', fill: 'forwards' },
+      [{ transform: 'scale(1)', opacity: 1, borderRadius: getComputedStyle(el).borderRadius }, { opacity: 1, offset: 0.55 }, { transform: 'scale(0.12)', opacity: 0, borderRadius: '60px' }],
+      { duration: 340, easing: 'cubic-bezier(0.5, 0, 0.75, 0.3)', fill: 'forwards' },
     ).onfinish = finish;
   } else if (animate) {
     el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: 'forwards' }).onfinish = finish;
@@ -562,7 +624,7 @@ function phoneRoute(animate) {
   if (current && !current.closing && current.id === id) {
     if (current.sub !== sub) {
       current.sub = sub;
-      applyScreen(current.el, screens[id](sub));
+      applyScreen(current.el, screens[id](sub), sub ? 1 : -1);
     }
     return;
   }
@@ -579,6 +641,11 @@ function dockDot(id, open) {
   if (d) d.classList.toggle('open', open);
 }
 
+/** The hero steps back while any window is on screen, so text never fights text. */
+function syncDesk() {
+  document.body.classList.toggle('has-win', [...wins.values()].some((w) => !w.minimized));
+}
+
 function focusWindow(id) {
   const w = wins.get(id);
   if (!w) return;
@@ -592,9 +659,10 @@ function enableDrag(w) {
   const bar = $('.titlebar', w.el);
   let d = null;
   bar.addEventListener('pointerdown', (e) => {
-    if (e.target.closest('button') || w.el.classList.contains('maxed')) return;
+    if (e.target.closest('button') || w.maxed) return;
     d = { x: e.clientX - w.el.offsetLeft, y: e.clientY - w.el.offsetTop };
     bar.setPointerCapture(e.pointerId);
+    w.el.classList.add('dragging');
   });
   bar.addEventListener('pointermove', (e) => {
     if (!d) return;
@@ -603,26 +671,75 @@ function enableDrag(w) {
     w.el.style.left = `${left}px`;
     w.el.style.top = `${top}px`;
   });
-  const end = () => { d = null; };
+  const end = () => { d = null; w.el.classList.remove('dragging'); };
   bar.addEventListener('pointerup', end);
   bar.addEventListener('pointercancel', end);
-  bar.addEventListener('dblclick', (e) => { if (!e.target.closest('button')) w.el.classList.toggle('maxed'); });
+  bar.addEventListener('dblclick', (e) => { if (!e.target.closest('button')) toggleZoom(w); });
+}
+
+const maxRect = () => ({ left: 8, top: MENU_H + 8, width: innerWidth - 16, height: innerHeight - MENU_H - 8 - 104 });
+function setRect(el, r) {
+  el.style.left = `${Math.round(r.left)}px`;
+  el.style.top = `${Math.round(r.top)}px`;
+  el.style.width = `${Math.round(r.width)}px`;
+  el.style.height = `${Math.round(r.height)}px`;
+}
+/** Zoom fills the desktop between menu bar and dock; a second press restores the old frame. */
+function toggleZoom(w) {
+  const el = w.el;
+  if (!reduceMotion()) {
+    el.classList.add('zooming');
+    clearTimeout(w.zoomTimer);
+    w.zoomTimer = setTimeout(() => el.classList.remove('zooming'), 420);
+  }
+  if (w.maxed) {
+    setRect(el, w.restore);
+    w.maxed = false;
+  } else {
+    w.restore = { left: el.offsetLeft, top: el.offsetTop, width: el.offsetWidth, height: el.offsetHeight };
+    setRect(el, maxRect());
+    w.maxed = true;
+  }
+  el.classList.toggle('maxed', w.maxed);
+}
+
+/** Transform that shrinks a window into its dock icon (used by minimise and restore). */
+function toDock(w) {
+  const icon = iconFor(w.id);
+  const b = w.el.getBoundingClientRect();
+  if (!icon || !b.width) return 'translateY(40px) scale(0.6)';
+  const r = icon.getBoundingClientRect();
+  const dx = r.left + r.width / 2 - (b.left + b.width / 2);
+  const dy = r.top + r.height / 2 - (b.top + b.height / 2);
+  return `translate(${dx}px, ${dy}px) scale(${(r.width / b.width).toFixed(3)}, ${(r.height / b.height).toFixed(3)})`;
+}
+
+function bounce(el) {
+  const sq = el && el.querySelector('.squircle');
+  if (!sq || reduceMotion()) return;
+  sq.animate(
+    [{ translate: '0 0' }, { translate: '0 -16px' }, { translate: '0 0' }, { translate: '0 -6px' }, { translate: '0 0' }],
+    { duration: 620, easing: 'cubic-bezier(0.3, 0, 0.3, 1)' },
+  );
 }
 
 function openWindow(id, sub, animate) {
   const el = shell(id, sub, 'win');
-  const w = { id, el, sub, minimized: false, z: 0 };
-  const W = Math.min(880, innerWidth - 120);
-  const H = Math.min(660, innerHeight - MENU_H - 120);
+  const w = { id, el, sub, minimized: false, maxed: false, z: 0 };
+  const W = Math.min(900, innerWidth - 120);
+  const H = Math.min(680, innerHeight - MENU_H - 120);
   const off = (cascade++ % 5) * 26;
-  el.style.width = `${W}px`;
-  el.style.height = `${H}px`;
-  el.style.left = `${Math.round((innerWidth - W) / 2 + off)}px`;
-  el.style.top = `${Math.round(MENU_H + Math.max(14, (innerHeight - MENU_H - 110 - H) / 2) + off)}px`;
+  setRect(el, {
+    width: W,
+    height: H,
+    left: (innerWidth - W) / 2 + off,
+    top: MENU_H + Math.max(14, (innerHeight - MENU_H - 110 - H) / 2) + off,
+  });
   wins.set(id, w);
   $('#app-layer').appendChild(el);
   dockDot(id, true);
   focusWindow(id);
+  syncDesk();
   enableDrag(w);
 
   el.addEventListener('pointerdown', () => {
@@ -630,13 +747,17 @@ function openWindow(id, sub, animate) {
   });
   $('.tl-close', el).addEventListener('click', () => closeWindow(id, true));
   $('.tl-min', el).addEventListener('click', () => minimizeWindow(id));
-  $('.tl-zoom', el).addEventListener('click', () => el.classList.toggle('maxed'));
+  $('.tl-zoom', el).addEventListener('click', () => toggleZoom(w));
 
   const trigger = pendingTrigger && document.contains(pendingTrigger) ? pendingTrigger : iconFor(id);
   pendingTrigger = null;
   if (animate && !reduceMotion() && trigger) {
+    bounce(iconFor(id));
     el.style.transformOrigin = originOf(el, trigger);
-    el.animate([{ transform: 'scale(0.5)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 240, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+    el.animate(
+      [{ transform: 'scale(0.2)', opacity: 0 }, { opacity: 1, offset: 0.4 }, { transform: 'scale(1)', opacity: 1 }],
+      { duration: 420, easing: SPRING },
+    ).onfinish = () => { el.style.transformOrigin = ''; };
   } else if (animate) {
     el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 140 });
   }
@@ -645,10 +766,19 @@ function openWindow(id, sub, animate) {
 
 function minimizeWindow(id) {
   const w = wins.get(id);
-  if (!w) return;
+  if (!w || w.minimized) return;
   w.minimized = true;
-  w.el.classList.add('minimized');
+  syncDesk();
   w.el.classList.remove('focused');
+  const hide = () => { if (w.minimized) w.el.classList.add('minimized'); };
+  if (reduceMotion()) hide();
+  else {
+    w.el.animate(
+      [{ transform: 'none', opacity: 1 }, { opacity: 0.9, offset: 0.6 }, { transform: toDock(w), opacity: 0 }],
+      { duration: 380, easing: 'cubic-bezier(0.5, 0, 0.6, 0.6)', fill: 'forwards' },
+    ).onfinish = hide;
+    w.el.style.pointerEvents = 'none';
+  }
   if (frontId === id) {
     frontId = null;
     const next = [...wins.values()].filter((x) => !x.minimized).sort((a, b) => b.z - a.z)[0];
@@ -656,15 +786,27 @@ function minimizeWindow(id) {
   }
 }
 
+function restoreWindow(w) {
+  w.minimized = false;
+  syncDesk();
+  w.el.getAnimations().forEach((a) => a.cancel());
+  w.el.classList.remove('minimized');
+  w.el.style.pointerEvents = '';
+  if (reduceMotion()) return;
+  bounce(iconFor(w.id));
+  w.el.animate([{ transform: toDock(w), opacity: 0 }, { opacity: 1, offset: 0.4 }, { transform: 'none', opacity: 1 }], { duration: 400, easing: SPRING });
+}
+
 function closeWindow(id, userAction, syncHash = true) {
   const w = wins.get(id);
   if (!w) return;
   wins.delete(id);
+  syncDesk();
   dockDot(id, false);
   const remove = () => w.el.remove();
-  if (userAction && !reduceMotion()) {
+  if (userAction && !reduceMotion() && !w.minimized) {
     w.el.style.pointerEvents = 'none';
-    w.el.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(0.94)' }], { duration: 140, fill: 'forwards' }).onfinish = remove;
+    w.el.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(0.92)' }], { duration: 180, easing: 'ease-in', fill: 'forwards' }).onfinish = remove;
   } else remove();
   if (frontId === id) {
     frontId = null;
@@ -677,6 +819,17 @@ function closeWindow(id, userAction, syncHash = true) {
   }
 }
 
+/** Keep windows reachable when the browser window is resized. */
+function reflowWindows() {
+  wins.forEach((w) => {
+    if (w.maxed) return setRect(w.el, maxRect());
+    const left = Math.min(Math.max(w.el.offsetLeft, 120 - w.el.offsetWidth), innerWidth - 120);
+    const top = Math.min(Math.max(w.el.offsetTop, MENU_H), innerHeight - 60);
+    w.el.style.left = `${left}px`;
+    w.el.style.top = `${top}px`;
+  });
+}
+
 function desktopRoute(animate) {
   const { id, sub } = parseHash();
   if (!id) {
@@ -685,13 +838,10 @@ function desktopRoute(animate) {
   }
   const w = wins.get(id);
   if (!w) return openWindow(id, sub, animate);
-  if (w.minimized) {
-    w.minimized = false;
-    w.el.classList.remove('minimized');
-  }
+  if (w.minimized) restoreWindow(w);
   if (w.sub !== sub) {
     w.sub = sub;
-    applyScreen(w.el, screens[id](sub));
+    applyScreen(w.el, screens[id](sub), sub ? 1 : -1);
   }
   focusWindow(id);
   w.el.focus({ preventScroll: true });
@@ -704,19 +854,158 @@ function route(animate) {
 
 /** Drop every open app/window (used when the layout mode changes). */
 function teardown() {
+  closeSpotlight(false);
   current = null;
   wins.clear();
   frontId = null;
   $('#app-layer').innerHTML = '';
-  document.body.classList.remove('app-open', 'term-open');
+  document.body.classList.remove('app-open', 'term-open', 'has-win');
   $('#home').inert = false;
   $('#dock').inert = false;
+}
+
+/* ── spotlight search (Ctrl/⌘ K, or "/") ─────────────────── */
+let spot = null; // { el, items, shown, index, opener }
+
+function spotlightItems() {
+  const open = (href) => () => window.open(href, '_blank', 'noopener');
+  return [
+    ...C.apps.map((a) => ({
+      label: a.label,
+      hint: a.type === 'app' ? 'App' : 'Opens in a new tab',
+      glyph: `<span class="mini sm" style="background:${a.gradient}">${glyph(a, 16)}</span>`,
+      run: a.type === 'app' ? () => navigate(a.id) : open(a.href),
+    })),
+    ...C.projects.map((p) => ({
+      label: p.name,
+      hint: `Project · ${p.tagline}`,
+      words: p.tools.join(' '),
+      glyph: `<span class="mini sm" style="background:${p.gradient}">${icon(p.icon, 16)}</span>`,
+      run: () => navigate(`projects/${p.id}`),
+    })),
+    {
+      label: 'Copy email address',
+      hint: identity.email,
+      glyph: `<span class="mini sm" style="background:linear-gradient(160deg,#38bdf8,#2563eb)">${icon('copy', 16)}</span>`,
+      run: () => copyText(identity.email),
+    },
+    {
+      label: 'Simple view',
+      hint: 'Plain, fast, print-friendly page',
+      glyph: `<span class="mini sm" style="background:linear-gradient(160deg,#94a3b8,#334155)">${icon('list', 16)}</span>`,
+      run: () => { location.href = identity.simple; },
+    },
+  ];
+}
+
+function paintSpotlight() {
+  const q = $('input', spot.el).value.trim().toLowerCase();
+  spot.shown = spot.items.filter((it) => !q || `${it.label} ${it.hint} ${it.words || ''}`.toLowerCase().includes(q));
+  spot.index = Math.min(spot.index, Math.max(0, spot.shown.length - 1));
+  const list = $('.spot-list', spot.el);
+  list.innerHTML = spot.shown.length
+    ? spot.shown
+        .map(
+          (it, i) => `<li class="spot-item" id="spot-${i}" role="option" data-i="${i}" aria-selected="${i === spot.index}">
+            ${it.glyph}<span class="grow"><span class="t">${esc(it.label)}</span><span class="s">${esc(it.hint)}</span></span>
+            <span class="ret" aria-hidden="true">↵</span></li>`,
+        )
+        .join('')
+    : '<li class="spot-empty">No matches. Try “projects”, “SQL” or “resume”.</li>';
+  $('input', spot.el).setAttribute('aria-activedescendant', spot.shown.length ? `spot-${spot.index}` : '');
+  $('[aria-selected="true"]', list)?.scrollIntoView({ block: 'nearest' });
+}
+
+function openSpotlight() {
+  if (spot) return;
+  const el = document.createElement('div');
+  el.className = 'spot';
+  el.innerHTML = `
+    <div class="spot-box" role="dialog" aria-modal="true" aria-label="Search">
+      <label class="spot-field">${icon('search', 20)}
+        <input type="text" role="combobox" aria-expanded="true" aria-controls="spot-list" aria-autocomplete="list"
+          autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Search apps, projects and actions" aria-label="Search">
+        <kbd>esc</kbd></label>
+      <ul class="spot-list" id="spot-list" role="listbox" aria-label="Results"></ul>
+    </div>`;
+  document.body.appendChild(el);
+  spot = { el, items: spotlightItems(), shown: [], index: 0, opener: document.activeElement };
+  paintSpotlight();
+  const input = $('input', el);
+  input.focus();
+  input.addEventListener('input', () => { spot.index = 0; paintSpotlight(); });
+  input.addEventListener('keydown', (ev) => {
+    if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+      ev.preventDefault();
+      const n = spot.shown.length;
+      if (n) spot.index = (spot.index + (ev.key === 'ArrowDown' ? 1 : n - 1)) % n;
+      paintSpotlight();
+    } else if (ev.key === 'Enter') {
+      ev.preventDefault();
+      runSpotlight(spot.index);
+    } else if (ev.key === 'Tab') ev.preventDefault(); // focus stays in the field; arrows move the selection
+  });
+  el.addEventListener('pointermove', (ev) => {
+    const li = ev.target.closest('.spot-item');
+    if (li && +li.dataset.i !== spot.index) {
+      $('[aria-selected="true"]', el)?.setAttribute('aria-selected', 'false');
+      spot.index = +li.dataset.i;
+      li.setAttribute('aria-selected', 'true');
+    }
+  });
+  el.addEventListener('click', (ev) => {
+    const li = ev.target.closest('.spot-item');
+    if (li) runSpotlight(+li.dataset.i);
+    else if (!ev.target.closest('.spot-box')) closeSpotlight(true);
+  });
+}
+
+function closeSpotlight(refocus) {
+  if (!spot) return;
+  const { el, opener } = spot;
+  spot = null;
+  el.classList.add('out');
+  setTimeout(() => el.remove(), reduceMotion() ? 0 : 160);
+  if (refocus && opener && document.contains(opener)) opener.focus({ preventScroll: true });
+}
+
+function runSpotlight(i) {
+  const it = spot && spot.shown[i];
+  if (!it) return;
+  closeSpotlight(false);
+  it.run();
+}
+
+/* ── pointer light: glass cards glow under the cursor, hero cards tilt toward it ── */
+function wirePointerFx() {
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  let tilted = null;
+  document.addEventListener('pointermove', (e) => {
+    const g = e.target.closest?.('[data-glow]');
+    if (g) {
+      const r = g.getBoundingClientRect();
+      g.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      g.style.setProperty('--my', `${e.clientY - r.top}px`);
+    }
+    const t = reduceMotion() ? null : e.target.closest?.('[data-tilt]');
+    if (tilted && tilted !== t) {
+      tilted.style.removeProperty('--rx');
+      tilted.style.removeProperty('--ry');
+    }
+    tilted = t || null;
+    if (t) {
+      const r = t.getBoundingClientRect();
+      t.style.setProperty('--ry', `${(((e.clientX - r.left) / r.width - 0.5) * 12).toFixed(2)}deg`);
+      t.style.setProperty('--rx', `${((0.5 - (e.clientY - r.top) / r.height) * 12).toFixed(2)}deg`);
+    }
+  }, { passive: true });
 }
 
 /* ── global events ───────────────────────────────────────── */
 document.addEventListener('click', (ev) => {
   const copy = ev.target.closest('[data-copy]');
   if (copy) return copyText(copy.dataset.copy);
+  if (ev.target.closest('[data-spotlight]')) return openSpotlight();
 
   const more = ev.target.closest('#more-btn');
   const menu = $('#more-menu');
@@ -741,6 +1030,18 @@ document.addEventListener('click', (ev) => {
 });
 
 document.addEventListener('keydown', (ev) => {
+  if ((ev.key === 'k' || ev.key === 'K') && (ev.metaKey || ev.ctrlKey)) {
+    ev.preventDefault();
+    return spot ? closeSpotlight(true) : openSpotlight();
+  }
+  if (spot) {
+    if (ev.key === 'Escape') { ev.preventDefault(); closeSpotlight(true); }
+    return;
+  }
+  if (ev.key === '/' && !ev.target.closest('input, textarea')) {
+    ev.preventDefault();
+    return openSpotlight();
+  }
   const menu = $('#more-menu');
   if (ev.key === 'Escape' && menu && !menu.hidden) {
     menu.hidden = true;
@@ -801,3 +1102,6 @@ function mount() {
 history.replaceState({ idx: 0 }, '');
 mount();
 mqDesktop.addEventListener('change', mount);
+addEventListener('resize', () => { if (isDesktop()) reflowWindows(); });
+wirePointerFx();
+startWallpaper($('#bg'));

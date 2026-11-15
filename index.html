@@ -6,7 +6,7 @@
 <title>Pinkesh Darji — Data Analyst (BI &amp; AI Solutions)</title>
 <meta name="description" content="I turn factory and business data into clear dashboards, plans and AI assistants, and I build the software behind them with Claude Code.">
 <meta name="author" content="Pinkesh Darji">
-<meta name="theme-color" content="#1c1b1b">
+<meta name="theme-color" content="#0b0a17">
 <meta name="color-scheme" content="light dark">
 <link rel="canonical" href="https://pinkeshh.vercel.app/">
 <link rel="alternate" href="https://pinkeshh.vercel.app/simple.html" title="Simple view">
@@ -30,8 +30,6 @@
 <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
 <link rel="manifest" href="site.webmanifest">
 
-<link rel="preload" as="image" href="images/wallpaper-mobile.webp" type="image/webp" media="(max-width: 1023px)">
-<link rel="preload" as="image" href="images/wallpaper-desktop.webp" type="image/webp" media="(min-width: 1024px)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
@@ -57,12 +55,7 @@
 </script>
 </head>
 <body>
-<picture class="wallpaper" aria-hidden="true">
-  <source media="(min-width: 1024px)" srcset="images/wallpaper-desktop.webp" type="image/webp">
-  <source media="(min-width: 1024px)" srcset="images/wallpaper-desktop.jpg" type="image/jpeg">
-  <source srcset="images/wallpaper-mobile.webp" type="image/webp">
-  <img src="images/wallpaper-mobile.jpg" alt="" width="1170" height="2532" fetchpriority="high">
-</picture>
+<div class="wallpaper" aria-hidden="true"><canvas id="bg"></canvas></div>
 
 <header class="menubar" id="menubar" hidden></header>
 
@@ -77,6 +70,7 @@
 
 <main id="home" class="home">
   <div class="home-scroll" id="home-scroll"></div>
+  <div id="hero-host"></div>
   <div class="home-indicator" aria-hidden="true"></div>
 </main>
 <nav class="dock" id="dock" aria-label="Quick contact"></nav>
