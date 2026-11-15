@@ -1,9 +1,9 @@
 // Single source of truth for every word on the site.
-// The mobile apps, desktop windows, terminal and meta tags all read from here.
+// The streaming-style home page, the OS view (os.html), the simple view and meta tags all read from here.
 // Wording matches the resume. Do not add numbers, clients or skills that are not on it.
 //
 // Confidentiality: only "Vezapp Solutions LLP" may be named. Describe clients generically.
-// Inline markup: **bold** is the only supported syntax (see rich() in main.js).
+// Inline markup: **bold** is the only supported syntax (see rich() in stream.js / os.js).
 
 /**
  * @typedef {{ label: string, href: string }} Link

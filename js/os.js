@@ -69,6 +69,7 @@ function profileWidget(avatarPx) {
     <section class="profile glass" data-glow aria-label="Profile">
       <button class="more-btn" id="more-btn" type="button" aria-label="More options" aria-haspopup="true" aria-expanded="false">${icon('more-horizontal', 20)}</button>
       <div class="more-menu glass" id="more-menu" hidden>
+        <a href="./">${icon('play', 16)} Main site</a>
         <a href="${identity.simple}">${icon('list', 16)} Simple view</a>
       </div>
       <div class="profile-top">
@@ -115,6 +116,7 @@ function renderMenubar() {
     </nav>
     <span class="mb-spacer"></span>
     <button class="mb-search" type="button" data-spotlight aria-label="Search (Ctrl or Command K)">${icon('search', 14)}<span>Search</span><kbd>${modKey}K</kbd></button>
+    <a class="mb-simple" href="./">Main site</a>
     <a class="mb-simple" href="${identity.simple}">Simple view</a>
     <span class="mb-time" id="mb-time"></span>`;
 }
