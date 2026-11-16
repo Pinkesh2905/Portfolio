@@ -72,12 +72,29 @@ async function copyText(text) {
   toast('Email copied');
 }
 
-/* ── poster art (generated: gradient, icon and title; no screenshots needed) ── */
+/* ── poster art: a real screenshot and logo when the project has them, otherwise generated ── */
+const pdir = (id) => `images/projects/${id}`;
+const shotUrl = (id, i, small) => `${pdir(id)}/${i + 1}${small ? '-sm' : ''}.webp`;
+const isPhone = (s) => /phone|mobile/i.test(s.src);
+const hasShots = (p) => (p.shots || []).length > 0;
+
 function art(p, cls = '') {
-  return `<span class="art ${cls}" style="--g:${p.gradient}">
-    <span class="art-big" aria-hidden="true">${icon(p.icon, 96, 1.4)}</span>
+  if (!hasShots(p)) {
+    return `<span class="art ${cls}" style="--g:${p.gradient}">
+      <span class="art-big" aria-hidden="true">${icon(p.icon, 96, 1.4)}</span>
+      <span class="badge">${esc(shortStatus(p))}</span>
+      <span class="art-title">${esc(p.name)}</span>
+    </span>`;
+  }
+  const tall = cls.includes('tall');
+  const i = tall ? p.media?.poster ?? 0 : 0;
+  return `<span class="art has-img ${cls}" style="--g:${p.gradient}">
+    <img class="art-img${isPhone(p.shots[i]) ? ' phone' : ''}" src="${shotUrl(p.id, i, true)}" alt="" loading="lazy" decoding="async">
     <span class="badge">${esc(shortStatus(p))}</span>
-    <span class="art-title">${esc(p.name)}</span>
+    <span class="art-foot">
+      ${p.media?.logo ? `<img class="art-logo" src="${pdir(p.id)}/logo.webp" alt="" loading="lazy" decoding="async">` : ''}
+      <span class="art-title">${esc(p.name)}</span>
+    </span>
   </span>`;
 }
 const card = (p, cls = '') =>
@@ -121,6 +138,9 @@ const BUILD_ART = [
   'linear-gradient(135deg,#c2410c,#be123c)', 'linear-gradient(135deg,#334155,#0f172a)',
 ];
 
+/** Gives a small build the fields the poster art expects. */
+const asProject = (b, i) => ({ ...b, gradient: BUILD_ART[i % BUILD_ART.length], icon: 'arrow-up-right', status: b.note || 'Build' });
+
 const ROWS = {
   featured: () => `
     <section class="row rv" id="projects" aria-labelledby="t-featured">
@@ -137,7 +157,9 @@ const ROWS = {
   builds: () => `
     <section class="row rv" id="builds" aria-labelledby="t-builds">
       <h2 class="row-title" data-split id="t-builds">More builds</h2>
-      ${track(C.moreBuilds.map((b, i) => `<li><a class="card build" href="${b.href}" ${ext} aria-label="${esc(b.name)}${b.note ? `, ${esc(b.note)}` : ''} (opens in a new tab)">
+      ${track(C.moreBuilds.map((b, i) => hasShots(b)
+        ? `<li><a class="card build" href="#builds/${b.id}" aria-label="${esc(b.name)}${b.note ? `, ${esc(b.note)}` : ''}">${art(asProject(b, i))}</a></li>`
+        : `<li><a class="card build" href="${b.href}" ${ext} aria-label="${esc(b.name)}${b.note ? `, ${esc(b.note)}` : ''} (opens in a new tab)">
           <span class="art" style="--g:${BUILD_ART[i % BUILD_ART.length]}">
             <span class="art-big" aria-hidden="true">${icon('arrow-up-right', 96, 1.4)}</span>
             ${b.note ? `<span class="badge">${esc(b.note)}</span>` : ''}
@@ -314,6 +336,45 @@ function wirePeek() {
 }
 
 /* ── detail dialog ───────────────────────────────────────── */
+function cover(p) {
+  return hasShots(p)
+    ? `<img class="m-cover" src="${shotUrl(p.id, 0)}" alt="" decoding="async">`
+    : `<span class="m-icon" aria-hidden="true">${icon(p.icon, 220, 1.1)}</span>`;
+}
+const logoTag = (p) => (p.media?.logo ? `<img class="m-logo" src="${pdir(p.id)}/logo.webp" alt="" width="56" height="56">` : '');
+
+function gallery(p) {
+  if (!hasShots(p)) return '';
+  return `<section class="m-gallery" aria-labelledby="g-${p.id}">
+    <div class="mg-head"><h3 id="g-${p.id}">Screenshots</h3>${p.media?.note ? `<p>${esc(p.media.note)}</p>` : ''}</div>
+    <div class="mg-strip">${p.shots.map((s, i) => `
+      <button class="mg-shot${isPhone(s) ? ' phone' : ''}" type="button" data-shot="${i}" data-of="${p.id}" aria-label="View screenshot ${i + 1} of ${p.shots.length}: ${esc(s.caption)}">
+        <span class="mg-frame"><img src="${shotUrl(p.id, i, true)}" alt="" loading="lazy" decoding="async"></span>
+        <span class="mg-cap">${esc(s.caption)}</span>
+      </button>`).join('')}
+    </div>
+  </section>`;
+}
+
+/** Page for a small build that has screenshots: cover, live link and gallery. */
+function buildView(b) {
+  const i = C.moreBuilds.indexOf(b);
+  const p = asProject(b, i);
+  return {
+    label: b.name,
+    html: `
+      <div class="m-art has-cover" style="--g:${p.gradient}">
+        ${cover(p)}
+        <div class="m-head">
+          ${logoTag(p)}${b.note ? `<span class="badge">${esc(b.note)}</span>` : ''}
+          <h2 id="m-title">${esc(b.name)}</h2>
+          <div class="m-actions"><a class="btn primary" href="${b.href}" ${ext}>${icon('play', 18)} Open live</a></div>
+        </div>
+      </div>
+      ${gallery(p)}`,
+  };
+}
+
 function projectView(p) {
   const section = (title, text) => (text ? `<h3>${title}</h3><p>${esc(text)}</p>` : '');
   const tools = p.tools;
@@ -321,10 +382,10 @@ function projectView(p) {
   return {
     label: p.name,
     html: `
-      <div class="m-art" style="--g:${p.gradient}">
-        <span class="m-icon" aria-hidden="true">${icon(p.icon, 220, 1.1)}</span>
+      <div class="m-art${hasShots(p) ? ' has-cover' : ''}" style="--g:${p.gradient}">
+        ${cover(p)}
         <div class="m-head">
-          <span class="badge">${esc(p.status)}</span>
+          ${logoTag(p)}<span class="badge">${esc(p.status)}</span>
           <h2 id="m-title">${esc(p.name)}</h2>
           <p class="m-tag">${esc(p.tagline)}</p>
           <div class="m-actions">
@@ -343,6 +404,7 @@ function projectView(p) {
           ${p.builtWithClaudeCode ? '<p><span>Built with</span>Claude Code</p>' : ''}
         </aside>
       </div>
+      ${gallery(p)}
       <div class="m-more"><h3>More projects</h3><div class="m-grid">${more.map((x) => card(x)).join('')}</div></div>`,
   };
 }
@@ -352,7 +414,7 @@ function aboutView() {
     label: `About ${identity.name}`,
     html: `
       <div class="m-art about">
-        ${picture(identity.portrait, `Portrait of ${identity.name}`, 'width="1121" height="1403"')}
+        ${picture(identity.portrait, `Portrait of ${identity.name}`, 'width="1093" height="1439"')}
         <div class="m-head">
           <span class="badge">${esc(identity.status)}</span>
           <h2 id="m-title">${esc(identity.name)}</h2>
@@ -417,6 +479,7 @@ function showModal(view, origin) {
 }
 
 function hideModal() {
+  closeLightbox();
   if (!modal) return;
   const { el, opener } = modal;
   modal = null;
@@ -430,13 +493,104 @@ function hideModal() {
   $('.scrim', el).animate([{ opacity: 1 }, { opacity: 0 }], { duration: 240, fill: 'forwards' }).onfinish = () => el.remove();
 }
 
+/* ── screenshot viewer: full screen, arrows / swipe / Esc ── */
+let lb = null; // { el, item, i, opener }
+
+function findShots(id) {
+  return C.projects.find((x) => x.id === id) || C.moreBuilds.find((x) => x.id === id);
+}
+
+function showShot(i, dir = 0) {
+  const { el, item } = lb;
+  const n = item.shots.length;
+  lb.i = (i + n) % n;
+  const s = item.shots[lb.i];
+  const img = $('.lb-img', el);
+  img.src = shotUrl(item.id, lb.i);
+  img.alt = s.caption;
+  img.classList.toggle('phone', isPhone(s));
+  $('.lb-cap', el).textContent = s.caption;
+  $('.lb-count', el).textContent = `${lb.i + 1} / ${n}`;
+  if (dir && !reduceMotion()) {
+    img.animate([{ opacity: 0, transform: `translateX(${dir * 40}px) scale(0.98)` }, { opacity: 1, transform: 'none' }], { duration: 380, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+  }
+  // warm the next and previous images
+  [lb.i + 1, lb.i - 1].forEach((k) => { const im = new Image(); im.src = shotUrl(item.id, (k + n) % n); });
+}
+
+function openLightbox(id, i, opener) {
+  const item = findShots(id);
+  if (!item || lb) return;
+  const el = document.createElement('div');
+  el.className = 'lb';
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-modal', 'true');
+  el.setAttribute('aria-label', `${item.name} screenshots`);
+  el.setAttribute('data-lenis-prevent', '');
+  el.innerHTML = `
+    <figure class="lb-fig"><img class="lb-img" alt="" decoding="async">
+      <figcaption><span class="lb-count"></span><span class="lb-cap"></span></figcaption></figure>
+    <button class="round lb-prev" type="button" aria-label="Previous screenshot">${icon('chevron-left', 22)}</button>
+    <button class="round lb-next" type="button" aria-label="Next screenshot">${icon('chevron-right', 22)}</button>
+    <button class="round lb-close" type="button" aria-label="Close screenshots">${icon('x', 20)}</button>`;
+  document.body.appendChild(el);
+  lb = { el, item, i, opener };
+  if (modal) modal.el.inert = true;
+  showShot(i);
+  $('.lb-close', el).focus({ preventScroll: true });
+  if (!reduceMotion() && opener) {
+    const r = opener.getBoundingClientRect();
+    const img = $('.lb-img', el);
+    const go = () => {
+      const m = img.getBoundingClientRect();
+      if (!m.width) return;
+      img.animate([
+        { transform: `translate(${r.left + r.width / 2 - (m.left + m.width / 2)}px, ${r.top + r.height / 2 - (m.top + m.height / 2)}px) scale(${(r.width / m.width).toFixed(3)})`, opacity: 0.6 },
+        { transform: 'none', opacity: 1 },
+      ], { duration: 460, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+    };
+    if (img.complete && img.naturalWidth) go();
+    else img.addEventListener('load', go, { once: true });
+    el.animate([{ backgroundColor: 'rgba(0,0,0,0)' }, { backgroundColor: 'rgba(0,0,0,0.92)' }], { duration: 300 });
+  }
+  el.addEventListener('click', (ev) => {
+    if (ev.target.closest('.lb-prev')) return showShot(lb.i - 1, -1);
+    if (ev.target.closest('.lb-next')) return showShot(lb.i + 1, 1);
+    if (ev.target.closest('.lb-close') || !ev.target.closest('.lb-fig')) closeLightbox();
+  });
+  let sx = null;
+  el.addEventListener('pointerdown', (ev) => { sx = ev.clientX; });
+  el.addEventListener('pointerup', (ev) => {
+    if (sx === null) return;
+    const dx = ev.clientX - sx;
+    sx = null;
+    if (Math.abs(dx) > 50) showShot(lb.i + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+  });
+}
+
+function closeLightbox() {
+  if (!lb) return;
+  const { el, opener } = lb;
+  lb = null;
+  if (modal) modal.el.inert = false;
+  if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
+  if (reduceMotion()) {
+    el.remove();
+    return;
+  }
+  el.style.pointerEvents = 'none';
+  el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' }).onfinish = () => el.remove();
+}
+
 /* ── routing: #projects/<id> and #about open the dialog, other hashes are page sections ── */
-const isModalHash = (h) => /^#(projects\/.+|about)$/.test(h);
+const isModalHash = (h) => /^#((projects|builds)\/.+|about)$/.test(h);
 
 function route(origin) {
   const [a, b] = decodeURIComponent(location.hash.slice(1)).split('/');
   const p = a === 'projects' && b ? C.projects.find((x) => x.id === b) : null;
   if (p) return showModal(projectView(p), origin);
+  const bld = a === 'builds' && b ? C.moreBuilds.find((x) => x.id === b && hasShots(x)) : null;
+  if (bld) return showModal(buildView(bld), origin);
   if (a === 'about') return showModal(aboutView(), origin);
   hideModal();
 }
@@ -686,6 +840,9 @@ document.addEventListener('click', (ev) => {
     return tr.scrollBy({ left: +arrow.dataset.dir * tr.clientWidth * 0.85, behavior: reduceMotion() ? 'auto' : 'smooth' });
   }
 
+  const shot = t.closest('[data-shot]');
+  if (shot) return openLightbox(shot.dataset.of, +shot.dataset.shot, shot);
+
   if (t.closest('.m-close') || t.classList.contains('scrim') || t.classList.contains('modal-wrap')) return closeModal();
 
   const a = t.closest('a[href]');
@@ -714,6 +871,18 @@ function goSection(hash) {
 
 document.addEventListener('keydown', (ev) => {
   if ($('.gate') || $('.opening')) return;
+  if (lb) {
+    if (ev.key === 'Escape') { ev.preventDefault(); closeLightbox(); }
+    else if (ev.key === 'ArrowRight') { ev.preventDefault(); showShot(lb.i + 1, 1); }
+    else if (ev.key === 'ArrowLeft') { ev.preventDefault(); showShot(lb.i - 1, -1); }
+    else if (ev.key === 'Tab') {
+      const f = $$('button', lb.el);
+      const k = f.indexOf(document.activeElement);
+      ev.preventDefault();
+      f[(k + (ev.shiftKey ? f.length - 1 : 1)) % f.length].focus();
+    }
+    return;
+  }
   if ((ev.key === 'k' || ev.key === 'K') && (ev.metaKey || ev.ctrlKey)) {
     ev.preventDefault();
     return spot ? closeSpotlight(true) : openSpotlight();

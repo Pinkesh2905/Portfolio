@@ -216,7 +216,7 @@ const screens = {
   about: () => ({
     title: 'About',
     html: `
-      <div class="hero-photo-wrap">${picture(identity.portrait, 'Portrait of Pinkesh Darji', 'hero-photo', 'width="1121" height="1403"')}</div>
+      <div class="hero-photo-wrap">${picture(identity.portrait, 'Portrait of Pinkesh Darji', 'hero-photo', 'width="1093" height="1439"')}</div>
       <div class="who"><h2>${esc(identity.name)}</h2><p>${esc(identity.title)}</p></div>
       ${groupTitle('Hello')}
       ${group(`<div class="pad">${C.about.paragraphs.map((p) => `<p class="body-text">${rich(p)}</p>`).join('')}
