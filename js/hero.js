@@ -10,8 +10,8 @@ const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/** Where the callout line starts on the portrait, as a fraction of the image (right shoulder). */
-const ANCHOR = { x: 0.82, y: 0.6 };
+/** Where the callout line starts on the portrait, as a fraction of the image (right collar). */
+const ANCHOR = { x: 0.8, y: 0.8 };
 
 function barcode(seed, n = 34) {
   let h = 0;
@@ -63,7 +63,7 @@ export function heroHTML({ icon, brand, ext }) {
     <div class="layer me-layer" style="--d:10">
       <div class="hero-me">
         <span class="me-glow" aria-hidden="true"></span>
-        <picture><source type="image/webp" srcset="images/cutout.webp"><img src="images/cutout.png" alt="Portrait of ${esc(id.name)}" width="1121" height="1403" fetchpriority="high" decoding="async"></picture>
+        <picture><source type="image/webp" srcset="images/cutout.webp"><img src="images/cutout.png" alt="Portrait of ${esc(id.name)}" width="1093" height="1439" fetchpriority="high" decoding="async"></picture>
         <span class="me-rim" aria-hidden="true"></span>
       </div>
       <svg class="callout-svg" aria-hidden="true"><path class="callout-path" pathLength="1"/><circle class="callout-dot" r="5"/><circle class="callout-ring" r="13"/></svg>
