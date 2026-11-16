@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1100 480" width="2200" height="960">
+  <title>AURA — logo lockup</title>
+  <defs>
+    <linearGradient id="wm" x1="470" y1="0" x2="970" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.55" stop-color="#e3d4ff"/>
+      <stop offset="1" stop-color="#ff7ae8"/>
+    </linearGradient>
+    <radialGradient id="bg" cx="30%" cy="50%" r="80%">
+      <stop offset="0" stop-color="#1c0b45"/>
+      <stop offset="1" stop-color="#05030f"/>
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-40%" width="140%" height="180%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1100" height="480" fill="url(#bg)"/>
+  <image href="aura-logo-icon.svg" xlink:href="aura-logo-icon.svg" x="80" y="80" width="320" height="320"/>
+
+  <g transform="translate(470 178) scale(1.25)" fill="none" stroke="url(#wm)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+    <path d="M0 100 L35 0 L70 100 M14 68 L56 68"/>
+    <path transform="translate(110 0)" d="M0 0 V65 A35 35 0 0 0 70 65 V0"/>
+    <path transform="translate(220 0)" d="M0 100 V0 H40 A26 26 0 0 1 40 52 H0 M36 52 L70 100"/>
+    <path transform="translate(330 0)" d="M0 100 L35 0 L70 100 M14 68 L56 68"/>
+  </g>
+  <linearGradient id="ul" x1="470" y1="0" x2="970" y2="0" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#ff2bd6"/><stop offset="1" stop-color="#00f5ff"/>
+  </linearGradient>
+  <rect x="470" y="332" width="500" height="4" rx="2" fill="url(#ul)" filter="url(#glow)"/>
+</svg>
