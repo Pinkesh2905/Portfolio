@@ -1,8 +1,11 @@
-// Streaming-style home page: profile picker, opening sting, billboard, rows of
+// Streaming-style home page: red P opening, profile picker, poster-style hero, rows of
 // project "titles", hover previews and a detail dialog. All words come from content.js.
 import * as C from './content.js';
 import { ICONS, BRAND } from './icons.js';
-import { sting, soundOn, setSound } from './sound.js';
+import { tudum, swoosh, soundOn, setSound } from './sound.js';
+import { playIntro, pMark } from './intro.js';
+import { heroHTML, wireHero, heroCounters } from './hero.js';
+import { initMotion, refreshMotion, scrollToTarget, stopScroll, startScroll } from './motion.js';
 
 const { identity } = C;
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -86,7 +89,7 @@ const NAV = [['projects', 'Projects'], ['experience', 'Experience'], ['skills', 
 function renderHeader() {
   const p = prof();
   $('#top').innerHTML = `
-    <a class="logo" href="./" data-home aria-label="${esc(identity.name)}, home">PINKESH</a>
+    <a class="logo" href="./" data-home aria-label="${esc(identity.name)}, home">${pMark('logo-mark', 'lg')}<span>PINKESH</span></a>
     <nav class="nav" aria-label="Sections">${NAV.map(([id, l]) => `<a href="#${id}">${l}</a>`).join('')}</nav>
     <span class="grow"></span>
     <button class="ib" type="button" data-spotlight aria-label="Search (Ctrl or Command K)">${icon('search', 20)}</button>
@@ -105,70 +108,6 @@ function renderHeader() {
     </div>`;
 }
 
-/* ── billboard ───────────────────────────────────────────── */
-function slides() {
-  const me = {
-    kind: 'me',
-    kicker: `<span class="live" aria-hidden="true"></span>${esc(identity.status)}`,
-    title: identity.name,
-    meta: [identity.title, `${identity.company}, ${identity.companyCity}`],
-    text: identity.oneLiner,
-    actions: `<a class="btn primary" href="${identity.resume}" ${ext}>${icon('play', 20)} Resume</a>
-      <a class="btn" href="#about">${icon('info', 20)} More info</a>`,
-  };
-  const proj = featured.map((p) => ({
-    kind: 'project',
-    p,
-    kicker: `Featured project · ${esc(shortStatus(p))}`,
-    title: p.name,
-    meta: [p.tagline],
-    text: p.problem || p.summary || '',
-    actions: `<a class="btn primary" href="#projects/${p.id}">${icon('play', 20)} View project</a>
-      <a class="btn" href="#projects">${icon('layout-grid', 20)} All projects</a>`,
-  }));
-  return prof().id === 'developer' ? [...proj, me] : [me, ...proj];
-}
-
-function billboard() {
-  const S = slides();
-  return `<section class="bb" id="bb" aria-roledescription="carousel" aria-label="Highlights">
-    ${S.map((s, i) => {
-      const H = s.kind === 'me' ? 'h1' : 'h2';
-      return `<div class="bb-slide" data-i="${i}" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${S.length}" inert>
-        <div class="bb-art ${s.kind}" ${s.p ? `style="--g:${s.p.gradient}"` : ''} aria-hidden="true">
-          ${s.kind === 'me'
-            ? picture(identity.portrait, '', 'width="1121" height="1403" fetchpriority="high"')
-            : `<span class="bb-icon">${icon(s.p.icon, 300, 1.1)}</span>`}
-        </div>
-        <div class="bb-copy">
-          <p class="kicker">${s.kicker}</p>
-          <${H} class="bb-title">${esc(s.title)}</${H}>
-          <p class="bb-meta">${s.meta.map((m) => `<span>${esc(m)}</span>`).join('')}</p>
-          <p class="bb-text">${esc(s.text)}</p>
-          <div class="bb-actions">${s.actions}</div>
-        </div>
-      </div>`;
-    }).join('')}
-    <div class="bb-dots">${S.map((s, i) => `<button type="button" data-go="${i}" aria-label="Show ${esc(s.title)}"><i></i></button>`).join('')}</div>
-  </section>`;
-}
-
-let slideIndex = 0;
-function goSlide(i) {
-  const all = $$('.bb-slide');
-  if (!all.length) return;
-  slideIndex = (i + all.length) % all.length;
-  all.forEach((el, n) => {
-    el.classList.toggle('on', n === slideIndex);
-    el.inert = n !== slideIndex;
-  });
-  $$('.bb-dots button').forEach((b, n) => {
-    b.classList.remove('on');
-    if (n === slideIndex) { void b.offsetWidth; b.classList.add('on'); } // restart the progress fill
-    b.setAttribute('aria-current', String(n === slideIndex));
-  });
-}
-
 /* ── rows ────────────────────────────────────────────────── */
 const track = (inner) => `
   <div class="track-wrap">
@@ -184,20 +123,20 @@ const BUILD_ART = [
 
 const ROWS = {
   featured: () => `
-    <section class="row" id="projects" aria-labelledby="t-featured">
-      <h2 class="row-title" id="t-featured">${esc(prof().picks)}</h2>
+    <section class="row rv" id="projects" aria-labelledby="t-featured">
+      <h2 class="row-title" data-split id="t-featured">${esc(prof().picks)}</h2>
       ${track(featured.map((p, i) => `<li class="rank"><span class="num" aria-hidden="true">${i + 1}</span>${card(p, 'poster')}</li>`).join(''))}
     </section>`,
 
   projects: () => `
-    <section class="row" id="more-projects" aria-labelledby="t-projects">
-      <h2 class="row-title" id="t-projects">Personal and freelance projects</h2>
+    <section class="row rv" id="more-projects" aria-labelledby="t-projects">
+      <h2 class="row-title" data-split id="t-projects">Personal and freelance projects</h2>
       ${track(others.map((p) => `<li>${card(p)}</li>`).join(''))}
     </section>`,
 
   builds: () => `
-    <section class="row" id="builds" aria-labelledby="t-builds">
-      <h2 class="row-title" id="t-builds">More builds</h2>
+    <section class="row rv" id="builds" aria-labelledby="t-builds">
+      <h2 class="row-title" data-split id="t-builds">More builds</h2>
       ${track(C.moreBuilds.map((b, i) => `<li><a class="card build" href="${b.href}" ${ext} aria-label="${esc(b.name)}${b.note ? `, ${esc(b.note)}` : ''} (opens in a new tab)">
           <span class="art" style="--g:${BUILD_ART[i % BUILD_ART.length]}">
             <span class="art-big" aria-hidden="true">${icon('arrow-up-right', 96, 1.4)}</span>
@@ -207,12 +146,12 @@ const ROWS = {
     </section>`,
 
   experience: () => `
-    <section class="sec" id="experience" aria-labelledby="t-exp">
-      <h2 class="row-title" id="t-exp">Experience</h2>
+    <section class="sec rv" id="experience" aria-labelledby="t-exp">
+      <h2 class="row-title" data-split id="t-exp">Experience</h2>
       ${C.experience.map((e) => `
         <div class="exp">
           <div class="exp-head">
-            <h3>${esc(e.role)}</h3>
+            <h3 data-split>${esc(e.role)}</h3>
             <p class="exp-meta"><span class="now">${esc(e.period)}</span><span>${esc(e.company)}</span></p>
             <p class="exp-blurb">${esc(e.blurb)}</p>
           </div>
@@ -221,8 +160,8 @@ const ROWS = {
     </section>`,
 
   skills: () => `
-    <section class="sec" id="skills" aria-labelledby="t-skills">
-      <h2 class="row-title" id="t-skills">Skills</h2>
+    <section class="sec rv" id="skills" aria-labelledby="t-skills">
+      <h2 class="row-title" data-split id="t-skills">Skills</h2>
       <div class="genres">${C.skills.map((g) => `
         <div class="genre"><h3>${esc(g.group)}</h3>
           <ul class="chips">${g.items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul></div>`).join('')}</div>
@@ -231,8 +170,8 @@ const ROWS = {
   education: () => {
     const e = C.education;
     return `
-    <section class="sec" id="education" aria-labelledby="t-edu">
-      <h2 class="row-title" id="t-edu">Education</h2>
+    <section class="sec rv" id="education" aria-labelledby="t-edu">
+      <h2 class="row-title" data-split id="t-edu">Education</h2>
       <div class="edu">
         ${e.degrees.map((d) => `<div class="edu-card"><p class="edu-y">${esc(d.years)}</p><h3>${esc(d.name)}</h3><p>${esc(d.school)}</p><p class="edu-g">${esc(d.cgpa)}</p></div>`).join('')}
         <a class="edu-card link" href="${e.certification.href}" ${ext}><p class="edu-y">Certification</p><h3>${esc(e.certification.name)}</h3><p class="edu-g">View certificate ${icon('arrow-up-right', 16)}</p></a>
@@ -243,9 +182,9 @@ const ROWS = {
 
 function contact() {
   return `
-    <section class="sec contact" id="contact" aria-labelledby="t-contact">
+    <section class="sec contact rv" id="contact" aria-labelledby="t-contact">
       <p class="kicker"><span class="live" aria-hidden="true"></span>${esc(identity.statusLong)}</p>
-      <h2 class="cta" id="t-contact">Get in touch</h2>
+      <h2 class="cta" id="t-contact" data-split>Get in touch</h2>
       <div class="contact-actions">
         <a class="btn primary" href="mailto:${identity.email}">${icon('mail', 20)} ${esc(identity.email)}</a>
         <button class="btn" type="button" data-copy="${esc(identity.email)}">${icon('copy', 20)} Copy email</button>
@@ -258,16 +197,33 @@ function contact() {
     </section>`;
 }
 
+/* ── marquee bands ───────────────────────────────────────── */
+function marquee(items, dir, cls = '') {
+  const run = items.map((t) => `<span>${esc(t)}</span><b aria-hidden="true">✦</b>`).join('');
+  return `<div class="marquee ${cls}" data-dir="${dir}" aria-hidden="true"><div class="mq-inner"><div>${run}</div><div>${run}</div></div></div>`;
+}
+const skillWords = () => {
+  const all = [...C.skillsWidget, ...C.skills.flatMap((g) => g.items)].filter((t) => t.length <= 18);
+  return [...new Set(all)];
+};
+
 function render() {
   renderHeader();
-  $('#main').innerHTML = billboard() + prof().rows.map((r) => ROWS[r]()).join('') + contact();
+  if (!$('.hero')) {
+    $('#main').innerHTML = `${heroHTML({ icon, brand, ext })}<div id="rows"></div>`;
+    wireHero();
+  }
+  $('#rows').innerHTML =
+    marquee(skillWords(), -1, 'band-red') +
+    prof().rows.map((r) => ROWS[r]()).join('') +
+    marquee([identity.statusLong], 1, 'band-outline') +
+    contact();
   $('#foot').innerHTML = `
-    <span class="logo sm" aria-hidden="true">PINKESH</span>
+    <span class="logo sm" aria-hidden="true">${pMark('logo-mark', 'lf')}<span>PINKESH</span></span>
     <nav aria-label="Other views"><a href="#about">About</a><a href="os.html">Classic OS view</a><a href="${identity.simple}">Simple view</a></nav>
     <p>${esc(identity.name)} · ${esc(identity.title)}</p>`;
-  goSlide(0);
   wireTracks();
-  wireReveal();
+  refreshMotion();
 }
 
 /* ── row scrolling ───────────────────────────────────────── */
@@ -283,20 +239,6 @@ function wireTracks() {
     t.addEventListener('scroll', () => { sync(); if (peek) hidePeek(true); }, { passive: true });
     sync();
   });
-}
-
-function wireReveal() {
-  const items = $$('.row, .sec');
-  if (reduceMotion() || !('IntersectionObserver' in window)) return;
-  const io = new IntersectionObserver(
-    (entries) => entries.forEach((en) => {
-      if (!en.isIntersecting) return;
-      en.target.classList.add('in');
-      io.unobserve(en.target);
-    }),
-    { rootMargin: '0px 0px -8% 0px' },
-  );
-  items.forEach((el) => { el.classList.add('rv'); io.observe(el); });
 }
 
 /* ── hover preview (mouse only): the card grows into a small info panel ── */
@@ -450,6 +392,7 @@ function showModal(view, origin) {
   }
   const el = document.createElement('div');
   el.className = 'modal-wrap';
+  el.setAttribute('data-lenis-prevent', '');
   el.innerHTML = `<div class="scrim"></div>
     <div class="modal" role="dialog" aria-modal="true" aria-label="${esc(view.label)}" tabindex="-1">
       <button class="m-close" type="button" aria-label="Close">${icon('x', 22)}</button>
@@ -458,6 +401,7 @@ function showModal(view, origin) {
   $('#layer').appendChild(el);
   modal = { el, opener: document.activeElement };
   document.body.classList.add('locked');
+  stopScroll();
   background().forEach((n) => { n.inert = true; });
   const box = $('.modal', el);
   if (!reduceMotion()) {
@@ -477,6 +421,7 @@ function hideModal() {
   const { el, opener } = modal;
   modal = null;
   document.body.classList.remove('locked');
+  startScroll();
   background().forEach((n) => { n.inert = false; });
   if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
   if (reduceMotion()) return el.remove();
@@ -520,11 +465,7 @@ function spotlightItems() {
   const grey = 'linear-gradient(160deg,#52525b,#27272a)';
   const go = (hash) => () => {
     if (isModalHash(hash)) return openHash(hash);
-    if (modal) {
-      history.replaceState(null, '', location.pathname + location.search);
-      route();
-    }
-    location.hash = hash;
+    goSection(hash);
   };
   return [
     ...C.projects.map((p) => ({ label: p.name, hint: `Project · ${p.tagline}`, words: p.tools.join(' '), glyph: tile(p.gradient, icon(p.icon, 16)), run: go(`#projects/${p.id}`) })),
@@ -557,6 +498,7 @@ function openSpotlight() {
   hidePeek(true);
   const el = document.createElement('div');
   el.className = 'spot';
+  el.setAttribute('data-lenis-prevent', '');
   el.innerHTML = `
     <div class="spot-box" role="dialog" aria-modal="true" aria-label="Search">
       <label class="spot-field">${icon('search', 20)}
@@ -617,18 +559,35 @@ function setProfile(id, { rerender = true } = {}) {
   store.set('pd-profile', profile.id);
   if (rerender) {
     render();
-    scrollTo({ top: 0 });
+    scrollToTarget(0, { immediate: true });
   }
 }
 
-function showGate() {
+/** Hides the page behind an overlay (intro or picker) and stops scrolling. */
+function lockPage() {
+  document.body.classList.add('locked');
+  background().forEach((n) => { n.inert = true; });
+  stopScroll();
+}
+
+/** The page is ready to be seen: unlock it and play the hero entrance. */
+function reveal() {
+  document.body.classList.remove('locked');
+  background().forEach((n) => { n.inert = false; });
+  startScroll();
+  document.body.classList.add('ready');
+  heroCounters();
+}
+
+function showGate(afterShown) {
   const el = document.createElement('div');
   el.className = 'gate';
+  el.setAttribute('data-lenis-prevent', '');
   el.setAttribute('role', 'dialog');
   el.setAttribute('aria-modal', 'true');
   el.setAttribute('aria-labelledby', 'gate-t');
   el.innerHTML = `
-    <span class="logo" aria-hidden="true">PINKESH</span>
+    <span class="logo" aria-hidden="true">${pMark('logo-mark', 'gl')}<span>PINKESH</span></span>
     <div class="gate-in">
       <h2 id="gate-t">Who’s viewing?</h2>
       <div class="gate-tiles">
@@ -638,10 +597,10 @@ function showGate() {
       <button class="gate-snd" type="button" aria-pressed="${soundOn()}">${icon(soundOn() ? 'volume-2' : 'volume-x', 18)} <span>Sound ${soundOn() ? 'on' : 'off'}</span></button>
     </div>`;
   document.body.appendChild(el);
-  document.body.classList.add('locked');
-  background().forEach((n) => { n.inert = true; });
+  lockPage();
   el.tabIndex = -1;
   el.focus({ preventScroll: true });
+  afterShown?.();
 
   el.addEventListener('click', (ev) => {
     const snd = ev.target.closest('.gate-snd');
@@ -666,38 +625,25 @@ function showGate() {
   });
 }
 
-/** Profile chosen: play the sting and the title animation, then reveal the page. */
+/** Profile chosen: the picked tile zooms toward the viewer and the page comes up behind it. */
 function enter(id, gate) {
+  if (gate.classList.contains('leaving')) return;
   setProfile(id, { rerender: false });
   render();
-  sting();
-  const done = () => {
-    document.body.classList.remove('locked');
-    background().forEach((n) => { n.inert = false; });
-    goSlide(0);
-    $('#main').focus({ preventScroll: true });
-  };
+  scrollToTarget(0, { immediate: true });
+  swoosh();
   if (reduceMotion()) {
     gate.remove();
-    return done();
+    reveal();
+    return $('#main').focus({ preventScroll: true });
   }
-  const intro = document.createElement('div');
-  intro.className = 'intro';
-  intro.innerHTML = '<div class="intro-word" aria-hidden="true">PINKESH</div><div class="intro-bar" aria-hidden="true"></div><span class="intro-skip">Click to skip</span>';
-  document.body.appendChild(intro);
-  gate.remove();
-  let finished = false;
-  const finish = () => {
-    if (finished) return;
-    finished = true;
-    removeEventListener('keydown', finish);
-    done();
-    intro.classList.add('out');
-    setTimeout(() => intro.remove(), 520);
-  };
-  setTimeout(finish, 2150);
-  intro.addEventListener('click', finish);
-  addEventListener('keydown', finish);
+  gate.classList.add('leaving');
+  gate.querySelector(`[data-pick="${id}"]`)?.classList.add('chosen');
+  setTimeout(() => {
+    reveal();
+    $('#main').focus({ preventScroll: true });
+  }, 520);
+  setTimeout(() => gate.remove(), 1100);
 }
 
 /* ── global events ───────────────────────────────────────── */
@@ -721,7 +667,7 @@ document.addEventListener('click', (ev) => {
     setSound(on);
     renderHeader();
     $('#snd').focus();
-    if (on) sting();
+    if (on) tudum();
     return;
   }
   if (t.closest('#who-btn')) {
@@ -733,9 +679,6 @@ document.addEventListener('click', (ev) => {
   const pick = t.closest('[data-profile]');
   if (pick) return setProfile(pick.dataset.profile);
   if (!t.closest('#who-menu')) closeMenu(false);
-
-  const dot = t.closest('[data-go]');
-  if (dot) return goSlide(+dot.dataset.go);
 
   const arrow = t.closest('.arrow');
   if (arrow) {
@@ -751,24 +694,26 @@ document.addEventListener('click', (ev) => {
   if (a.hasAttribute('data-home')) {
     ev.preventDefault();
     history.replaceState(null, '', location.pathname + location.search);
-    return scrollTo({ top: 0, behavior: reduceMotion() ? 'auto' : 'smooth' });
+    return scrollToTarget(0);
   }
   if (!href.startsWith('#')) return;
-  if (isModalHash(href)) {
-    ev.preventDefault();
-    return openHash(href, a.closest('.card, .peek') || null);
-  }
-  if (modal) {
-    // a section link inside the dialog: close it, then go there
-    ev.preventDefault();
-    history.replaceState(null, '', location.pathname + location.search);
-    route();
-    location.hash = href;
-  }
+  ev.preventDefault();
+  if (isModalHash(href)) return openHash(href, a.closest('.card, .peek, .callouts') || null);
+  goSection(href);
 });
 
+/** Smooth-scrolls to a page section, closing the dialog first if one is open. */
+function goSection(hash) {
+  if (modal) {
+    history.replaceState(null, '', location.pathname + location.search);
+    route();
+  }
+  history.replaceState(history.state, '', hash);
+  setTimeout(() => scrollToTarget(hash), modal ? 260 : 0);
+}
+
 document.addEventListener('keydown', (ev) => {
-  if ($('.gate') || $('.intro')) return;
+  if ($('.gate') || $('.opening')) return;
   if ((ev.key === 'k' || ev.key === 'K') && (ev.metaKey || ev.ctrlKey)) {
     ev.preventDefault();
     return spot ? closeSpotlight(true) : openSpotlight();
@@ -799,31 +744,35 @@ document.addEventListener('keydown', (ev) => {
 addEventListener('popstate', () => route());
 addEventListener('hashchange', () => route());
 
-// billboard: the progress fill on the active dot is the timer; when it ends, advance
-document.addEventListener('animationend', (ev) => {
-  if (ev.animationName === 'dot-fill' && !reduceMotion()) goSlide(slideIndex + 1);
-});
-
-// header turns solid once the page scrolls; the billboard art drifts for depth
-let ticking = false;
-addEventListener('scroll', () => {
-  if (ticking) return;
-  ticking = true;
-  requestAnimationFrame(() => {
-    ticking = false;
-    const y = scrollY;
-    $('#top').classList.toggle('solid', y > 24);
-    const bb = $('#bb');
-    if (bb && !reduceMotion() && y < innerHeight) bb.style.setProperty('--sy', y.toFixed(0));
-  });
-}, { passive: true });
 
 /* ── boot ────────────────────────────────────────────────── */
+// Fresh visit: red P intro (with sound) → "Who's viewing?" → hero.
+// Same session, or a link straight to a section or project: no intro, no picker.
 $('#main').tabIndex = -1;
+initMotion();
 render();
 wirePeek();
-if (!profile && !location.hash) showGate();
-else {
-  if (!profile) setProfile('guest', { rerender: false });
-  route();
+
+const deepLink = !!location.hash;
+if (deepLink || store.get('pd-intro')) {
+  if (!profile && !deepLink) showGate();
+  else {
+    if (!profile) setProfile('guest', { rerender: false });
+    reveal();
+    route();
+    if (location.hash && !isModalHash(location.hash)) {
+      const go = () => scrollToTarget(location.hash, { immediate: true });
+      requestAnimationFrame(go);
+      document.fonts?.ready.then(go);
+    }
+  }
+} else {
+  lockPage();
+  playIntro().then((clearIntro) => {
+    store.set('pd-intro', '1');
+    if (profile) {
+      clearIntro();
+      reveal();
+    } else showGate(clearIntro);
+  });
 }

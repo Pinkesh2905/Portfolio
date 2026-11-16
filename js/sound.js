@@ -1,7 +1,8 @@
-// Opening sting, synthesised in the browser with Web Audio. No audio files.
-// It is an original sound: a low sub drop, a rising breath of noise, then an
-// open A add9 chord that blooms and fades. Browsers only allow audio after a
-// click or key press, so it is played from the profile picker.
+// Opening sound and small UI sounds, synthesised with Web Audio (no audio files).
+// The opening is an original "ta-DUM" style sting: a quick low drum hit, a heavier
+// second hit an octave up, then a wide chord that blooms and rings out in a big room.
+// It is in A, not a copy of any existing sound logo.
+// Browsers only allow audio after a click or key press, so the intro waits for one.
 
 const KEY = 'pd-sound';
 let ctx = null;
@@ -22,84 +23,187 @@ function audio() {
   return ctx;
 }
 
-/** Plays the ~2 second opening sting. Call from a user gesture. */
-export function sting() {
-  if (!soundOn()) return;
-  const ac = audio();
-  if (!ac) return;
-  const t0 = ac.currentTime + 0.03;
+/** True when this browser will let the page play sound before any click. */
+export function canAutoplay() {
+  try {
+    if (navigator.getAutoplayPolicy) return navigator.getAutoplayPolicy('audiocontext') === 'allowed';
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    if (!ctx) ctx = new AC();
+    return ctx.state === 'running';
+  } catch {
+    return false;
+  }
+}
 
-  const master = ac.createGain();
-  master.gain.value = 0.32;
-  const comp = ac.createDynamicsCompressor();
-  master.connect(comp).connect(ac.destination);
+/** A stereo impulse response for a large, dark room, generated from decaying noise. */
+function room(ac, seconds = 2.8) {
+  const len = Math.floor(ac.sampleRate * seconds);
+  const ir = ac.createBuffer(2, len, ac.sampleRate);
+  for (let ch = 0; ch < 2; ch++) {
+    const d = ir.getChannelData(ch);
+    for (let i = 0; i < len; i++) {
+      const k = i / len;
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - k, 3.2) * (k < 0.004 ? k / 0.004 : 1);
+    }
+  }
+  return ir;
+}
 
-  // a short feedback echo gives the chord a tail without loading a reverb sample
-  const delay = ac.createDelay(1);
-  delay.delayTime.value = 0.19;
-  const fb = ac.createGain();
-  fb.gain.value = 0.34;
-  const wet = ac.createGain();
-  wet.gain.value = 0.4;
-  delay.connect(fb).connect(delay);
-  delay.connect(wet).connect(master);
-
-  // 1. sub drop
-  const sub = ac.createOscillator();
-  const subGain = ac.createGain();
-  sub.type = 'sine';
-  sub.frequency.setValueAtTime(92, t0);
-  sub.frequency.exponentialRampToValueAtTime(36, t0 + 0.7);
-  subGain.gain.setValueAtTime(0.0001, t0);
-  subGain.gain.exponentialRampToValueAtTime(1, t0 + 0.02);
-  subGain.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.1);
-  sub.connect(subGain).connect(master);
-  sub.start(t0);
-  sub.stop(t0 + 1.2);
-
-  // 2. rising breath of filtered noise
-  const len = Math.floor(ac.sampleRate * 0.7);
+function noiseBuffer(ac, seconds) {
+  const len = Math.floor(ac.sampleRate * seconds);
   const buf = ac.createBuffer(1, len, ac.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
-  const noise = ac.createBufferSource();
-  noise.buffer = buf;
-  const band = ac.createBiquadFilter();
-  band.type = 'bandpass';
-  band.Q.value = 1.2;
-  band.frequency.setValueAtTime(250, t0);
-  band.frequency.exponentialRampToValueAtTime(5200, t0 + 0.6);
-  const noiseGain = ac.createGain();
-  noiseGain.gain.setValueAtTime(0.0001, t0);
-  noiseGain.gain.exponentialRampToValueAtTime(0.22, t0 + 0.55);
-  noiseGain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.68);
-  noise.connect(band).connect(noiseGain).connect(master);
-  noise.start(t0);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  return buf;
+}
 
-  // 3. chord bloom: A2 E3 A3 C#4 E4 B4
-  const tc = t0 + 0.6;
+/** One deep drum hit: pitched body that drops, an inharmonic overtone, a felt-mallet click and a sub thump. */
+function hit(ac, out, t, freq, vel, length) {
+  const env = (node, peak, attack, decay) => {
+    node.gain.setValueAtTime(0.0001, t);
+    node.gain.exponentialRampToValueAtTime(peak, t + attack);
+    node.gain.exponentialRampToValueAtTime(0.0001, t + decay);
+  };
+  const body = ac.createOscillator();
+  const bodyG = ac.createGain();
+  body.type = 'sine';
+  body.frequency.setValueAtTime(freq * 1.6, t);
+  body.frequency.exponentialRampToValueAtTime(freq, t + 0.06);
+  env(bodyG, vel, 0.004, length);
+  body.connect(bodyG).connect(out);
+
+  const over = ac.createOscillator();
+  const overG = ac.createGain();
+  over.type = 'sine';
+  over.frequency.setValueAtTime(freq * 2.9, t);
+  over.frequency.exponentialRampToValueAtTime(freq * 2.7, t + 0.1);
+  env(overG, vel * 0.32, 0.003, length * 0.35);
+  over.connect(overG).connect(out);
+
+  const sub = ac.createOscillator();
+  const subG = ac.createGain();
+  sub.type = 'sine';
+  sub.frequency.setValueAtTime(70, t);
+  sub.frequency.exponentialRampToValueAtTime(38, t + 0.3);
+  env(subG, vel * 0.9, 0.003, 0.5);
+  sub.connect(subG).connect(out);
+
+  const click = ac.createBufferSource();
+  click.buffer = noiseBuffer(ac, 0.08);
   const lp = ac.createBiquadFilter();
   lp.type = 'lowpass';
-  lp.Q.value = 0.8;
-  lp.frequency.setValueAtTime(500, tc);
-  lp.frequency.exponentialRampToValueAtTime(6200, tc + 0.35);
-  lp.frequency.exponentialRampToValueAtTime(900, tc + 1.9);
-  lp.connect(master);
-  lp.connect(delay);
-  [110, 164.81, 220, 277.18, 329.63, 493.88].forEach((f, i) => {
-    [-5, 6].forEach((cents) => {
+  lp.frequency.value = 2200;
+  const clickG = ac.createGain();
+  env(clickG, vel * 0.5, 0.001, 0.07);
+  click.connect(lp).connect(clickG).connect(out);
+
+  [body, over, sub].forEach((o) => { o.start(t); o.stop(t + length + 0.1); });
+  click.start(t);
+}
+
+/**
+ * Builds the sting on any audio context (a live one, or an OfflineAudioContext for testing)
+ * and returns its length in seconds.
+ */
+export function buildTudum(ac, t0) {
+  // master chain: glue compressor, then a limiter-style compressor so it is loud but never clips
+  const master = ac.createGain();
+  master.gain.value = 1.0;
+  const glue = ac.createDynamicsCompressor();
+  glue.threshold.value = -18; glue.knee.value = 8; glue.ratio.value = 3.5; glue.attack.value = 0.004; glue.release.value = 0.3;
+  const makeup = ac.createGain();
+  makeup.gain.value = 1.7;
+  const limit = ac.createDynamicsCompressor();
+  limit.threshold.value = -3; limit.knee.value = 0; limit.ratio.value = 20; limit.attack.value = 0.001; limit.release.value = 0.12;
+  master.connect(glue).connect(makeup).connect(limit).connect(ac.destination);
+
+  const verb = ac.createConvolver();
+  verb.buffer = room(ac);
+  const wet = ac.createGain();
+  wet.gain.value = 0.42;
+  verb.connect(wet).connect(master);
+  const dry = ac.createGain();
+  dry.gain.value = 1;
+  dry.connect(master);
+  dry.connect(verb);
+
+  // "ta" — short and lighter; "DUM" — heavier, an octave up, with the low note doubled underneath
+  hit(ac, dry, t0, 55, 0.7, 0.3);
+  hit(ac, dry, t0 + 0.17, 110, 1.0, 1.6);
+  hit(ac, dry, t0 + 0.17, 55, 0.55, 1.2);
+
+  // the bloom: an A add9 chord that opens up like a swelling string section, then rings out
+  const tb = t0 + 0.24;
+  const lp = ac.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.Q.value = 1.1;
+  lp.frequency.setValueAtTime(380, tb);
+  lp.frequency.exponentialRampToValueAtTime(5200, tb + 0.55);
+  lp.frequency.exponentialRampToValueAtTime(1400, tb + 3);
+  const bloom = ac.createGain();
+  bloom.gain.setValueAtTime(0.0001, tb);
+  bloom.gain.exponentialRampToValueAtTime(0.4, tb + 0.38);
+  bloom.gain.setValueAtTime(0.4, tb + 0.6);
+  bloom.gain.exponentialRampToValueAtTime(0.0001, tb + 3.2);
+  lp.connect(bloom);
+  bloom.connect(dry);
+  [55, 110, 164.81, 220, 246.94, 277.18, 329.63, 440].forEach((f, i) => {
+    [-9, 0, 8].forEach((cents) => {
       const o = ac.createOscillator();
       const g = ac.createGain();
       o.type = i < 2 ? 'triangle' : 'sawtooth';
       o.frequency.value = f;
       o.detune.value = cents;
-      const start = tc + i * 0.018;
-      g.gain.setValueAtTime(0.0001, start);
-      g.gain.exponentialRampToValueAtTime(i < 2 ? 0.2 : 0.075, start + 0.05);
-      g.gain.exponentialRampToValueAtTime(0.0001, start + 1.9);
+      g.gain.value = i < 2 ? 0.16 : 0.055;
       o.connect(g).connect(lp);
-      o.start(start);
-      o.stop(start + 2);
+      o.start(tb);
+      o.stop(tb + 3.3);
     });
   });
+
+  // airy shimmer on top
+  const shimmer = ac.createGain();
+  shimmer.gain.setValueAtTime(0.0001, tb + 0.1);
+  shimmer.gain.exponentialRampToValueAtTime(0.05, tb + 0.6);
+  shimmer.gain.exponentialRampToValueAtTime(0.0001, tb + 2.8);
+  shimmer.connect(verb);
+  [880, 1318.5].forEach((f) => {
+    const o = ac.createOscillator();
+    o.type = 'sine';
+    o.frequency.value = f;
+    o.connect(shimmer);
+    o.start(tb + 0.1);
+    o.stop(tb + 2.9);
+  });
+  return 3.6;
+}
+
+/** Plays the opening sting. Call from a click or key press. */
+export function tudum() {
+  if (!soundOn()) return;
+  const ac = audio();
+  if (!ac) return;
+  buildTudum(ac, ac.currentTime + 0.04);
+}
+
+/** A short airy swoosh, used when a profile is picked. */
+export function swoosh() {
+  if (!soundOn()) return;
+  const ac = audio();
+  if (!ac) return;
+  const t = ac.currentTime + 0.02;
+  const src = ac.createBufferSource();
+  src.buffer = noiseBuffer(ac, 0.6);
+  const bp = ac.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.Q.value = 0.9;
+  bp.frequency.setValueAtTime(400, t);
+  bp.frequency.exponentialRampToValueAtTime(3800, t + 0.42);
+  const g = ac.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.35, t + 0.3);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.55);
+  src.connect(bp).connect(g).connect(ac.destination);
+  src.start(t);
 }
