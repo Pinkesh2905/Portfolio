@@ -451,18 +451,11 @@ body.ready .hero-bg { opacity: 1; transition: opacity 1.4s ease; }
 .scan { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px); }
 
 /* the title, badge and intro paragraph */
-.title-layer { z-index: 2; transform: translate3d(calc(var(--mx) * var(--d) * 1px), calc(var(--my) * var(--d) * 0.6px + var(--p) * -28vh), 0); opacity: calc(1 - var(--p) * 1.3); }
-.hero-title { position: absolute; left: 0; right: 0; top: calc(var(--top-h) + 3vh); margin: 0; text-align: center; line-height: 0.8; }
-.ht-1 {
-  display: inline-flex; font-weight: 900; font-stretch: 125%; font-size: clamp(84px, 15.6vw, 300px); letter-spacing: -0.015em;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 20%, rgba(255, 236, 238, 0.52) 58%, rgba(255, 210, 216, 0.14) 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-.ht-1 .hl { display: inline-block; }
 
 /* the portrait */
 .me-layer { z-index: 4; }
 .hero-me {
-  position: absolute; left: 50%; bottom: 0; height: 92%; aspect-ratio: 1093 / 1439; translate: -50% 0;
+  position: absolute; left: auto; right: 0; bottom: 0; height: 90%; aspect-ratio: 1093 / 1439;
   transform: translateY(calc(var(--p) * 10vh)) scale(calc(1 + var(--p) * 0.12)); transform-origin: 50% 100%;
 }
 .hero-me picture, .hero-me img { display: block; width: 100%; height: 100%; }
@@ -493,10 +486,8 @@ body.ready .hero-bg { opacity: 1; transition: opacity 1.4s ease; }
 /* entrance, once the page is revealed */
 body.ready .hud-floor { animation: floor 6s linear infinite, fade-in 1.6s ease 0.3s backwards; opacity: 0.55; }
 @keyframes fade-in { from { opacity: 0; } }
-body.ready .ht-1 .hl { animation: letter 1.15s cubic-bezier(0.16, 1, 0.3, 1) backwards; animation-delay: calc(0.15s + var(--i) * 0.07s); }
-@keyframes letter { from { opacity: 0; translate: 0 70%; scale: 1.5 1.1; } }
 body.ready .hero-me { animation: me-in 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s backwards; }
-@keyframes me-in { from { opacity: 0; translate: -50% 9%; } }
+@keyframes me-in { from { opacity: 0; translate: 4% 6%; } }
 body.ready .me-glow { animation: fade-in 2s ease 0.8s backwards; opacity: 1; }
 
 /* ═══════════════════════════════════════════════════════════
@@ -586,9 +577,6 @@ body.ready .top { animation: drop 0.8s var(--ease) 0.5s backwards; }
 @media (max-width: 700px) {
   .hero { height: auto; min-height: 0; max-height: none; padding-bottom: 26px; }
   .hero::after { height: 10%; }
-  .hero-title { position: relative; top: auto; padding-top: calc(var(--top-h) + 26px); }
-  .ht-1 { font-stretch: 100%; font-size: 18.4vw; letter-spacing: -0.02em; }
-  .title-layer { position: absolute; inset: 0 0 auto 0; }
   .me-layer { position: relative; inset: auto; height: 118vw; margin-top: calc(var(--top-h) + 26px + 18.4vw * 0.8 - 2vw); }
   .hero-me { height: 100%; }
   .hud-floor { height: 40%; }
@@ -722,49 +710,15 @@ body.ready .top { animation: drop 0.8s var(--ease) 0.5s backwards; }
 
 /* Touch screens: fewer separately animated layers when the hero appears, so the first
    frames are not spent setting them up (desktop keeps the letter-by-letter entrance) */
-@media (hover: none) {
-  body.ready .ht-1 .hl { animation: none; }
-  body.ready .ht-1 { animation: word-in 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards; }
-}
-@keyframes word-in { from { opacity: 0; transform: translateY(30%) scale(1.15); } }
-
-
 
 /* ═══════════════════════════════════════════════════════════
    Hero, decluttered: name, signature, portrait, introduction
    ═══════════════════════════════════════════════════════════ */
 /* "Darji" signed across the portrait in red script, written on from left to right */
-.sig-layer { z-index: 5; transform: translate3d(calc(var(--mx) * var(--d) * 1px), calc(var(--my) * var(--d) * 0.6px + var(--p) * -20vh), 0); opacity: calc(1 - var(--p) * 1.6); }
-.sig {
-  position: absolute; right: 8vw; top: calc(var(--top-h) + 3vh + clamp(84px, 15.6vw, 300px) * 0.6);
-  padding: 0.12em 0.3em 0.2em; font: 400 clamp(64px, 9.5vw, 190px)/1 var(--script); rotate: -7deg;
-  background: linear-gradient(180deg, #ff6a7c 0%, #f2122f 52%, #a3081d 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
-  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 26px rgba(242, 18, 47, 0.4));
-  clip-path: inset(0 100% 0 0);
-}
-body.ready .sig { animation: sign 1.25s cubic-bezier(0.65, 0, 0.35, 1) 0.95s forwards; }
-@keyframes sign { to { clip-path: inset(0 0 0 0); } }
 
 /* the introduction, bottom left, with room around it */
-.hero-copy { position: absolute; z-index: 7; left: 7.5vw; bottom: 10vh; width: min(460px, 33vw); display: grid; gap: 14px; opacity: calc(1 - var(--p) * 2.2); }
-.hc-role { font-size: 13px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent-2); }
-.hc-intro { font-size: clamp(17px, 1.4vw, 22px); line-height: 1.5; color: rgba(255, 255, 255, 0.92); text-wrap: pretty; text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6); }
-.hc-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
-.hc-actions .btn.primary svg { transition: translate 0.3s var(--ease); }
-.hc-actions .btn.primary:hover svg { translate: 4px 0; }
-body.ready .hero-copy > * { animation: rise 0.9s var(--ease) backwards; }
-body.ready .hero-copy > :nth-child(1) { animation-delay: 1.05s; }
-body.ready .hero-copy > :nth-child(2) { animation-delay: 1.15s; }
-body.ready .hero-copy > :nth-child(3) { animation-delay: 1.25s; }
 
 /* a quiet scroll hint, bottom right */
-.scroll-cue { position: absolute; z-index: 8; right: 4.5vw; bottom: 9vh; display: grid; justify-items: center; gap: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255, 255, 255, 0.55); writing-mode: vertical-rl; opacity: calc(1 - var(--p) * 3); transition: color 0.2s; }
-.scroll-cue:hover { color: #fff; }
-.scroll-cue span { position: relative; width: 1px; height: 64px; overflow: hidden; background: rgba(255, 255, 255, 0.2); }
-.scroll-cue span::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 40%; background: var(--accent-2); animation: cue 2.2s cubic-bezier(0.7, 0, 0.3, 1) infinite; }
-@keyframes cue { 0% { transform: translateY(-100%); } 100% { transform: translateY(260%); } }
-body.ready .scroll-cue { animation: fade-in 1s ease 1.6s backwards; }
-
 
 /* ═══════════════════════════════════════════════════════════
    At a glance: now, links and the resume, right below the hero
@@ -797,19 +751,93 @@ body.ready .scroll-cue { animation: fade-in 1s ease 1.6s backwards; }
 
 /* Phones: the introduction sits under the portrait (after the desktop rules above, so it wins) */
 @media (max-width: 700px) {
-  .sig { right: 4vw; top: calc(var(--top-h) + 26px + 18.4vw * 0.58); font-size: 16vw; }
-  .hero-copy { position: relative; z-index: 7; left: auto; bottom: auto; width: auto; margin: -24vw 16px 0; gap: 12px; }
   /* a soft dark band behind the text so it reads over the portrait */
-  .hero-copy::before { content: ""; position: absolute; z-index: -1; inset: -36px -16px -10px; background: linear-gradient(180deg, transparent, rgba(8, 8, 10, 0.82) 38%, var(--bg)); pointer-events: none; }
-  .hc-actions .btn { white-space: nowrap; padding: 0 14px; }
-  .hc-intro { font-size: 16.5px; }
-  .hc-actions { margin-top: 4px; }
-  .hc-actions .btn { flex: 1 1 140px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Hero, split: introduction left, portrait right in a ring of light
+   ═══════════════════════════════════════════════════════════ */
+/* a thin ring of red light behind the head, drawn on, then slowly turning */
+.me-ring { position: absolute; z-index: -1; left: 50%; top: 32%; width: 112%; aspect-ratio: 1; translate: -50% -50%; overflow: visible; pointer-events: none; }
+.me-ring circle { fill: none; stroke: url(#ring-g); stroke-width: 1.4; stroke-linecap: round; stroke-dasharray: 0.62 1; stroke-dashoffset: 0.62; filter: drop-shadow(0 0 6px rgba(255, 35, 64, 0.9)); transform-origin: 100px 100px; rotate: -150deg; }
+body.ready .me-ring circle { animation: ring-draw 1.6s cubic-bezier(0.65, 0, 0.35, 1) 0.6s forwards, ring-turn 40s linear 2.2s infinite; }
+@keyframes ring-draw { to { stroke-dashoffset: 0; } }
+@keyframes ring-turn { from { rotate: -150deg; } to { rotate: 210deg; } }
+
+.hero-copy { position: absolute; z-index: 7; left: 7vw; top: 52%; translate: 0 -50%; width: min(760px, 52vw); display: grid; gap: 20px; opacity: calc(1 - var(--p) * 2); }
+.hc-name { display: flex; flex-wrap: nowrap; align-items: baseline; column-gap: 0.18em; margin: 0; font-weight: 800; font-size: clamp(50px, 6vw, 108px); white-space: nowrap; line-height: 0.95; letter-spacing: -0.035em; }
+.hc-first { color: #fff; }
+.hc-sig { position: relative; display: inline-block; padding: 0 0.12em 0.05em 0.04em; font: 400 1.12em/1 var(--script); letter-spacing: 0; color: var(--accent); rotate: -5deg; translate: 0 0.06em; text-shadow: 0 0 28px rgba(242, 18, 47, 0.45); clip-path: inset(-20% 100% -40% 0); }
+.hc-swash { position: absolute; left: 4%; right: -6%; bottom: -0.1em; width: 102%; height: 0.32em; overflow: visible; }
+.hc-swash path { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; vector-effect: non-scaling-stroke; stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+.hc-roles { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; font-size: clamp(15px, 1.25vw, 19px); font-weight: 600; color: #f1f1f4; }
+.hc-roles i { width: 1px; height: 1.1em; background: var(--accent); }
+.hc-intro { max-width: 34em; font-size: clamp(16px, 1.3vw, 20px); line-height: 1.6; color: rgba(255, 255, 255, 0.72); text-wrap: pretty; }
+.hc-intro strong { color: #fff; font-weight: 600; }
+.hc-intro mark { color: #fff; background: linear-gradient(transparent 12%, rgba(242, 18, 47, 0.55) 12%, rgba(242, 18, 47, 0.55) 92%, transparent 92%); padding: 0 0.25em; border-radius: 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.hc-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.hc-actions .btn.primary { background: var(--accent); color: #fff; box-shadow: 0 10px 30px rgba(242, 18, 47, 0.35); }
+.hc-actions .btn.primary:hover { background: #ff2440; }
+.hc-actions .btn.primary svg { transition: translate 0.3s var(--ease); }
+.hc-actions .btn.primary:hover svg { translate: 4px 0; }
+.hc-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+.hc-tools li { padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.04); font: 500 12.5px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #d9d9e0; transition: border-color 0.2s, color 0.2s; }
+.hc-tools li:hover { border-color: rgba(255, 60, 85, 0.6); color: #fff; }
+
+/* entrance */
+body.ready .hc-first { animation: rise 0.9s var(--ease) 0.15s backwards; display: inline-block; }
+body.ready .hc-sig { animation: sign 1.2s cubic-bezier(0.65, 0, 0.35, 1) 0.55s forwards; }
+@keyframes sign { to { clip-path: inset(-20% -10% -40% 0); } }
+body.ready .hc-swash path { animation: swash 0.7s cubic-bezier(0.65, 0, 0.35, 1) 1.55s forwards; }
+@keyframes swash { to { stroke-dashoffset: 0; } }
+body.ready .hero-copy > :not(.hc-name) { animation: rise 0.9s var(--ease) backwards; }
+body.ready .hc-roles { animation-delay: 0.75s; }
+body.ready .hc-intro { animation-delay: 0.9s; }
+body.ready .hc-actions { animation-delay: 1.05s; }
+body.ready .hc-tools { animation: none; }
+body.ready .hc-tools li { animation: rise 0.6s var(--ease) backwards; animation-delay: calc(1.2s + var(--i) * 0.06s); }
+
+/* round scroll button, bottom centre */
+.scroll-cue { position: absolute; z-index: 8; left: 50%; bottom: 4vh; translate: -50% 0; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; opacity: calc(1 - var(--p) * 3); transition: border-color 0.2s, background 0.2s; }
+.scroll-cue:hover { border-color: #fff; background: rgba(255, 255, 255, 0.08); }
+.scroll-cue svg { animation: nudge 2s ease-in-out infinite; }
+@keyframes nudge { 50% { translate: 0 4px; } }
+body.ready .scroll-cue { animation: fade-in 1s ease 1.8s backwards; }
+
+/* header: current section and a clear call to action */
+.nav a { position: relative; padding: 7px 14px; margin: 0 -6px; border-radius: 999px; transition: color 0.2s, background 0.25s; }
+.nav a.on { color: #fff; background: rgba(242, 18, 47, 0.9); box-shadow: 0 6px 18px rgba(242, 18, 47, 0.35); }
+.talk { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 16px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 14.5px; font-weight: 700; box-shadow: 0 8px 24px rgba(242, 18, 47, 0.35); transition: background 0.2s, transform 0.2s var(--ease); }
+.talk:hover { background: #ff2440; }
+.talk svg { transition: translate 0.25s var(--ease); }
+.talk:hover svg { translate: 2px -2px; }
+
+/* tablets and phones: portrait on top, introduction below */
+@media (max-width: 900px) {
+  .hero { height: auto; min-height: 0; max-height: none; padding-bottom: 34px; }
+  .hero::after { height: 10%; }
+  .me-layer { position: relative; inset: auto; height: min(118vw, 720px); margin-top: calc(var(--top-h) + 4px); }
+  .hero-me { left: 50%; right: auto; translate: -50% 0; height: 100%; }
+  @keyframes me-in { from { opacity: 0; translate: -50% 6%; } }
+  .hero-copy { position: relative; left: auto; top: auto; translate: none; width: auto; max-width: 640px; margin: calc(-1 * min(26vw, 160px)) auto 0; padding: 0 var(--pad); gap: 16px; }
+  .hero-copy::before { content: ""; position: absolute; z-index: -1; inset: -48px calc(50% - 50vw) -10px; background: linear-gradient(180deg, transparent, rgba(8, 8, 10, 0.85) 30%, var(--bg)); pointer-events: none; }
+  .hc-name { font-size: clamp(42px, 11.5vw, 84px); }
+  .hc-actions .btn { flex: 1 1 150px; white-space: nowrap; }
   .scroll-cue { display: none; }
 }
-@media (min-width: 701px) and (max-width: 1100px) {
-  .hero-copy { width: min(460px, 56vw); }
-  .hc-intro { font-size: 18px; }
+@media (max-width: 560px) {
+  .talk { display: none; }
+  .hc-roles { gap: 4px 12px; font-size: 14.5px; }
+  .hc-intro { font-size: 16px; }
+}
+
+
+/* desktop: the portrait runs off the right edge, so only its left side and bottom fade */
+@media (min-width: 901px) {
+  .hero-me img {
+    -webkit-mask-image: linear-gradient(0deg, transparent 0%, #000 22%), linear-gradient(90deg, transparent 0%, #000 9%);
+    mask-image: linear-gradient(0deg, transparent 0%, #000 22%), linear-gradient(90deg, transparent 0%, #000 9%);
+  }
 }
 
 /* Reduced motion: calm versions of the animations above (keep this block last so it wins) */
@@ -817,8 +845,6 @@ body.ready .scroll-cue { animation: fade-in 1s ease 1.6s backwards; }
   /* entrances: fade only */
   @keyframes rise { from { opacity: 0; } }
   @keyframes pop { from { opacity: 0; } }
-  @keyframes letter { from { opacity: 0; } }
-  @keyframes word-in { from { opacity: 0; } }
   @keyframes me-in { from { opacity: 0; } }
   @keyframes gate-in { from { opacity: 0; } }
   @keyframes gate-out { 0%, 40% { opacity: 1; } 100% { opacity: 0; } }
@@ -847,7 +873,8 @@ body.ready .scroll-cue { animation: fade-in 1s ease 1.6s backwards; }
   .contact .cta { scale: none; }
   .card:hover, .card:focus-visible { transform: none; }
   .logo-card:hover .lc-mark, .logo-card:focus-visible .lc-mark { transform: none; }
-  .scroll-cue span::after { animation: none; }
   .top { transition: background-color 0.35s ease, opacity 0.5s ease; }
   body.locked .top { transform: none; opacity: 0; }
+  body.ready .me-ring circle { animation: ring-draw 1.6s ease 0.6s forwards; }
+  .scroll-cue svg { animation: none; }
 }

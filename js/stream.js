@@ -103,14 +103,40 @@ const card = (p, cls = '') =>
 /* ── header ──────────────────────────────────────────────── */
 const NAV = [['projects', 'Projects'], ['experience', 'Experience'], ['skills', 'Skills'], ['education', 'Education'], ['contact', 'Contact']];
 
+let activeSec = '';
+/** Highlights the nav item for the section in the middle of the screen. */
+function watchSections() {
+  if (!('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (!en.isIntersecting) return;
+      const id = en.target.id === 'more-projects' || en.target.id === 'builds' ? 'projects' : en.target.id;
+      if (!NAV.some(([n]) => n === id) && en.target.id !== 'hero') return;
+      activeSec = en.target.id === 'hero' ? '' : id;
+      $$('.nav a').forEach((a) => {
+        const on = a.dataset.sec === activeSec;
+        a.classList.toggle('on', on);
+        if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+      });
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  ['hero', 'projects', 'more-projects', 'builds', 'experience', 'skills', 'education', 'contact'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) io.observe(el);
+  });
+  return io;
+}
+let secWatch = null;
+
 function renderHeader() {
   const p = prof();
   $('#top').innerHTML = `
     <a class="logo" href="./" data-home aria-label="${esc(identity.name)}, home">${wordmark()}</a>
-    <nav class="nav" aria-label="Sections">${NAV.map(([id, l]) => `<a href="#${id}">${l}</a>`).join('')}</nav>
+    <nav class="nav" aria-label="Sections">${NAV.map(([id, l]) => `<a href="#${id}" data-sec="${id}"${id === activeSec ? ' class="on" aria-current="true"' : ''}>${l}</a>`).join('')}</nav>
     <span class="grow"></span>
     <button class="ib" type="button" data-spotlight aria-label="Search (Ctrl or Command K)">${icon('search', 20)}</button>
     <button class="ib" type="button" id="snd" aria-label="Sound" aria-pressed="${soundOn()}">${icon(soundOn() ? 'volume-2' : 'volume-x', 20)}</button>
+    <a class="talk" href="#contact">Let's talk ${icon('arrow-up-right', 16)}</a>
     <div class="who">
       <button class="who-btn" type="button" id="who-btn" aria-haspopup="true" aria-expanded="false" aria-label="Viewing as ${esc(p.label)}. Switch profile">
         <span class="tile sm" style="background:${p.g}">${icon(p.icon, 16)}</span>${icon('chevron-down', 16)}
@@ -264,6 +290,8 @@ function render() {
     <p>${esc(identity.name)} · ${esc(identity.title)}</p>`;
   wireTracks();
   refreshMotion();
+  secWatch?.disconnect();
+  secWatch = watchSections();
 }
 
 /* ── row scrolling ───────────────────────────────────────── */

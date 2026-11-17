@@ -30,6 +30,10 @@ export const identity = {
     'I turn factory and business data into clear dashboards, plans and AI assistants, and I build the software behind them with Claude Code.',
   status: 'Open to Data Analyst & Developer roles',
   statusLong: 'Open to Data Analyst and Software Developer roles · Ahmedabad / Vadodara',
+  /** Hero role line. Keep to what the resume supports. */
+  roles: ['Data Analyst', 'Software Developer', 'Builds with AI'],
+  /** Hero tool strip: the tools I use most, from the skills list. */
+  tools: ['SQL', 'Looker Studio', 'Python', 'Django', 'Next.js', 'Claude Code'],
   company: 'Vezapp Solutions LLP',
   companyCity: 'Vadodara',
   location: 'Borsad, Gujarat, India',
