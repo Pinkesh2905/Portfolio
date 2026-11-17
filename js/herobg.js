@@ -1,5 +1,5 @@
-// Hero background: red smoke lit from behind, with light rays fanning out from a point
-// behind the portrait. One fragment shader at reduced resolution; paused when the hero
+// Hero background: soft red light and smoke around the portrait, fading to black away from it,
+// with a few broad, slow rays. One fragment shader at reduced resolution; paused when the hero
 // is off screen or the tab is hidden; a single still frame for reduced motion.
 // Without WebGL, the CSS gradient on .hero-bg shows instead.
 
@@ -37,24 +37,22 @@ void main() {
   vec2 q = vec2(fbm(p * 1.4 + vec2(0.0, t * 0.035)), fbm(p * 1.4 + vec2(4.1, -t * 0.03)));
   float smoke = fbm(p * 1.8 + q * 2.2 + vec2(t * 0.02, -t * 0.045));
 
-  // rays: angular stripes that slowly turn, broken up by the smoke
+  // the red lives in a soft pool around the portrait (about half the screen) and fades to black
+  float pool = smoothstep(0.78, 0.05, dist);
+
+  // a few broad rays that drift slowly, softened by the smoke
   float ang = atan(d.y, d.x);
-  float rays = pow(0.5 + 0.5 * sin(ang * 13.0 + t * 0.12 + smoke * 3.0), 6.0)
-             + 0.6 * pow(0.5 + 0.5 * sin(ang * 29.0 - t * 0.08 + q.x * 5.0), 10.0);
-  rays *= exp(-dist * 1.7) * (0.35 + smoke);
+  float rays = pow(0.5 + 0.5 * sin(ang * 6.0 + t * 0.06 + smoke * 1.2), 2.5);
+  rays *= exp(-dist * 2.4) * (0.5 + 0.5 * smoke) * pool;
 
-  vec3 col = vec3(0.035, 0.0, 0.006);
-  col += vec3(0.55, 0.02, 0.06) * pow(smoke, 2.4) * 1.5;            // smoke body
-  col += vec3(1.0, 0.1, 0.16) * exp(-dist * dist * 5.0) * 0.85;     // backlight bloom
-  col += vec3(1.0, 0.2, 0.25) * exp(-dist * dist * 40.0) * 0.5;     // hot core
-  col += vec3(0.95, 0.08, 0.14) * rays * 0.55;
+  vec3 col = vec3(0.012, 0.0, 0.003);
+  col += vec3(0.5, 0.02, 0.06) * pow(smoke, 2.2) * 1.3 * pool;      // smoke, only near the light
+  col += vec3(0.95, 0.08, 0.14) * exp(-dist * dist * 6.5) * 0.8;    // backlight bloom
+  col += vec3(1.0, 0.2, 0.25) * exp(-dist * dist * 45.0) * 0.35;    // hot core
+  col += vec3(0.9, 0.06, 0.12) * rays * 0.28;
 
-  // a second, softer red source low on the left, like a practical light in the set
-  float d2 = length(p - vec2(0.08 * asp, 0.12));
-  col += vec3(0.6, 0.02, 0.05) * exp(-d2 * d2 * 6.0) * 0.6 * (0.6 + smoke);
-
-  col *= 0.55 + 0.45 * smoothstep(1.25, 0.2, length((uv - vec2(0.5, 0.55)) * vec2(1.2, 1.0)));
-  col += (hash(gl_FragCoord.xy + fract(t * 7.0) * 91.0) - 0.5) * 0.035;  // film grain
+  col *= 0.35 + 0.65 * pool;
+  col += (hash(gl_FragCoord.xy + fract(t * 7.0) * 91.0) - 0.5) * 0.025 * (0.3 + pool);  // film grain
   gl_FragColor = vec4(col, 1.0);
 }`;
 

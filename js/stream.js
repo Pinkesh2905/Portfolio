@@ -3,7 +3,7 @@
 import * as C from './content.js';
 import { ICONS, BRAND } from './icons.js';
 import { tudum, swoosh, soundOn, setSound } from './sound.js';
-import { playIntro, pMark } from './intro.js';
+import { playIntro, wordmark } from './intro.js';
 import { heroHTML, wireHero, heroCounters } from './hero.js';
 import { initMotion, refreshMotion, scrollToTarget, stopScroll, startScroll } from './motion.js';
 
@@ -106,7 +106,7 @@ const NAV = [['projects', 'Projects'], ['experience', 'Experience'], ['skills', 
 function renderHeader() {
   const p = prof();
   $('#top').innerHTML = `
-    <a class="logo" href="./" data-home aria-label="${esc(identity.name)}, home">${pMark('logo-mark', 'lg')}<span>PINKESH</span></a>
+    <a class="logo" href="./" data-home aria-label="${esc(identity.name)}, home">${wordmark()}</a>
     <nav class="nav" aria-label="Sections">${NAV.map(([id, l]) => `<a href="#${id}">${l}</a>`).join('')}</nav>
     <span class="grow"></span>
     <button class="ib" type="button" data-spotlight aria-label="Search (Ctrl or Command K)">${icon('search', 20)}</button>
@@ -138,6 +138,21 @@ const BUILD_ART = [
   'linear-gradient(135deg,#c2410c,#be123c)', 'linear-gradient(135deg,#334155,#0f172a)',
 ];
 
+/** Featured poster: just the project's logo on a dark card lit in its colour. Details open on tap. */
+function logoCard(p) {
+  const m = p.media || {};
+  const mark = m.wordmark
+    ? `<img class="lc-word" src="${pdir(p.id)}/wordmark.webp" alt="" loading="lazy" decoding="async">`
+    : m.logo
+      ? `<img class="lc-logo" src="${pdir(p.id)}/logo.webp" alt="" loading="lazy" decoding="async"><span class="lc-name">${esc(p.name)}</span>`
+      : `<span class="lc-icon" style="background:${p.gradient}">${icon(p.icon, 56, 1.6)}</span><span class="lc-name">${esc(p.name)}</span>`;
+  return `<a class="card poster logo-card" href="#projects/${p.id}" data-id="${p.id}" style="--g:${p.gradient}" aria-label="${esc(p.name)}: ${esc(p.tagline)}">
+    <span class="lc-glow" aria-hidden="true"></span>
+    <span class="lc-mark">${mark}</span>
+    <span class="lc-more" aria-hidden="true">View project ${icon('arrow-right', 14)}</span>
+  </a>`;
+}
+
 /** Gives a small build the fields the poster art expects. */
 const asProject = (b, i) => ({ ...b, gradient: BUILD_ART[i % BUILD_ART.length], icon: 'arrow-up-right', status: b.note || 'Build' });
 
@@ -145,7 +160,7 @@ const ROWS = {
   featured: () => `
     <section class="row rv" id="projects" aria-labelledby="t-featured">
       <h2 class="row-title" data-split id="t-featured">${esc(prof().picks)}</h2>
-      ${track(featured.map((p, i) => `<li class="rank"><span class="num" aria-hidden="true">${i + 1}</span>${card(p, 'poster')}</li>`).join(''))}
+      ${track(featured.map((p, i) => `<li class="rank"><span class="num" aria-hidden="true">${i + 1}</span>${logoCard(p)}</li>`).join(''))}
     </section>`,
 
   projects: () => `
@@ -205,7 +220,7 @@ const ROWS = {
 function contact() {
   return `
     <section class="sec contact rv" id="contact" aria-labelledby="t-contact">
-      <p class="kicker"><span class="live" aria-hidden="true"></span>${esc(identity.statusLong)}</p>
+      <p class="kicker">${esc(identity.statusLong)}</p>
       <h2 class="cta" id="t-contact" data-split>Get in touch</h2>
       <div class="contact-actions">
         <a class="btn primary" href="mailto:${identity.email}">${icon('mail', 20)} ${esc(identity.email)}</a>
@@ -241,7 +256,7 @@ function render() {
     marquee([identity.statusLong], 1, 'band-outline') +
     contact();
   $('#foot').innerHTML = `
-    <span class="logo sm" aria-hidden="true">${pMark('logo-mark', 'lf')}<span>PINKESH</span></span>
+    <span class="logo sm" aria-hidden="true">${wordmark()}</span>
     <nav aria-label="Other views"><a href="#about">About</a><a href="os.html">Classic OS view</a><a href="${identity.simple}">Simple view</a></nav>
     <p>${esc(identity.name)} · ${esc(identity.title)}</p>`;
   wireTracks();
@@ -323,7 +338,7 @@ function wirePeek() {
   document.addEventListener('pointerover', (e) => {
     if (e.pointerType !== 'mouse' || !finePointer() || innerWidth < 900) return;
     const c = e.target.closest?.('.card[data-id]');
-    if (!c || c.closest('.modal')) return;
+    if (!c || c.closest('.modal') || c.classList.contains('logo-card')) return;
     if (peek && peek.card === c) return;
     clearTimeout(peekTimer);
     peekTimer = setTimeout(() => { if (c.matches(':hover')) showPeek(c); }, 420);
@@ -741,7 +756,7 @@ function showGate(afterShown) {
   el.setAttribute('aria-modal', 'true');
   el.setAttribute('aria-labelledby', 'gate-t');
   el.innerHTML = `
-    <span class="logo" aria-hidden="true">${pMark('logo-mark', 'gl')}<span>PINKESH</span></span>
+    <span class="logo" aria-hidden="true">${wordmark()}</span>
     <div class="gate-in">
       <h2 id="gate-t">Who’s viewing?</h2>
       <div class="gate-tiles">

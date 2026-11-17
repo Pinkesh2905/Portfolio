@@ -3,7 +3,6 @@
 // All words come from content.js.
 
 import * as C from './content.js';
-import { pMark } from './intro.js';
 import { startHeroBg } from './herobg.js';
 
 const esc = (s) =>
@@ -29,7 +28,6 @@ export function heroHTML({ icon, brand, ext }) {
   const id = C.identity;
   const job = C.experience[0];
   const featured = C.projects.filter((p) => p.featured);
-  const builds = C.projects.length + C.moreBuilds.length;
   const mca = C.education.degrees[0];
   const letters = 'PINKESH'.split('').map((l, i) => `<span class="hl" style="--i:${i}">${l}</span>`).join('');
   const plus = [[8, 22], [31, 64], [64, 18], [92, 40], [47, 88], [76, 74]]
@@ -53,7 +51,7 @@ export function heroHTML({ icon, brand, ext }) {
     </div>
 
     <div class="layer title-layer" style="--d:-14">
-      <p class="hero-badge"><span class="hb-mark">${pMark('', 'hb')}</span><span>Portfolio</span></p>
+      <p class="hero-badge"><span>Portfolio</span></p>
       <h1 class="hero-title" id="hero-name"><span class="ht-1" aria-hidden="true">${letters}</span><span class="sr">${esc(id.name)}</span><span class="ht-2" aria-hidden="true">Darji</span></h1>
       <p class="hero-intro">${esc(id.oneLiner)}</p>
     </div>
@@ -74,30 +72,30 @@ export function heroHTML({ icon, brand, ext }) {
     </div>
 
     <div class="hero-left">
-      <p class="hl-status"><span class="live" aria-hidden="true"></span>${esc(id.status)}</p>
+      <p class="hl-status">${esc(id.status)}</p>
       <p class="hl-row"><span class="date-pill">${esc(job.period)}</span><span class="hl-role">${esc(id.title)}<br>${esc(id.company)}, ${esc(id.companyCity)}</span></p>
-      <a class="dl mag" href="${id.resume}" ${ext} aria-label="Resume (PDF, opens in a new tab)">
-        <span class="dl-top"><span>${icon('file-text', 16)} Resume.pdf</span><span class="dl-pct" aria-hidden="true">0%</span></span>
-        <span class="dl-bar" aria-hidden="true"><i></i></span>
-        <span class="dl-cta" aria-hidden="true">Open ${icon('arrow-up-right', 14)}</span>
-      </a>
+      <div class="resume-card">
+        <a class="rc-doc" href="${id.resume}" ${ext} tabindex="-1" aria-hidden="true">
+          <span class="rc-sheet rc-back"></span>
+          <span class="rc-sheet rc-front"><img src="images/resume-page.webp" alt="" width="360" height="466" loading="lazy" decoding="async"></span>
+        </a>
+        <div class="rc-info">
+          <p class="rc-k">Resume</p>
+          <p class="rc-t">${esc(id.title)} · PDF</p>
+          <div class="rc-actions">
+            <a class="rc-btn primary" href="${id.resume}" ${ext} aria-label="View resume (PDF, opens in a new tab)">${icon('eye', 16)} View</a>
+            <a class="rc-btn" href="${id.resume}" download="Pinkesh_Darji_Resume.pdf" aria-label="Download resume (PDF)">${icon('download', 16)} Download</a>
+          </div>
+        </div>
+      </div>
       <div class="hl-actions">
         <a class="btn primary" href="#contact">${icon('mail', 18)} Get in touch</a>
         <a class="btn" href="#about">${icon('info', 18)} About me</a>
       </div>
     </div>
 
-    <div class="hero-plate" aria-hidden="true">
-      <span class="pl-name">PINKESH</span>${pMark('pl-mark', 'pl')}<span class="pl-name">DARJI</span>
-      <p>${esc(C.about.credentials)}</p>
-    </div>
-
     <div class="hero-right">
       <p class="hr-co">${icon('briefcase', 16)} ${esc(id.company)}</p>
-      <div class="ring" role="img" aria-label="${builds} projects and builds">
-        <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" class="r1"/><circle cx="60" cy="60" r="44" class="r2"/><circle cx="60" cy="60" r="34" class="r3"/></svg>
-        <span class="ring-n" data-count="${builds}" aria-hidden="true">00</span><span class="ring-l" aria-hidden="true">Builds</span>
-      </div>
       <div class="socials">
         <a class="round" href="${id.linkedin}" ${ext} aria-label="LinkedIn">${brand('linkedin', 18)}</a>
         <a class="round" href="${id.github}" ${ext} aria-label="GitHub">${brand('github', 18)}</a>
@@ -136,17 +134,6 @@ function layoutCallout(hero) {
   });
 }
 
-function countUp(el, to, ms, fmt) {
-  if (reduce()) { el.textContent = fmt(to); return; }
-  const t0 = performance.now();
-  const step = (now) => {
-    const k = Math.min(1, (now - t0) / ms);
-    el.textContent = fmt(Math.round(to * (1 - Math.pow(1 - k, 3))));
-    if (k < 1) requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
-}
-
 /** Starts the hero's background and layout. Call once, after the hero is in the DOM. */
 export function wireHero() {
   const hero = document.querySelector('.hero');
@@ -169,13 +156,9 @@ export function wireHero() {
   setTimeout(layout, 400);
 }
 
-/** Runs the counters once the hero entrance starts. */
+/** Re-measures the callout once the hero entrance starts. */
 export function heroCounters() {
   const hero = document.querySelector('.hero');
   if (!hero) return;
-  const pct = hero.querySelector('.dl-pct');
-  if (pct) setTimeout(() => countUp(pct, 100, 1700, (v) => `${v}%`), reduce() ? 0 : 1500);
-  const n = hero.querySelector('.ring-n');
-  if (n) setTimeout(() => countUp(n, +n.dataset.count, 1500, (v) => String(v).padStart(2, '0')), reduce() ? 0 : 1300);
   layoutCallout(hero);
 }

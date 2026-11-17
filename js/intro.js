@@ -26,6 +26,15 @@ export function pMark(cls = '', id = 'p') {
   </svg>`;
 }
 
+/**
+ * The name as a red wordmark in the same ribbon red as the P: heavy condensed letters,
+ * taller at the ends than in the middle so the word bows slightly, like a film title card.
+ */
+export function wordmark(cls = '') {
+  const scale = [1.16, 1.07, 1.01, 0.97, 1.01, 1.07, 1.16];
+  return `<span class="wm ${cls}" aria-hidden="true">${'PINKESH'.split('').map((l, i) => `<span style="--s:${scale[i]}">${l}</span>`).join('')}</span>`;
+}
+
 const STREAK_COLORS = ['#ff1f3d', '#e0102c', '#ff4d6d', '#b3001e', '#ff7a8a', '#ffffff', '#ff2a00', '#7a0014', '#ff3355', '#ffb3c0'];
 
 function streaks(n = 110) {
