@@ -1,4 +1,4 @@
-// Hero: just the portrait, the name and a short introduction, on red light that fades to black.
+// Hero: introduction on the left, portrait on the right in a ring of red light that fades to black.
 // Role, resume and links live in the "At a glance" section right below (see glanceHTML).
 // All words come from content.js.
 
@@ -10,7 +10,11 @@ const esc = (s) =>
 
 export function heroHTML({ icon }) {
   const id = C.identity;
-  const letters = 'PINKESH'.split('').map((l, i) => `<span class="hl" style="--i:${i}">${l}</span>`).join('');
+  // the key phrases of the one-liner stand out; the rest stays quiet
+  const intro = esc(id.oneLiner)
+    .replace('AI agents and MCP tools', '<strong>AI agents and MCP tools</strong>')
+    .replace('in plain English', '<strong>in plain English</strong>')
+    .replace(/Claude Code\.?$/, (m) => `<mark>${m.replace('.', '')}</mark>.`);
 
   return `
   <section class="hero" id="hero" aria-labelledby="hero-name">
@@ -20,30 +24,29 @@ export function heroHTML({ icon }) {
       <div class="scan"></div>
     </div>
 
-    <div class="layer title-layer" style="--d:-14">
-      <h1 class="hero-title" id="hero-name"><span class="ht-1" aria-hidden="true">${letters}</span><span class="sr">${esc(id.name)}</span></h1>
-    </div>
-
     <div class="layer me-layer" style="--d:10">
       <div class="hero-me">
         <span class="me-glow" aria-hidden="true"></span>
+        <svg class="me-ring" viewBox="0 0 200 200" aria-hidden="true">
+          <defs><linearGradient id="ring-g" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#ff2340" stop-opacity="0"/><stop offset=".45" stop-color="#ff2340"/><stop offset="1" stop-color="#ff8a9a" stop-opacity=".9"/></linearGradient></defs>
+          <circle cx="100" cy="100" r="96" pathLength="1"/>
+        </svg>
         <picture><source type="image/webp" srcset="images/cutout.webp"><img src="images/cutout.png" alt="Portrait of ${esc(id.name)}" width="1093" height="1439" fetchpriority="high" decoding="async"></picture>
         <span class="me-rim" aria-hidden="true"></span>
       </div>
     </div>
 
-    <div class="layer sig-layer" style="--d:-22" aria-hidden="true"><span class="sig">Darji</span></div>
-
     <div class="hero-copy">
-      <p class="hc-role">${esc(id.title)}</p>
-      <p class="hc-intro">${esc(id.oneLiner)}</p>
-      <div class="hc-actions">
-        <a class="btn primary" href="#projects">See my work ${icon('arrow-right', 18)}</a>
-        <a class="btn" href="#contact">${icon('mail', 18)} Get in touch</a>
-      </div>
+      <h1 class="hc-name" id="hero-name"><span class="hc-first">PINKESH</span> <span class="hc-sig">Darji<svg class="hc-swash" viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M4 30 C 70 18, 150 10, 296 6"/></svg></span></h1>
+      <p class="hc-roles">${id.roles.map((r) => `<span>${esc(r)}</span>`).join('<i aria-hidden="true"></i>')}</p>
+      <p class="hc-intro">${intro}</p>
+      <a class="hc-play" href="#glance" aria-label="Press play: scroll to the next section">
+        <span class="hp-btn" aria-hidden="true">${icon('play', 22)}</span>
+        <span class="hp-txt" aria-hidden="true"><b>Press play</b><small>Start the tour</small></span>
+      </a>
+      <ul class="hc-tools" aria-label="Tools I use most">${id.tools.map((t, n) => `<li style="--i:${n}">${esc(t)}</li>`).join('')}</ul>
     </div>
 
-    <a class="scroll-cue" href="#glance" aria-label="Scroll down"><span aria-hidden="true"></span>Scroll</a>
   </section>`;
 }
 
@@ -60,7 +63,7 @@ export function glanceHTML({ icon, brand, ext }) {
         <p class="gl-status">${esc(id.statusLong)}</p>
         <div class="gl-role">
           <span class="date-pill">${esc(job.period)}</span>
-          <p>${esc(id.title)}<br><span>${esc(id.company)}, ${esc(id.companyCity)}</span></p>
+          <p>${esc(job.role)}<br><span>${esc(id.company)}, ${esc(id.companyCity)}</span></p>
         </div>
         <div class="gl-links">
           <a class="round" href="${id.linkedin}" ${ext} aria-label="LinkedIn">${brand('linkedin', 18)}</a>
@@ -79,7 +82,7 @@ export function glanceHTML({ icon, brand, ext }) {
           <p class="rc-t">${esc(id.title)} · PDF</p>
           <div class="rc-actions">
             <a class="rc-btn primary" href="${id.resume}" ${ext} aria-label="View resume (PDF, opens in a new tab)">${icon('eye', 16)} View</a>
-            <a class="rc-btn" href="${id.resume}" download="Pinkesh_Darji_Resume.pdf" aria-label="Download resume (PDF)">${icon('download', 16)} Download</a>
+            <a class="rc-btn" href="${id.resume}" download="Pinkesh_Darji_AI_Engineer.pdf" aria-label="Download resume (PDF)">${icon('download', 16)} Download</a>
           </div>
         </div>
       </div>
@@ -97,7 +100,6 @@ export function wireHero() {
   if (!hero) return;
   const img = hero.querySelector('.hero-me img');
   bg = startHeroBg(hero.querySelector('#hero-canvas'));
-  const name = hero.querySelector('.ht-1');
   const layout = () => {
     const hr = hero.getBoundingClientRect();
     const ir = img.getBoundingClientRect();
@@ -105,10 +107,6 @@ export function wireHero() {
       // the light sits just behind the head
       bg.light((ir.left + ir.width * 0.55 - hr.left) / hr.width, 1 - (ir.top + ir.height * 0.24 - hr.top) / hr.height);
     }
-    // the name must never run off the edge: if this font renders wider than planned, shrink it
-    name.style.fontSize = '';
-    const room = hero.clientWidth * 0.94;
-    if (name.offsetWidth > room) name.style.fontSize = `${(parseFloat(getComputedStyle(name).fontSize) * room / name.offsetWidth).toFixed(2)}px`;
   };
   addEventListener('resize', layout);
   img.addEventListener('load', layout);

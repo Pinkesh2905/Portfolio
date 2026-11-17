@@ -25,11 +25,16 @@
 
 export const identity = {
   name: 'Pinkesh Darji',
-  title: 'Data Analyst – BI & AI Solutions',
+  /** Headline, as on the resume. The job title at Vezapp is experience[0].role. */
+  title: 'AI Engineer – Agentic Workflows & MCP',
   oneLiner:
-    'I turn factory and business data into clear dashboards, plans and AI assistants, and I build the software behind them with Claude Code.',
-  status: 'Open to Data Analyst & Developer roles',
-  statusLong: 'Open to Data Analyst and Software Developer roles · Ahmedabad / Vadodara',
+    'I build AI agents and MCP tools that let factories ask their own data questions in plain English, and I ship them with Claude Code.',
+  status: 'Open to AI Engineer roles',
+  statusLong: 'Open to AI Engineer roles · Ahmedabad',
+  /** Hero role line. Keep to what the resume supports. */
+  roles: ['AI Engineer', 'Agentic workflows & MCP', 'Python · FastAPI'],
+  /** Hero tool strip: the tools I use most, from the skills list. */
+  tools: ['Python', 'FastAPI', 'Claude API', 'MCP', 'SQL', 'Next.js', 'Claude Code'],
   company: 'Vezapp Solutions LLP',
   companyCity: 'Vadodara',
   location: 'Borsad, Gujarat, India',
@@ -70,14 +75,13 @@ export const experience = [
     period: 'Dec 2025 – Present',
     blurb: 'Industrial analytics firm serving foundry and auto-component manufacturers.',
     bullets: [
-      "Write SQL queries on foundry clients' MySQL databases (hosted on AWS RDS) to pull moulding, rejection and dispatch data for reports and dashboards.",
-      'Build and maintain Looker Studio dashboards for clients covering plan vs actual, order tracking and quality/rejection.',
-      'Load client data from CSV files into MySQL using Python scripts, checking for duplicates and errors before upload.',
-      'Found why client dashboards were loading slowly: the same queries were running many times at once and key tables had no indexes. Suggested adding indexes and turning on Looker caching.',
+      "Built **MCP servers** that connect Claude to foundry clients' MySQL production databases (AWS RDS) and to TallyPrime accounts, so managers get answers in plain English instead of opening dashboards. The MySQL MCPs are used by several clients; the TallyPrime MCP is used by a client.",
+      'Built **Ask Vezapp AI**, a text-to-SQL agent in Python/FastAPI deployed on Render. Claude calls tools (list_tables, describe_table, run_query) on a read-only MySQL user, and a validation step allows only single SELECT queries.',
+      'Extended the same agent backend to a second client database through per-client configs, without changing the core code.',
+      'Built a **Google Sheets MCP server**, packaged as a Claude Desktop extension (.mcpb), so clients can log shop-floor entries into a Clappia-linked sheet by chatting with Claude.',
+      'Building an AI support chatbot that lets customers solve common Clappia app issues themselves, piloting with one client.',
+      'Write SQL on client MySQL databases and maintain Looker Studio dashboards for plan vs actual, order tracking and rejection.',
       'Set up shop-floor data-entry apps and workflows in Clappia (no-code), connected to MySQL and Google Sheets.',
-      'Used Claude Code to build AI assistants that let clients ask questions about their MySQL production data and TallyPrime accounts in plain English, instead of opening dashboards. These assistants are now used by several clients.',
-      'Prepared client documentation: Excel field lists for each app, workflow diagrams, meeting minutes and database status reports.',
-      'Screened and interviewed 10+ Data Analyst candidates for the team.',
     ],
   },
 ];
@@ -124,17 +128,16 @@ export const projects = [
   {
     id: 'vezapp-ai',
     name: 'Vezapp AI',
-    tagline: 'Ask your factory data',
+    tagline: 'Multi-tenant AI data assistant',
     featured: true,
     status: 'Built at Vezapp · In use by clients',
     icon: 'sparkles',
     gradient: 'linear-gradient(135deg,#0ea5e9,#6366f1)',
     problem:
       'Plant managers wanted answers from their production data without opening dashboards or installing Claude Desktop.',
-    did: "A website where each client company logs in and asks questions in plain English. The AI turns the question into a read-only SQL query on that company's data and answers in plain language. Each company can only see its own data.",
-    result: 'Built and now used by real clients. Replaces the desktop-only assistants with one web login for all clients.',
-    // TODO: add the tech stack of the Vezapp AI website.
-    tools: [],
+    did: "An installable web app where client staff ask about their company's MySQL production data in plain English and get answers as text, interactive tables, charts and downloadable PDF, Word and Excel reports. It runs a controlled Claude tool-use loop with six tools (schema lookup, read-only SQL, tables, charts, reports), streamed over Server-Sent Events: the model writes the structure and narrative, and every number comes from the database. A SQL security engine checks every query (SQLGlot AST validation: SELECT-only, single statement, table whitelist, blocked functions, forced row limit, hidden personal columns) on read-only TLS sessions with a full query log.",
+    result: "Live and used by real clients. Multi-tenant: each company has its own read-only database, business rules, admins and daily AI spend cap, resolved server-side so no company can see another's data. Covered by about 290 backend (pytest) and 123 frontend (Vitest) tests.",
+    tools: ['Next.js 15', 'React 19', 'FastAPI', 'Claude API', 'MySQL (AWS RDS)', 'SQLGlot'],
     builtWithClaudeCode: true,
     media: {
       logo: 'media/projects/vezapp-ai/vezapp-ai-icon.png',
@@ -291,16 +294,17 @@ export const moreBuilds = [
 
 /** @type {SkillGroup[]} */
 export const skills = [
-  { group: 'SQL', items: ['MySQL on AWS RDS (joins, GROUP BY, subqueries, indexes)'] },
-  { group: 'Dashboards & reporting', items: ['Looker Studio', 'Power BI (basic)', 'Excel', 'Google Sheets'] },
-  { group: 'Python', items: ['Pandas', 'NumPy', 'Matplotlib'] },
-  { group: 'Software development', items: ['Django', 'Next.js', 'PostgreSQL', 'Git/GitHub'] },
-  { group: 'AI tools', items: ['Claude Code (building apps and data tools)', 'Claude API and MCP servers', 'Claude', 'ChatGPT', 'Gemini'] },
-  { group: 'Tools', items: ['Clappia (no-code apps)'] },
+  { group: 'AI & agents', items: ['MCP servers (Python, Claude Desktop extensions)', 'Tool / function calling', 'Text-to-SQL agents', 'Structured outputs', 'Prompt engineering'] },
+  { group: 'LLM APIs', items: ['Anthropic Claude API', 'Gemini API', 'OpenAI API'] },
+  { group: 'AI dev tools', items: ['Claude Code (daily)', 'Antigravity', 'GitHub Copilot'] },
+  { group: 'Backend', items: ['Python', 'FastAPI', 'Django', 'Django REST Framework', 'Node.js / Express (basics)', 'REST APIs'] },
+  { group: 'Frontend', items: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS'] },
+  { group: 'Data', items: ['MySQL (AWS RDS)', 'PostgreSQL (Supabase)', 'SQL', 'Pandas', 'Looker Studio'] },
+  { group: 'Deployment & tools', items: ['Render', 'Vercel', 'AWS (EC2, S3, RDS)', 'Git / GitHub', 'Clappia (no-code)'] },
 ];
 
 /** Four short lines for the home-screen "Skills" widget. */
-export const skillsWidget = ['SQL', 'Looker Studio', 'Python · Django', 'Claude Code'];
+export const skillsWidget = ['MCP · Claude API', 'Python · FastAPI', 'SQL', 'Claude Code'];
 
 export const education = {
   degrees: [

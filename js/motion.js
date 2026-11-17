@@ -53,7 +53,8 @@ export function scrollToTarget(target, { immediate = false } = {}) {
     lenis.scrollTo(y, { immediate, force: true, duration: 1.4, easing: (t) => 1 - Math.pow(1 - t, 4) });
     return;
   }
-  scrollTo({ top: y, behavior: 'auto' });
+  // reduced motion: no scroll hijacking, but a link the visitor clicks still glides there
+  scrollTo({ top: y, behavior: immediate ? 'auto' : 'smooth' });
 }
 export const stopScroll = () => lenis?.stop();
 export const startScroll = () => lenis?.start();
@@ -125,12 +126,13 @@ function tick() {
     }
   }
 
-  if (!reduce()) {
-    const skew = clamp(vel * 0.35, -9, 9);
+  {
+    const calm = reduce();
+    const skew = calm ? 0 : clamp(vel * 0.35, -9, 9);
     marquees.forEach((m) => {
       if (!m.inner || !m.on) return;
       const w = m.w;
-      m.x += (0.55 + Math.min(Math.abs(vel) * 0.6, 18)) * m.dir;
+      m.x += (calm ? 0.35 : 0.55 + Math.min(Math.abs(vel) * 0.6, 18)) * m.dir;
       if (w) m.x = ((m.x % w) + w) % w - w;
       m.inner.style.transform = `translate3d(${m.x.toFixed(1)}px,0,0) skewX(${(skew * m.dir * -1).toFixed(2)}deg)`;
     });

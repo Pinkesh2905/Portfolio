@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pinkesh Darji — Data Analyst (BI &amp; AI Solutions) · Simple view</title>
-<meta name="description" content="I turn factory and business data into clear dashboards, plans and AI assistants, and I build the software behind them with Claude Code.">
+<meta name="description" content="I build AI agents and MCP tools that let factories ask their own data questions in plain English, and I ship them with Claude Code.">
 <meta name="color-scheme" content="light dark">
 <link rel="canonical" href="https://pinkeshh.vercel.app/simple.html">
 <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
 <meta property="og:title" content="Pinkesh Darji — Data Analyst (BI &amp; AI Solutions)">
-<meta property="og:description" content="I turn factory and business data into clear dashboards, plans and AI assistants, and I build the software behind them with Claude Code.">
+<meta property="og:description" content="I build AI agents and MCP tools that let factories ask their own data questions in plain English, and I ship them with Claude Code.">
 <meta property="og:image" content="https://pinkeshh.vercel.app/images/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <style>
@@ -49,8 +49,8 @@
   "@context": "https://schema.org",
   "@type": "Person",
   "name": "Pinkesh Darji",
-  "jobTitle": "Data Analyst – BI & AI Solutions",
-  "description": "I turn factory and business data into clear dashboards, plans and AI assistants, and I build the software behind them with Claude Code.",
+  "jobTitle": "AI Engineer – Agentic Workflows & MCP",
+  "description": "I build AI agents and MCP tools that let factories ask their own data questions in plain English, and I ship them with Claude Code.",
   "url": "https://pinkeshh.vercel.app/",
   "image": "https://pinkeshh.vercel.app/images/avatar.jpg",
   "email": "mailto:pinkeshd29@gmail.com",
@@ -72,11 +72,11 @@
       <img src="images/avatar.jpg" alt="Pinkesh Darji" width="96" height="96">
       <div>
         <h1>Pinkesh Darji</h1>
-        <p class="muted" style="margin:.2rem 0 0">Data Analyst – BI &amp; AI Solutions · Vezapp Solutions LLP, Vadodara</p>
-        <p class="muted" style="margin:.2rem 0 0">Open to Data Analyst and Software Developer roles · Ahmedabad / Vadodara</p>
+        <p class="muted" style="margin:.2rem 0 0">AI Engineer – Agentic Workflows &amp; MCP</p><p class="muted" style="margin:.2rem 0 0">Data Analyst – BI &amp; AI Solutions · Vezapp Solutions LLP, Vadodara</p>
+        <p class="muted" style="margin:.2rem 0 0">Open to AI Engineer roles · Ahmedabad</p>
       </div>
     </div>
-    <p class="lead">I turn factory and business data into clear dashboards, plans and AI assistants, and I build the software behind them with Claude Code.</p>
+    <p class="lead">I build AI agents and MCP tools that let factories ask their own data questions in plain English, and I ship them with Claude Code.</p>
     <p class="links"><a href="Pinkesh_Darji_Resume.pdf">Resume (PDF)</a><a href="mailto:pinkeshd29@gmail.com">pinkeshd29@gmail.com</a><a href="https://www.linkedin.com/in/pinkesh29" rel="noopener">LinkedIn</a><a href="https://github.com/Pinkesh2905" rel="noopener">GitHub</a></p>
     <nav class="jump" aria-label="Sections"><a href="#about">About</a><a href="#experience">Experience</a><a href="#projects">Projects</a><a href="#skills">Skills</a><a href="#education">Education</a><a href="#contact">Contact</a></nav>
   </header>
@@ -97,14 +97,13 @@
     <p class="muted">Vezapp Solutions LLP, Vadodara · Dec 2025 – Present</p>
     <p><em>Industrial analytics firm serving foundry and auto-component manufacturers.</em></p>
     <ul>
-      <li>Write SQL queries on foundry clients&#39; MySQL databases (hosted on AWS RDS) to pull moulding, rejection and dispatch data for reports and dashboards.</li>
-      <li>Build and maintain Looker Studio dashboards for clients covering plan vs actual, order tracking and quality/rejection.</li>
-      <li>Load client data from CSV files into MySQL using Python scripts, checking for duplicates and errors before upload.</li>
-      <li>Found why client dashboards were loading slowly: the same queries were running many times at once and key tables had no indexes. Suggested adding indexes and turning on Looker caching.</li>
+      <li>Built <strong>MCP servers</strong> that connect Claude to foundry clients&#39; MySQL production databases (AWS RDS) and to TallyPrime accounts, so managers get answers in plain English instead of opening dashboards. The MySQL MCPs are used by several clients; the TallyPrime MCP is used by a client.</li>
+      <li>Built <strong>Ask Vezapp AI</strong>, a text-to-SQL agent in Python/FastAPI deployed on Render. Claude calls tools (list_tables, describe_table, run_query) on a read-only MySQL user, and a validation step allows only single SELECT queries.</li>
+      <li>Extended the same agent backend to a second client database through per-client configs, without changing the core code.</li>
+      <li>Built a <strong>Google Sheets MCP server</strong>, packaged as a Claude Desktop extension (.mcpb), so clients can log shop-floor entries into a Clappia-linked sheet by chatting with Claude.</li>
+      <li>Building an AI support chatbot that lets customers solve common Clappia app issues themselves, piloting with one client.</li>
+      <li>Write SQL on client MySQL databases and maintain Looker Studio dashboards for plan vs actual, order tracking and rejection.</li>
       <li>Set up shop-floor data-entry apps and workflows in Clappia (no-code), connected to MySQL and Google Sheets.</li>
-      <li>Used Claude Code to build AI assistants that let clients ask questions about their MySQL production data and TallyPrime accounts in plain English, instead of opening dashboards. These assistants are now used by several clients.</li>
-      <li>Prepared client documentation: Excel field lists for each app, workflow diagrams, meeting minutes and database status reports.</li>
-      <li>Screened and interviewed 10+ Data Analyst candidates for the team.</li>
     </ul>
   </section>
 
@@ -120,9 +119,9 @@
   </article>
   <article class="project" id="vezapp-ai">
     <h3>Vezapp AI <span class="tag">Built at Vezapp · In use by clients</span></h3>
-    <p class="muted">Ask your factory data</p>
-    <p><strong>Problem:</strong> Plant managers wanted answers from their production data without opening dashboards or installing Claude Desktop.</p><p><strong>What I did:</strong> A website where each client company logs in and asks questions in plain English. The AI turns the question into a read-only SQL query on that company&#39;s data and answers in plain language. Each company can only see its own data.</p><p><strong>Result:</strong> Built and now used by real clients. Replaces the desktop-only assistants with one web login for all clients.</p>
-    <p><strong>Tools:</strong> built with Claude Code</p>
+    <p class="muted">Multi-tenant AI data assistant</p>
+    <p><strong>Problem:</strong> Plant managers wanted answers from their production data without opening dashboards or installing Claude Desktop.</p><p><strong>What I did:</strong> An installable web app where client staff ask about their company&#39;s MySQL production data in plain English and get answers as text, interactive tables, charts and downloadable PDF, Word and Excel reports. It runs a controlled Claude tool-use loop with six tools (schema lookup, read-only SQL, tables, charts, reports), streamed over Server-Sent Events: the model writes the structure and narrative, and every number comes from the database. A SQL security engine checks every query (SQLGlot AST validation: SELECT-only, single statement, table whitelist, blocked functions, forced row limit, hidden personal columns) on read-only TLS sessions with a full query log.</p><p><strong>Result:</strong> Live and used by real clients. Multi-tenant: each company has its own read-only database, business rules, admins and daily AI spend cap, resolved server-side so no company can see another&#39;s data. Covered by about 290 backend (pytest) and 123 frontend (Vitest) tests.</p>
+    <p><strong>Tools:</strong> Next.js 15 · React 19 · FastAPI · Claude API · MySQL (AWS RDS) · SQLGlot · built with Claude Code</p>
     
   </article>
   <article class="project" id="ai-data-assistants">
@@ -175,12 +174,13 @@
   <section id="skills">
     <h2>Skills</h2>
     <ul>
-      <li><strong>SQL:</strong> MySQL on AWS RDS (joins, GROUP BY, subqueries, indexes)</li>
-      <li><strong>Dashboards &amp; reporting:</strong> Looker Studio, Power BI (basic), Excel, Google Sheets</li>
-      <li><strong>Python:</strong> Pandas, NumPy, Matplotlib</li>
-      <li><strong>Software development:</strong> Django, Next.js, PostgreSQL, Git/GitHub</li>
-      <li><strong>AI tools:</strong> Claude Code (building apps and data tools), Claude API and MCP servers, Claude, ChatGPT, Gemini</li>
-      <li><strong>Tools:</strong> Clappia (no-code apps)</li>
+      <li><strong>AI &amp; agents:</strong> MCP servers (Python, Claude Desktop extensions), Tool / function calling, Text-to-SQL agents, Structured outputs, Prompt engineering</li>
+      <li><strong>LLM APIs:</strong> Anthropic Claude API, Gemini API, OpenAI API</li>
+      <li><strong>AI dev tools:</strong> Claude Code (daily), Antigravity, GitHub Copilot</li>
+      <li><strong>Backend:</strong> Python, FastAPI, Django, Django REST Framework, Node.js / Express (basics), REST APIs</li>
+      <li><strong>Frontend:</strong> Next.js, React, TypeScript, Tailwind CSS</li>
+      <li><strong>Data:</strong> MySQL (AWS RDS), PostgreSQL (Supabase), SQL, Pandas, Looker Studio</li>
+      <li><strong>Deployment &amp; tools:</strong> Render, Vercel, AWS (EC2, S3, RDS), Git / GitHub, Clappia (no-code)</li>
     </ul>
   </section>
 
