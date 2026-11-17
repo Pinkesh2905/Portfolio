@@ -314,7 +314,8 @@ function showPeek(cardEl) {
   el.style.left = `${left + scrollX}px`;
   el.style.top = `${top + scrollY}px`;
   peek = { el, card: cardEl };
-  if (!reduceMotion()) {
+  if (reduceMotion()) el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
+  else {
     const ox = r.left + r.width / 2 - left;
     const oy = r.top + r.height / 2 - top;
     el.style.transformOrigin = `${ox}px ${oy}px`;
@@ -331,9 +332,9 @@ function hidePeek(now) {
   if (!peek) return;
   const { el } = peek;
   peek = null;
-  if (now || reduceMotion()) return el.remove();
+  if (now) return el.remove();
   el.style.pointerEvents = 'none';
-  el.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(0.94)' }], { duration: 160, easing: 'ease-in', fill: 'forwards' }).onfinish = () => el.remove();
+  el.animate(reduceMotion() ? [{ opacity: 1 }, { opacity: 0 }] : [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(0.94)' }], { duration: 160, easing: 'ease-in', fill: 'forwards' }).onfinish = () => el.remove();
 }
 
 function wirePeek() {
@@ -465,7 +466,7 @@ function showModal(view, origin) {
     $('.m-content', box).innerHTML = view.html;
     box.setAttribute('aria-label', view.label);
     modal.el.scrollTop = 0;
-    if (!reduceMotion()) $('.m-content', box).animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 320, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+    $('.m-content', box).animate(reduceMotion() ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 320, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
     box.focus({ preventScroll: true });
     return;
   }
@@ -492,6 +493,9 @@ function showModal(view, origin) {
     box.style.transformOrigin = 'top center';
     box.animate([{ transform: from, opacity: 0 }, { opacity: 1, offset: 0.4 }, { transform: 'none', opacity: 1 }], { duration: 480, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
     $('.scrim', el).animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300 });
+  } else {
+    box.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, easing: 'ease-out' });
+    $('.scrim', el).animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260 });
   }
   box.focus({ preventScroll: true });
 }
@@ -506,9 +510,8 @@ function hideModal() {
   if (document.body.classList.contains('ready')) heroBackground(true);
   background().forEach((n) => { n.inert = false; });
   if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
-  if (reduceMotion()) return el.remove();
   el.style.pointerEvents = 'none';
-  $('.modal', el).animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(24px) scale(0.96)', opacity: 0 }], { duration: 220, easing: 'ease-in', fill: 'forwards' });
+  $('.modal', el).animate(reduceMotion() ? [{ opacity: 1 }, { opacity: 0 }] : [{ transform: 'none', opacity: 1 }, { transform: 'translateY(24px) scale(0.96)', opacity: 0 }], { duration: 220, easing: 'ease-in', fill: 'forwards' });
   $('.scrim', el).animate([{ opacity: 1 }, { opacity: 0 }], { duration: 240, fill: 'forwards' }).onfinish = () => el.remove();
 }
 
@@ -530,8 +533,8 @@ function showShot(i, dir = 0) {
   img.classList.toggle('phone', isPhone(s));
   $('.lb-cap', el).textContent = s.caption;
   $('.lb-count', el).textContent = `${lb.i + 1} / ${n}`;
-  if (dir && !reduceMotion()) {
-    img.animate([{ opacity: 0, transform: `translateX(${dir * 40}px) scale(0.98)` }, { opacity: 1, transform: 'none' }], { duration: 380, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+  if (dir) {
+    img.animate(reduceMotion() ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 0, transform: `translateX(${dir * 40}px) scale(0.98)` }, { opacity: 1, transform: 'none' }], { duration: 380, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
   }
   // warm the next and previous images
   [lb.i + 1, lb.i - 1].forEach((k) => { const im = new Image(); im.src = shotUrl(item.id, (k + n) % n); });
@@ -557,7 +560,8 @@ function openLightbox(id, i, opener) {
   if (modal) modal.el.inert = true;
   showShot(i);
   $('.lb-close', el).focus({ preventScroll: true });
-  if (!reduceMotion() && opener) {
+  if (reduceMotion()) el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220 });
+  else if (opener) {
     const r = opener.getBoundingClientRect();
     const img = $('.lb-img', el);
     const go = () => {
@@ -593,10 +597,6 @@ function closeLightbox() {
   lb = null;
   if (modal) modal.el.inert = false;
   if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
-  if (reduceMotion()) {
-    el.remove();
-    return;
-  }
   el.style.pointerEvents = 'none';
   el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' }).onfinish = () => el.remove();
 }
@@ -716,7 +716,7 @@ function closeSpotlight(refocus) {
   const { el, opener } = spot;
   spot = null;
   el.classList.add('out');
-  setTimeout(() => el.remove(), reduceMotion() ? 0 : 160);
+  setTimeout(() => el.remove(), 160);
   if (refocus && opener && document.contains(opener)) opener.focus({ preventScroll: true });
 }
 function runSpotlight(i) {
@@ -822,11 +822,6 @@ function enter(id, gate) {
   setProfile(id, { rerender: false });
   if (prof().rows.join() !== before || prof().picks !== renderedPicks) render();
   scrollToTarget(0, { immediate: true });
-  if (reduceMotion()) {
-    gate.remove();
-    reveal();
-    return $('#main').focus({ preventScroll: true });
-  }
   requestAnimationFrame(() => requestAnimationFrame(() => {
     gate.classList.add('leaving');
     setTimeout(() => reveal(true), 520);

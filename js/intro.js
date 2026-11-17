@@ -5,7 +5,6 @@
 
 import { tudum, soundOn, canAutoplay, prepareSound } from './sound.js';
 
-const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /** The P mark: a stem and a bowl drawn as two overlapping ribbons. Reused in the header and hero. */
 export function pMark(cls = '', id = 'p') {
@@ -119,8 +118,6 @@ export function playIntro() {
       if (ev.target.closest('.op-skip')) return finish();
       if (stage === 'wait' || stage === 'build') go();
     });
-
-    if (reduce()) return finish();
 
     // the P builds itself (silent), then either plays straight on or waits for a click
     later(1250, () => {

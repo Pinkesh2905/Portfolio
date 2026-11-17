@@ -115,7 +115,7 @@ export function startHeroBg(canvas) {
     raf = 0;
     const raw = (now - last) / 1000 || 0;
     last = now;
-    clock += Math.min(0.05, raw);
+    clock += Math.min(0.05, raw) * (reduce.matches ? 0.4 : 1); // calmer drift for reduced motion
     if (raw > 0 && raw < 0.5) {
       counted++;
       if (raw > 0.03) slow++;
@@ -129,7 +129,7 @@ export function startHeroBg(canvas) {
     draw();
     play();
   };
-  function play() { if (!raf && active && visible && !document.hidden && !reduce.matches) raf = requestAnimationFrame(frame); }
+  function play() { if (!raf && active && visible && !document.hidden) raf = requestAnimationFrame(frame); }
   const stop = () => { cancelAnimationFrame(raf); raf = 0; last = 0; };
 
   addEventListener('resize', () => { resize(); if (!raf) draw(); });
@@ -139,7 +139,6 @@ export function startHeroBg(canvas) {
     target.y = 1 - (e.clientY / innerHeight) * 2;
   }, { passive: true });
   document.addEventListener('visibilitychange', () => (document.hidden ? stop() : play()));
-  reduce.addEventListener('change', () => (reduce.matches ? stop() : play()));
   canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); stop(); });
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(([en]) => { visible = en.isIntersecting; visible ? play() : stop(); }).observe(canvas);
