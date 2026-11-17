@@ -340,9 +340,11 @@ main { overflow-x: clip; } /* reveal offsets must never widen the page */
   .foot p { margin-left: 0; width: 100%; }
 }
 
+/* Visitors who ask for less motion (e.g. Windows "Animation effects" off) get a calm
+   version, not a frozen page: things fade, glow and draw instead of flying, zooming or
+   drifting. Same timings, same keyframe names, redefined below. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 @media print {
   .top, .arrow, .gate, .opening, .toast, .cursor, .marquee, .hero-bg, .hero-hud { display: none !important; }
@@ -689,16 +691,7 @@ body.ready .top { animation: drop 0.8s var(--ease) 0.5s backwards; }
   .ep-n { width: 34px; height: 34px; font-size: 15px; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .rv, .rv .genre, .rv .edu-card, .rv .num, .rv .chips li, .hero-left > *, .callouts li, .hero-right, .hero-side, .plus, .callout-dot, .me-glow { opacity: 1 !important; translate: none; transform: none; scale: none; }
-  .rv .track > li { clip-path: none; }
-  .rv .track > li .art { scale: 1; }
-  .hero-brush span { clip-path: none; }
-  .si { translate: none; rotate: none; }
-  .callout-path, .hud-lines * { stroke-dashoffset: 0; }
-  .hud-floor { opacity: 0.55; }
-  .cursor { display: none; }
-}
+
 
 
 /* ═══════════════════════════════════════════════════════════
@@ -837,3 +830,49 @@ body.ready .top { animation: drop 0.8s var(--ease) 0.5s backwards; }
   .plus { display: none; }
 }
 @keyframes word-in { from { opacity: 0; transform: translateY(30%) scale(1.15); } }
+
+/* Reduced motion: calm versions of the animations above (keep this block last so it wins) */
+@media (prefers-reduced-motion: reduce) {
+  /* entrances: fade only */
+  @keyframes rise { from { opacity: 0; } }
+  @keyframes pop { from { opacity: 0; } }
+  @keyframes letter { from { opacity: 0; } }
+  @keyframes word-in { from { opacity: 0; } }
+  @keyframes me-in { from { opacity: 0; } }
+  @keyframes fade-up { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes co-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes plus-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes gate-in { from { opacity: 0; } }
+  @keyframes gate-out { 0%, 40% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes menu-in { from { opacity: 0; } }
+  @keyframes spot-in { from { opacity: 0; } }
+  @keyframes drop { from { opacity: 0; } }
+  /* opening: the P draws, glows on the sound, then fades out (no fly-through, no streak burst) */
+  @keyframes p-ta { 0%, 100% { scale: 1; } }
+  @keyframes p-dum { 0%, 100% { scale: 1; } }
+  @keyframes p-fly { 0% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes glow-breathe { 50% { opacity: 1; } }
+  @keyframes glow-punch { 0% { opacity: 0.7; } 30% { opacity: 1; } 100% { opacity: 0.9; } }
+  .op-streaks { display: none; }
+  .gate.leaving .chosen .tile { transform: none; }
+  /* nothing drifts or spins on its own */
+  body.ready .hud-floor { animation: fade-in 1.6s ease 0.3s backwards; }
+  body.ready .hud-lines .dash { animation: fade-in 1s ease 1.2s backwards; }
+  @keyframes ring-ping { 0% { opacity: 0.9; } 80%, 100% { opacity: 0; } }
+  .m-icon { animation: none; }
+  .callout-ring { scale: 1; }
+  /* sections and cards fade in instead of sliding or zooming */
+  .rv, .rv.in { translate: none; }
+  .rv .track > li .art, .rv.in .track > li .art { scale: 1; }
+  .rv .num, .rv.in .num { translate: none; }
+  .rv .genre, .rv .edu-card { transform: none; }
+  .rv .chips li, .rv.in .chips li { scale: none; }
+  .si { translate: none; rotate: none; opacity: 0; transition: opacity 0.7s ease; transition-delay: calc(var(--i) * 0.06s); }
+  .in .si, [data-split].in .si { opacity: 1; }
+  .callouts li, .hero-left > * { translate: none; }
+  .contact .cta { scale: none; }
+  .card:hover, .card:focus-visible { transform: none; }
+  .logo-card:hover .lc-mark, .logo-card:focus-visible .lc-mark { transform: none; }
+  .top { transition: background-color 0.35s ease, opacity 0.5s ease; }
+  body.locked .top { transform: none; opacity: 0; }
+}

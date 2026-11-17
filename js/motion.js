@@ -78,7 +78,7 @@ export function refreshMotion() {
   });
   requestAnimationFrame(measure);
   document.fonts?.ready.then(measure);
-  if (reduce() || !('IntersectionObserver' in window)) {
+  if (!('IntersectionObserver' in window)) {
     $$('.rv').forEach((el) => el.classList.add('in'));
     return;
   }
