@@ -36,17 +36,26 @@ export function wordmark(cls = '') {
 
 const STREAK_COLORS = ['#ff1f3d', '#e0102c', '#ff4d6d', '#b3001e', '#ff7a8a', '#ffffff', '#ff2a00', '#7a0014', '#ff3355', '#ffb3c0'];
 
-function streaks(n = 110) {
-  let html = '';
-  for (let i = 0; i < n; i++) {
+/**
+ * The lines of light inside the P's stem, as one gradient (one layer to draw, however many
+ * lines): random widths and colours side by side, with dark gaps between some of them.
+ */
+function streaks(n = 70) {
+  const stops = [];
+  let x = 0;
+  for (let i = 0; i < n && x < 100; i++) {
+    const w = Math.random() ** 2 * 2.6 + 0.25;
+    const gap = Math.random() < 0.35 ? Math.random() * 1.2 : 0;
     const c = STREAK_COLORS[(Math.random() * STREAK_COLORS.length) | 0];
-    const w = (Math.random() ** 2 * 2.2 + 0.15).toFixed(2);
-    const x = (Math.random() * 100).toFixed(2);
-    const d = (Math.random() * 0.5).toFixed(2);
-    const o = (0.35 + Math.random() * 0.65).toFixed(2);
-    html += `<i style="left:${x}%;width:${w}%;background:${c};opacity:${o};animation-delay:${d}s"></i>`;
+    stops.push(`${c} ${x.toFixed(2)}% ${(x + w).toFixed(2)}%`);
+    x += w;
+    if (gap) {
+      stops.push(`rgba(60,0,8,0.9) ${x.toFixed(2)}% ${(x + gap).toFixed(2)}%`);
+      x += gap;
+    }
   }
-  return html;
+  if (x < 100) stops.push(`#e0102c ${x.toFixed(2)}% 100%`);
+  return `linear-gradient(90deg, ${stops.join(', ')})`;
 }
 
 /**
@@ -63,8 +72,7 @@ export function playIntro() {
     el.tabIndex = -1;
     el.innerHTML = `
       <div class="op-stage">
-        <div class="op-p">${pMark('', 'op')}</div>
-        <div class="op-streaks" aria-hidden="true">${streaks(matchMedia('(pointer: coarse)').matches ? 48 : 90)}</div>
+        <div class="op-p">${pMark('', 'op')}<div class="op-streaks" aria-hidden="true" style="background:${streaks()}"></div></div>
       </div>
       <div class="op-flash" aria-hidden="true"></div>
       <button class="op-enter" type="button" hidden>
