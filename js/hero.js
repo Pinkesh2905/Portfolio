@@ -62,7 +62,7 @@ export function glanceHTML({ icon, brand, ext }) {
         <p class="gl-status">${esc(id.statusLong)}</p>
         <div class="gl-role">
           <span class="date-pill">${esc(job.period)}</span>
-          <p>${esc(id.title)}<br><span>${esc(id.company)}, ${esc(id.companyCity)}</span></p>
+          <p>${esc(job.role)}<br><span>${esc(id.company)}, ${esc(id.companyCity)}</span></p>
         </div>
         <div class="gl-links">
           <a class="round" href="${id.linkedin}" ${ext} aria-label="LinkedIn">${brand('linkedin', 18)}</a>
@@ -81,7 +81,7 @@ export function glanceHTML({ icon, brand, ext }) {
           <p class="rc-t">${esc(id.title)} · PDF</p>
           <div class="rc-actions">
             <a class="rc-btn primary" href="${id.resume}" ${ext} aria-label="View resume (PDF, opens in a new tab)">${icon('eye', 16)} View</a>
-            <a class="rc-btn" href="${id.resume}" download="Pinkesh_Darji_Resume.pdf" aria-label="Download resume (PDF)">${icon('download', 16)} Download</a>
+            <a class="rc-btn" href="${id.resume}" download="Pinkesh_Darji_AI_Engineer.pdf" aria-label="Download resume (PDF)">${icon('download', 16)} Download</a>
           </div>
         </div>
       </div>

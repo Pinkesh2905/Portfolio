@@ -89,7 +89,7 @@ ${JSON.stringify({
       <img src="${id.avatar.jpg}" alt="Pinkesh Darji" width="96" height="96">
       <div>
         <h1>${esc(id.name)}</h1>
-        <p class="muted" style="margin:.2rem 0 0">${esc(id.title)} · ${esc(id.company)}, ${esc(id.companyCity)}</p>
+        <p class="muted" style="margin:.2rem 0 0">${esc(id.title)}</p><p class="muted" style="margin:.2rem 0 0">${esc(C.experience[0].role)} · ${esc(id.company)}, ${esc(id.companyCity)}</p>
         <p class="muted" style="margin:.2rem 0 0">${esc(id.statusLong)}</p>
       </div>
     </div>
