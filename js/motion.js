@@ -53,7 +53,8 @@ export function scrollToTarget(target, { immediate = false } = {}) {
     lenis.scrollTo(y, { immediate, force: true, duration: 1.4, easing: (t) => 1 - Math.pow(1 - t, 4) });
     return;
   }
-  scrollTo({ top: y, behavior: 'auto' });
+  // reduced motion: no scroll hijacking, but a link the visitor clicks still glides there
+  scrollTo({ top: y, behavior: immediate ? 'auto' : 'smooth' });
 }
 export const stopScroll = () => lenis?.stop();
 export const startScroll = () => lenis?.start();
