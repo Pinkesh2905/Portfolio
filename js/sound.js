@@ -36,6 +36,30 @@ export function canAutoplay() {
   }
 }
 
+const cache = new WeakMap(); // audio context -> { room, noise08, noise06 }
+function buffers(ac) {
+  let b = cache.get(ac);
+  if (!b) {
+    b = { room: room(ac), click: noiseBuffer(ac, 0.08), whoosh: noiseBuffer(ac, 0.6) };
+    cache.set(ac, b);
+  }
+  return b;
+}
+
+/**
+ * Creates the audio context (silent until a tap) and builds the heavy buffers ahead of time,
+ * so the opening's first frames are not held up when the visitor taps.
+ */
+export function prepareSound() {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC || !soundOn()) return;
+    if (!ctx) ctx = new AC();
+    const go = () => buffers(ctx);
+    (window.requestIdleCallback || ((f) => setTimeout(f, 30)))(go);
+  } catch { /* sound is optional */ }
+}
+
 /** A stereo impulse response for a large, dark room, generated from decaying noise. */
 function room(ac, seconds = 2.8) {
   const len = Math.floor(ac.sampleRate * seconds);
@@ -90,7 +114,7 @@ function hit(ac, out, t, freq, vel, length) {
   sub.connect(subG).connect(out);
 
   const click = ac.createBufferSource();
-  click.buffer = noiseBuffer(ac, 0.08);
+  click.buffer = buffers(ac).click;
   const lp = ac.createBiquadFilter();
   lp.type = 'lowpass';
   lp.frequency.value = 2200;
@@ -119,7 +143,7 @@ export function buildTudum(ac, t0) {
   master.connect(glue).connect(makeup).connect(limit).connect(ac.destination);
 
   const verb = ac.createConvolver();
-  verb.buffer = room(ac);
+  verb.buffer = buffers(ac).room;
   const wet = ac.createGain();
   wet.gain.value = 0.42;
   verb.connect(wet).connect(master);
@@ -194,7 +218,7 @@ export function swoosh() {
   if (!ac) return;
   const t = ac.currentTime + 0.02;
   const src = ac.createBufferSource();
-  src.buffer = noiseBuffer(ac, 0.6);
+  src.buffer = buffers(ac).whoosh;
   const bp = ac.createBiquadFilter();
   bp.type = 'bandpass';
   bp.Q.value = 0.9;

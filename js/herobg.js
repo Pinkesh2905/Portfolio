@@ -58,10 +58,11 @@ void main() {
 
 const VERT = 'attribute vec2 a; void main(){ gl_Position = vec4(a, 0.0, 1.0); }';
 
-/** Starts the background on a canvas. Returns a function that moves the light (0..1, y up). */
+/** Sets up the background on a canvas. Returns { light(x, y) } to move the light (0..1, y up) and { run(on) } to animate or pause. */
 export function startHeroBg(canvas) {
   const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' });
-  if (!gl) return () => {};
+  const none = { light() {}, run() {} };
+  if (!gl) return none;
   const compile = (type, src) => {
     const s = gl.createShader(type);
     gl.shaderSource(s, src);
@@ -70,12 +71,12 @@ export function startHeroBg(canvas) {
   };
   const vs = compile(gl.VERTEX_SHADER, VERT);
   const fs = compile(gl.FRAGMENT_SHADER, FRAG);
-  if (!vs || !fs) return () => {};
+  if (!vs || !fs) return none;
   const prog = gl.createProgram();
   gl.attachShader(prog, vs);
   gl.attachShader(prog, fs);
   gl.linkProgram(prog);
-  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return () => {};
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return none;
   gl.useProgram(prog);
   gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
@@ -91,7 +92,10 @@ export function startHeroBg(canvas) {
   const mouse = { x: 0, y: 0 };
   let clock = 20 + Math.random() * 200;
   let last = 0, raf = 0, visible = true;
-  let quality = 1, slow = 0, counted = 0;
+  let active = false; // stays still until the page is revealed, and while overlays cover it
+  // phones get fewer pixels from the start; any device drops further if frames run slow
+  let quality = matchMedia('(pointer: coarse)').matches ? 0.6 : 1;
+  let slow = 0, counted = 0;
 
   const resize = () => {
     const rect = canvas.getBoundingClientRect();
@@ -125,7 +129,7 @@ export function startHeroBg(canvas) {
     draw();
     play();
   };
-  function play() { if (!raf && visible && !document.hidden && !reduce.matches) raf = requestAnimationFrame(frame); }
+  function play() { if (!raf && active && visible && !document.hidden && !reduce.matches) raf = requestAnimationFrame(frame); }
   const stop = () => { cancelAnimationFrame(raf); raf = 0; last = 0; };
 
   addEventListener('resize', () => { resize(); if (!raf) draw(); });
@@ -145,5 +149,8 @@ export function startHeroBg(canvas) {
   draw();
   canvas.classList.add('on');
   play();
-  return (x, y) => { light.x = x; light.y = y; if (!raf) draw(); };
+  return {
+    light(x, y) { light.x = x; light.y = y; if (!raf) draw(); },
+    run(on) { active = on; if (on) play(); else stop(); },
+  };
 }
