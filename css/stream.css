@@ -765,8 +765,8 @@ body.ready .me-ring circle { animation: ring-draw 1.6s cubic-bezier(0.65, 0, 0.3
 @keyframes ring-turn { from { rotate: -150deg; } to { rotate: 210deg; } }
 
 .hero-copy { position: absolute; z-index: 7; left: 7vw; top: 52%; translate: 0 -50%; width: min(760px, 52vw); display: grid; gap: 20px; opacity: calc(1 - var(--p) * 2); }
-.hc-name { display: flex; flex-wrap: nowrap; align-items: baseline; column-gap: 0.18em; margin: 0; font-weight: 800; font-size: clamp(50px, 6vw, 108px); white-space: nowrap; line-height: 0.95; letter-spacing: -0.035em; }
-.hc-first { color: #fff; }
+.hc-name { display: flex; flex-wrap: nowrap; align-items: baseline; column-gap: 0.2em; margin: 0; font-weight: 800; font-size: clamp(46px, 5.4vw, 100px); white-space: nowrap; line-height: 0.95; letter-spacing: -0.035em; }
+.hc-first { color: #fff; letter-spacing: -0.02em; }
 .hc-sig { position: relative; display: inline-block; padding: 0 0.12em 0.05em 0.04em; font: 400 1.12em/1 var(--script); letter-spacing: 0; color: var(--accent); rotate: -5deg; translate: 0 0.06em; text-shadow: 0 0 28px rgba(242, 18, 47, 0.45); clip-path: inset(-20% 100% -40% 0); }
 .hc-swash { position: absolute; left: 4%; right: -6%; bottom: -0.1em; width: 102%; height: 0.32em; overflow: visible; }
 .hc-swash path { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; vector-effect: non-scaling-stroke; stroke-dasharray: 1 1; stroke-dashoffset: 1; }
@@ -775,11 +775,6 @@ body.ready .me-ring circle { animation: ring-draw 1.6s cubic-bezier(0.65, 0, 0.3
 .hc-intro { max-width: 34em; font-size: clamp(16px, 1.3vw, 20px); line-height: 1.6; color: rgba(255, 255, 255, 0.72); text-wrap: pretty; }
 .hc-intro strong { color: #fff; font-weight: 600; }
 .hc-intro mark { color: #fff; background: linear-gradient(transparent 12%, rgba(242, 18, 47, 0.55) 12%, rgba(242, 18, 47, 0.55) 92%, transparent 92%); padding: 0 0.25em; border-radius: 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
-.hc-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
-.hc-actions .btn.primary { background: var(--accent); color: #fff; box-shadow: 0 10px 30px rgba(242, 18, 47, 0.35); }
-.hc-actions .btn.primary:hover { background: #ff2440; }
-.hc-actions .btn.primary svg { transition: translate 0.3s var(--ease); }
-.hc-actions .btn.primary:hover svg { translate: 4px 0; }
 .hc-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
 .hc-tools li { padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.04); font: 500 12.5px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #d9d9e0; transition: border-color 0.2s, color 0.2s; }
 .hc-tools li:hover { border-color: rgba(255, 60, 85, 0.6); color: #fff; }
@@ -793,16 +788,10 @@ body.ready .hc-swash path { animation: swash 0.7s cubic-bezier(0.65, 0, 0.35, 1)
 body.ready .hero-copy > :not(.hc-name) { animation: rise 0.9s var(--ease) backwards; }
 body.ready .hc-roles { animation-delay: 0.75s; }
 body.ready .hc-intro { animation-delay: 0.9s; }
-body.ready .hc-actions { animation-delay: 1.05s; }
 body.ready .hc-tools { animation: none; }
 body.ready .hc-tools li { animation: rise 0.6s var(--ease) backwards; animation-delay: calc(1.2s + var(--i) * 0.06s); }
 
 /* round scroll button, bottom centre */
-.scroll-cue { position: absolute; z-index: 8; left: 50%; bottom: 4vh; translate: -50% 0; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; opacity: calc(1 - var(--p) * 3); transition: border-color 0.2s, background 0.2s; }
-.scroll-cue:hover { border-color: #fff; background: rgba(255, 255, 255, 0.08); }
-.scroll-cue svg { animation: nudge 2s ease-in-out infinite; }
-@keyframes nudge { 50% { translate: 0 4px; } }
-body.ready .scroll-cue { animation: fade-in 1s ease 1.8s backwards; }
 
 /* header: current section and a clear call to action */
 .nav a { position: relative; padding: 7px 14px; margin: 0 -6px; border-radius: 999px; transition: color 0.2s, background 0.25s; }
@@ -821,9 +810,7 @@ body.ready .scroll-cue { animation: fade-in 1s ease 1.8s backwards; }
   @keyframes me-in { from { opacity: 0; translate: -50% 6%; } }
   .hero-copy { position: relative; left: auto; top: auto; translate: none; width: auto; max-width: 640px; margin: calc(-1 * min(26vw, 160px)) auto 0; padding: 0 var(--pad); gap: 16px; }
   .hero-copy::before { content: ""; position: absolute; z-index: -1; inset: -48px calc(50% - 50vw) -10px; background: linear-gradient(180deg, transparent, rgba(8, 8, 10, 0.85) 30%, var(--bg)); pointer-events: none; }
-  .hc-name { font-size: clamp(42px, 11.5vw, 84px); }
-  .hc-actions .btn { flex: 1 1 150px; white-space: nowrap; }
-  .scroll-cue { display: none; }
+  .hc-name { font-size: clamp(36px, 10.2vw, 78px); }
 }
 @media (max-width: 560px) {
   .talk { display: none; }
@@ -840,6 +827,24 @@ body.ready .scroll-cue { animation: fade-in 1s ease 1.8s backwards; }
   }
 }
 
+/* "Press play": a round red play button that rolls the page on to the next section */
+.hc-play { display: inline-flex; align-items: center; gap: 18px; justify-self: start; margin-top: 6px; color: #fff; }
+.hp-btn { position: relative; display: grid; place-items: center; width: 68px; height: 68px; border-radius: 50%; background: var(--accent); box-shadow: 0 12px 34px rgba(242, 18, 47, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25); transition: transform 0.4s var(--spring), background 0.2s, box-shadow 0.3s; }
+.hp-btn svg { translate: 2px 0; }
+.hp-btn::before, .hp-btn::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid rgba(255, 60, 85, 0.7); animation: hp-ring 2.6s cubic-bezier(0.2, 0.6, 0.3, 1) infinite; }
+.hp-btn::after { animation-delay: 1.3s; }
+@keyframes hp-ring { 0% { opacity: 0.9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.75); } }
+.hc-play:hover .hp-btn { transform: scale(1.08); background: #ff2440; box-shadow: 0 16px 44px rgba(242, 18, 47, 0.6); }
+.hc-play:active .hp-btn { transform: scale(0.95); }
+.hc-play:focus-visible { outline: none; }
+.hc-play:focus-visible .hp-btn { outline: 2px solid #fff; outline-offset: 4px; }
+.hp-txt { display: grid; gap: 2px; }
+.hp-txt b { font-size: 17px; font-weight: 700; letter-spacing: 0.01em; }
+.hp-txt small { font-size: 12px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255, 255, 255, 0.55); transition: color 0.2s; }
+.hc-play:hover .hp-txt small { color: var(--accent-2); }
+body.ready .hc-play { animation-delay: 1.05s; }
+@media (max-width: 900px) { .hc-play { margin-top: 2px; } .hp-btn { width: 60px; height: 60px; } }
+
 /* Reduced motion: calm versions of the animations above (keep this block last so it wins) */
 @media (prefers-reduced-motion: reduce) {
   /* entrances: fade only */
@@ -854,7 +859,7 @@ body.ready .scroll-cue { animation: fade-in 1s ease 1.8s backwards; }
   /* opening: the P draws, glows on the sound, then fades out (no fly-through, no streak burst) */
   @keyframes p-ta { 0%, 100% { scale: 1; } }
   @keyframes p-dum { 0%, 100% { scale: 1; } }
-  @keyframes p-fly { 0% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes p-fly { 0% { opacity: 1; scale: 1; } 100% { opacity: 0; scale: 2.6; } }
   @keyframes glow-breathe { 50% { opacity: 1; } }
   @keyframes glow-punch { 0% { opacity: 0.7; } 30% { opacity: 1; } 100% { opacity: 0.9; } }
   .op-streaks { display: none; }
@@ -876,5 +881,5 @@ body.ready .scroll-cue { animation: fade-in 1s ease 1.8s backwards; }
   .top { transition: background-color 0.35s ease, opacity 0.5s ease; }
   body.locked .top { transform: none; opacity: 0; }
   body.ready .me-ring circle { animation: ring-draw 1.6s ease 0.6s forwards; }
-  .scroll-cue svg { animation: none; }
+  .hp-btn::before, .hp-btn::after { animation: none; opacity: 0; }
 }

@@ -36,17 +36,16 @@ export function heroHTML({ icon }) {
     </div>
 
     <div class="hero-copy">
-      <h1 class="hc-name" id="hero-name"><span class="hc-first">Pinkesh</span> <span class="hc-sig">Darji<svg class="hc-swash" viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M4 30 C 70 18, 150 10, 296 6"/></svg></span></h1>
+      <h1 class="hc-name" id="hero-name"><span class="hc-first">PINKESH</span> <span class="hc-sig">Darji<svg class="hc-swash" viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M4 30 C 70 18, 150 10, 296 6"/></svg></span></h1>
       <p class="hc-roles">${id.roles.map((r) => `<span>${esc(r)}</span>`).join('<i aria-hidden="true"></i>')}</p>
       <p class="hc-intro">${intro}</p>
-      <div class="hc-actions">
-        <a class="btn primary" href="#projects">See my work ${icon('arrow-right', 18)}</a>
-        <a class="btn" href="#glance">${icon('file-text', 18)} Resume</a>
-      </div>
+      <a class="hc-play" href="#glance" aria-label="Press play: scroll to the next section">
+        <span class="hp-btn" aria-hidden="true">${icon('play', 22)}</span>
+        <span class="hp-txt" aria-hidden="true"><b>Press play</b><small>Start the tour</small></span>
+      </a>
       <ul class="hc-tools" aria-label="Tools I use most">${id.tools.map((t, n) => `<li style="--i:${n}">${esc(t)}</li>`).join('')}</ul>
     </div>
 
-    <a class="scroll-cue" href="#glance" aria-label="Scroll down">${icon('chevron-down', 22)}</a>
   </section>`;
 }
 
