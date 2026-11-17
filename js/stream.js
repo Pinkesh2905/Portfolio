@@ -4,7 +4,7 @@ import * as C from './content.js';
 import { ICONS, BRAND } from './icons.js';
 import { tudum, swoosh, soundOn, setSound } from './sound.js';
 import { playIntro, wordmark } from './intro.js';
-import { heroHTML, wireHero, heroCounters, heroBackground } from './hero.js';
+import { heroHTML, glanceHTML, wireHero, heroBackground } from './hero.js';
 import { initMotion, refreshMotion, scrollToTarget, stopScroll, startScroll } from './motion.js';
 
 const { identity } = C;
@@ -253,6 +253,7 @@ function render() {
     wireHero();
   }
   $('#rows').innerHTML =
+    glanceHTML({ icon, brand, ext }) +
     marquee(skillWords(), -1, 'band-red') +
     prof().rows.map((r) => ROWS[r]()).join('') +
     marquee([identity.statusLong], 1, 'band-outline') +
@@ -755,7 +756,6 @@ function reveal(fromGate = false) {
   document.body.classList.remove('locked');
   startScroll();
   document.body.classList.add('ready');
-  requestAnimationFrame(() => requestAnimationFrame(heroCounters));
   const unlock = () => background().forEach((n) => { n.inert = false; });
   if (fromGate) setTimeout(unlock, 560);
   else unlock();
@@ -887,7 +887,7 @@ document.addEventListener('click', (ev) => {
   }
   if (!href.startsWith('#')) return;
   ev.preventDefault();
-  if (isModalHash(href)) return openHash(href, a.closest('.card, .peek, .callouts') || null);
+  if (isModalHash(href)) return openHash(href, a.closest('.card, .peek') || null);
   goSection(href);
 });
 
