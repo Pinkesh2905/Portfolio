@@ -15,6 +15,26 @@ let io = null;
 let last = { y: -1 };
 let vel = 0;
 const marquees = [];
+// measured once per render / resize, not every frame
+const geo = { hero: null, heroH: 1, eps: [], contact: null, docMax: 1, vh: 1 };
+
+function measure() {
+  geo.vh = innerHeight;
+  geo.docMax = Math.max(1, document.documentElement.scrollHeight - geo.vh);
+  geo.hero = document.querySelector('.hero');
+  geo.heroH = geo.hero?.offsetHeight || 1;
+  const top = (el) => { let y = 0; for (let n = el; n; n = n.offsetParent) y += n.offsetTop; return y; };
+  geo.eps = $$('.eps').map((list) => ({
+    list,
+    top: top(list),
+    h: list.offsetHeight,
+    items: $$('li', list).map((li) => ({ li, mid: top(li) + li.offsetHeight / 2, lit: false })),
+  }));
+  geo.contact = document.querySelector('.contact');
+  geo.contactTop = geo.contact ? top(geo.contact) : 0;
+  marquees.forEach((m) => { m.w = m.inner ? m.inner.scrollWidth / 2 : 0; });
+  last.y = -1; // repaint scroll effects with the new numbers
+}
 
 /** Page y of an element's resting position (offsetTop ignores the reveal animation's offset). */
 function restingTop(el) {
@@ -51,7 +71,13 @@ function split(el) {
 export function refreshMotion() {
   $$('[data-split]').forEach(split);
   marquees.length = 0;
-  $$('.marquee').forEach((m) => marquees.push({ el: m, inner: m.querySelector('.mq-inner'), x: 0, dir: +m.dataset.dir || -1 }));
+  $$('.marquee').forEach((m) => {
+    const entry = { el: m, inner: m.querySelector('.mq-inner'), x: 0, dir: +m.dataset.dir || -1, w: 0, on: true };
+    marquees.push(entry);
+    if ('IntersectionObserver' in window) new IntersectionObserver(([en]) => { entry.on = en.isIntersecting; }).observe(m);
+  });
+  requestAnimationFrame(measure);
+  document.fonts?.ready.then(measure);
   if (reduce() || !('IntersectionObserver' in window)) {
     $$('.rv').forEach((el) => el.classList.add('in'));
     return;
@@ -69,44 +95,41 @@ export function refreshMotion() {
 }
 
 /* ── per-frame scroll effects ── */
+let topBar = null;
 function tick() {
   const y = lenis ? lenis.animatedScroll : scrollY;
   const raw = lenis ? lenis.velocity : y - (last.y < 0 ? y : last.y);
   vel += (raw - vel) * 0.12;
-  const moved = y !== last.y;
-  last.y = y;
-  const vh = innerHeight;
+  const moved = Math.abs(y - last.y) > 0.5;
+  if (moved) last.y = y;
+  const vh = geo.vh;
+  const top = topBar || (topBar = document.querySelector('.top'));
 
   if (moved) {
-    const max = document.documentElement.scrollHeight - vh;
-    document.documentElement.style.setProperty('--sp', max > 0 ? (y / max).toFixed(4) : '0');
-    document.querySelector('.top')?.classList.toggle('solid', y > 24);
+    document.documentElement.style.setProperty('--sp', clamp(y / geo.docMax, 0, 1).toFixed(4));
+    top?.classList.toggle('solid', y > 24);
 
-    const hero = document.querySelector('.hero');
-    if (hero && !reduce()) hero.style.setProperty('--p', clamp(y / hero.offsetHeight, 0, 1).toFixed(4));
+    if (geo.hero && !reduce() && y < geo.heroH * 1.2) geo.hero.style.setProperty('--p', clamp(y / geo.heroH, 0, 1).toFixed(4));
 
-    $$('.eps').forEach((list) => {
-      const r = list.getBoundingClientRect();
-      const f = clamp((vh * 0.6 - r.top) / r.height, 0, 1);
-      list.style.setProperty('--fill', f.toFixed(4));
-      $$('li', list).forEach((li) => {
-        const b = li.getBoundingClientRect();
-        li.classList.toggle('lit', b.top + b.height / 2 < vh * 0.62);
+    geo.eps.forEach((e) => {
+      if (y + vh < e.top - 200 || y > e.top + e.h + 200) return; // off screen: skip
+      e.list.style.setProperty('--fill', clamp((y + vh * 0.6 - e.top) / e.h, 0, 1).toFixed(4));
+      e.items.forEach((it) => {
+        const lit = it.mid < y + vh * 0.62;
+        if (lit !== it.lit) { it.lit = lit; it.li.classList.toggle('lit', lit); }
       });
     });
 
-    const c = document.querySelector('.contact');
-    if (c) {
-      const r = c.getBoundingClientRect();
-      c.style.setProperty('--cp', clamp(1 - (r.top - vh * 0.15) / (vh * 0.85), 0, 1).toFixed(4));
+    if (geo.contact && y + vh > geo.contactTop - 100) {
+      geo.contact.style.setProperty('--cp', clamp(1 - (geo.contactTop - y - vh * 0.15) / (vh * 0.85), 0, 1).toFixed(4));
     }
   }
 
   if (!reduce()) {
     const skew = clamp(vel * 0.35, -9, 9);
     marquees.forEach((m) => {
-      if (!m.inner) return;
-      const w = m.inner.scrollWidth / 2;
+      if (!m.inner || !m.on) return;
+      const w = m.w;
       m.x += (0.55 + Math.min(Math.abs(vel) * 0.6, 18)) * m.dir;
       if (w) m.x = ((m.x % w) + w) % w - w;
       m.inner.style.transform = `translate3d(${m.x.toFixed(1)}px,0,0) skewX(${(skew * m.dir * -1).toFixed(2)}deg)`;
@@ -153,9 +176,11 @@ function wirePointer() {
   addEventListener('pointerup', () => ring.classList.remove('down'));
 
   const loop = () => {
-    cur.x += (pos.x - cur.x) * 0.2;
-    cur.y += (pos.y - cur.y) * 0.2;
-    ring.style.transform = `translate3d(${cur.x.toFixed(1)}px, ${cur.y.toFixed(1)}px, 0)`;
+    if (Math.abs(pos.x - cur.x) > 0.1 || Math.abs(pos.y - cur.y) > 0.1) {
+      cur.x += (pos.x - cur.x) * 0.2;
+      cur.y += (pos.y - cur.y) * 0.2;
+      ring.style.transform = `translate3d(${cur.x.toFixed(1)}px, ${cur.y.toFixed(1)}px, 0)`;
+    }
     requestAnimationFrame(loop);
   };
   loop();
@@ -171,12 +196,16 @@ function wireHeroParallax() {
     target.y = (e.clientY / innerHeight) * 2 - 1;
   }, { passive: true });
   const loop = () => {
-    cur.x += (target.x - cur.x) * 0.06;
-    cur.y += (target.y - cur.y) * 0.06;
-    const hero = document.querySelector('.hero');
-    if (hero && !reduce()) {
-      hero.style.setProperty('--mx', cur.x.toFixed(4));
-      hero.style.setProperty('--my', cur.y.toFixed(4));
+    const dx = (target.x - cur.x) * 0.06;
+    const dy = (target.y - cur.y) * 0.06;
+    if (Math.abs(dx) > 0.0004 || Math.abs(dy) > 0.0004) {
+      cur.x += dx;
+      cur.y += dy;
+      const hero = geo.hero;
+      if (hero && !reduce() && scrollY < geo.heroH) {
+        hero.style.setProperty('--mx', cur.x.toFixed(4));
+        hero.style.setProperty('--my', cur.y.toFixed(4));
+      }
     }
     requestAnimationFrame(loop);
   };
@@ -184,6 +213,8 @@ function wireHeroParallax() {
 }
 
 export function initMotion() {
+  addEventListener('resize', () => requestAnimationFrame(measure));
+  addEventListener('load', measure);
   if (!reduce()) {
     lenis = new Lenis({ autoRaf: true, lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.95, anchors: false });
   }

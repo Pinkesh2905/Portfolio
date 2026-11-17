@@ -3,7 +3,7 @@
 // Browsers block sound until the visitor clicks or presses a key, so after the P is built
 // the intro waits for one, unless this browser already allows sound (or sound is off).
 
-import { tudum, soundOn, canAutoplay } from './sound.js';
+import { tudum, soundOn, canAutoplay, prepareSound } from './sound.js';
 
 const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -65,7 +65,7 @@ export function playIntro() {
     el.innerHTML = `
       <div class="op-stage">
         <div class="op-p">${pMark('', 'op')}</div>
-        <div class="op-streaks" aria-hidden="true">${streaks()}</div>
+        <div class="op-streaks" aria-hidden="true">${streaks(matchMedia('(pointer: coarse)').matches ? 48 : 90)}</div>
       </div>
       <div class="op-flash" aria-hidden="true"></div>
       <button class="op-enter" type="button" hidden>
@@ -75,6 +75,7 @@ export function playIntro() {
       <button class="op-skip" type="button">Skip intro</button>`;
     document.body.appendChild(el);
     el.focus({ preventScroll: true });
+    prepareSound();
 
     let stage = 'build';
     let done = false;

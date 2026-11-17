@@ -134,20 +134,29 @@ function layoutCallout(hero) {
   });
 }
 
+let bg = { light() {}, run() {} };
+/** Animates (true) or pauses (false) the hero background, e.g. while a full-screen overlay covers it. */
+export const heroBackground = (on) => bg.run(on);
+
 /** Starts the hero's background and layout. Call once, after the hero is in the DOM. */
 export function wireHero() {
   const hero = document.querySelector('.hero');
   if (!hero) return;
   const img = hero.querySelector('.hero-me img');
-  const setLight = startHeroBg(hero.querySelector('#hero-canvas'));
+  bg = startHeroBg(hero.querySelector('#hero-canvas'));
+  const name = hero.querySelector('.ht-1');
   const layout = () => {
     const hr = hero.getBoundingClientRect();
     const ir = img.getBoundingClientRect();
     if (hr.height && ir.height) {
       // the light sits just behind the head
-      setLight((ir.left + ir.width * 0.55 - hr.left) / hr.width, 1 - (ir.top + ir.height * 0.24 - hr.top) / hr.height);
+      bg.light((ir.left + ir.width * 0.55 - hr.left) / hr.width, 1 - (ir.top + ir.height * 0.24 - hr.top) / hr.height);
     }
     layoutCallout(hero);
+    // the name must never run off the edge: if this font renders wider than planned, shrink it
+    name.style.fontSize = '';
+    const room = hero.clientWidth * 0.94;
+    if (name.offsetWidth > room) name.style.fontSize = `${(parseFloat(getComputedStyle(name).fontSize) * room / name.offsetWidth).toFixed(2)}px`;
   };
   addEventListener('resize', layout);
   img.addEventListener('load', layout);

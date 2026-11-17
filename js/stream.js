@@ -4,7 +4,7 @@ import * as C from './content.js';
 import { ICONS, BRAND } from './icons.js';
 import { tudum, swoosh, soundOn, setSound } from './sound.js';
 import { playIntro, wordmark } from './intro.js';
-import { heroHTML, wireHero, heroCounters } from './hero.js';
+import { heroHTML, wireHero, heroCounters, heroBackground } from './hero.js';
 import { initMotion, refreshMotion, scrollToTarget, stopScroll, startScroll } from './motion.js';
 
 const { identity } = C;
@@ -244,7 +244,9 @@ const skillWords = () => {
   return [...new Set(all)];
 };
 
+let renderedPicks = '';
 function render() {
+  renderedPicks = prof().picks;
   renderHeader();
   if (!$('.hero')) {
     $('#main').innerHTML = `${heroHTML({ icon, brand, ext })}<div id="rows"></div>`;
@@ -479,6 +481,7 @@ function showModal(view, origin) {
   modal = { el, opener: document.activeElement };
   document.body.classList.add('locked');
   stopScroll();
+  heroBackground(false);
   background().forEach((n) => { n.inert = true; });
   const box = $('.modal', el);
   if (!reduceMotion()) {
@@ -500,6 +503,7 @@ function hideModal() {
   modal = null;
   document.body.classList.remove('locked');
   startScroll();
+  if (document.body.classList.contains('ready')) heroBackground(true);
   background().forEach((n) => { n.inert = false; });
   if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
   if (reduceMotion()) return el.remove();
@@ -732,20 +736,32 @@ function setProfile(id, { rerender = true } = {}) {
   }
 }
 
+let bgTimer = 0;
 /** Hides the page behind an overlay (intro or picker) and stops scrolling. */
 function lockPage() {
+  clearTimeout(bgTimer);
+  heroBackground(false);
   document.body.classList.add('locked');
   background().forEach((n) => { n.inert = true; });
   stopScroll();
 }
 
-/** The page is ready to be seen: unlock it and play the hero entrance. */
-function reveal() {
+/**
+ * The page is ready to be seen: unlock it and play the hero entrance.
+ * Coming from the picker, the heavier steps are spread over the next frames so the
+ * entrance animation starts on time.
+ */
+function reveal(fromGate = false) {
   document.body.classList.remove('locked');
-  background().forEach((n) => { n.inert = false; });
   startScroll();
   document.body.classList.add('ready');
-  heroCounters();
+  requestAnimationFrame(() => requestAnimationFrame(heroCounters));
+  const unlock = () => background().forEach((n) => { n.inert = false; });
+  if (fromGate) setTimeout(unlock, 560);
+  else unlock();
+  // let the entrance animations have the first second to themselves, then start the light
+  clearTimeout(bgTimer);
+  bgTimer = setTimeout(() => { if (!modal) heroBackground(true); }, 1100);
 }
 
 function showGate(afterShown) {
@@ -796,23 +812,29 @@ function showGate(afterShown) {
 
 /** Profile chosen: the picked tile zooms toward the viewer and the page comes up behind it. */
 function enter(id, gate) {
-  if (gate.classList.contains('leaving')) return;
-  setProfile(id, { rerender: false });
-  render();
-  scrollToTarget(0, { immediate: true });
+  if (gate.classList.contains('leaving') || gate.dataset.picked) return;
+  gate.dataset.picked = id;
   swoosh();
+  gate.querySelector(`[data-pick="${id}"]`)?.classList.add('chosen');
+  // rebuild the rows only if this profile orders them differently, and do it before the
+  // exit animation starts so the animation never stalls on it
+  const before = prof().rows.join();
+  setProfile(id, { rerender: false });
+  if (prof().rows.join() !== before || prof().picks !== renderedPicks) render();
+  scrollToTarget(0, { immediate: true });
   if (reduceMotion()) {
     gate.remove();
     reveal();
     return $('#main').focus({ preventScroll: true });
   }
-  gate.classList.add('leaving');
-  gate.querySelector(`[data-pick="${id}"]`)?.classList.add('chosen');
-  setTimeout(() => {
-    reveal();
-    $('#main').focus({ preventScroll: true });
-  }, 520);
-  setTimeout(() => gate.remove(), 1100);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    gate.classList.add('leaving');
+    setTimeout(() => reveal(true), 520);
+    setTimeout(() => {
+      gate.remove();
+      $('#main').focus({ preventScroll: true });
+    }, 1150);
+  }));
 }
 
 /* ── global events ───────────────────────────────────────── */
