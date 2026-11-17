@@ -12,7 +12,8 @@ export function heroHTML({ icon }) {
   const id = C.identity;
   // the key phrases of the one-liner stand out; the rest stays quiet
   const intro = esc(id.oneLiner)
-    .replace('clear dashboards, plans and AI assistants', '<strong>clear dashboards, plans and AI assistants</strong>')
+    .replace('AI agents and MCP tools', '<strong>AI agents and MCP tools</strong>')
+    .replace('in plain English', '<strong>in plain English</strong>')
     .replace(/Claude Code\.?$/, (m) => `<mark>${m.replace('.', '')}</mark>.`);
 
   return `

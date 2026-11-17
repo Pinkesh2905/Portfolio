@@ -28,7 +28,7 @@ export const identity = {
   /** Headline, as on the resume. The job title at Vezapp is experience[0].role. */
   title: 'AI Engineer – Agentic Workflows & MCP',
   oneLiner:
-    'I turn factory and business data into clear dashboards, plans and AI assistants, and I build the software behind them with Claude Code.',
+    'I build AI agents and MCP tools that let factories ask their own data questions in plain English, and I ship them with Claude Code.',
   status: 'Open to AI Engineer roles',
   statusLong: 'Open to AI Engineer roles · Ahmedabad',
   /** Hero role line. Keep to what the resume supports. */
